@@ -1,0 +1,5 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="900" viewBox="0 0 480 900">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5c4035"/><stop offset="100%" stop-color="#8b6f5e"/></linearGradient></defs>
+  <rect width="480" height="900" fill="url(#g)"/>
+  <text x="240" y="450" text-anchor="middle" fill="white" font-size="28" font-family="serif">Wedding Photo</text>
+</svg>

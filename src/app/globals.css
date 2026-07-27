@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #8b6f5e;
+  --color-primary-light: #c4a898;
+  --color-primary-dark: #5c4035;
+  --color-accent: #d4b896;
+  --color-gold: #c9a96e;
+  --color-cream: #faf6f1;
+  --color-warm-gray: #9e8e84;
+  --color-text: #3d2e28;
+  --color-text-light: #7a6358;
+
+  --font-serif: "Noto Serif KR", "Georgia", serif;
+  --font-sans: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+}
+
+:root {
+  --color-primary: #8b6f5e;
+  --color-primary-light: #c4a898;
+  --color-primary-dark: #5c4035;
+  --color-accent: #d4b896;
+  --color-gold: #c9a96e;
+  --color-cream: #faf6f1;
+  --color-warm-gray: #9e8e84;
+  --color-text: #3d2e28;
+  --color-text-light: #7a6358;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* overflow-x: hidden 을 html에 쓰면 iOS에서 position:fixed 버그 발생 */
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  /* iOS 모멘텀 스크롤 */
+  -webkit-overflow-scrolling: touch;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* Section divider */
+.section-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--color-gold);
+  margin: 0 auto;
+}

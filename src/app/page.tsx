@@ -1,0 +1,25 @@
+import GSAPInit from "@/components/GSAPInit";
+import EnvelopeScrollSection from "@/components/EnvelopeScrollSection";
+import IntroSection from "@/components/sections/IntroSection";
+import GreetingSection from "@/components/sections/GreetingSection";
+import CalendarSection from "@/components/sections/CalendarSection";
+import GallerySection from "@/components/sections/GallerySection";
+import LocationSection from "@/components/sections/LocationSection";
+import ContactSection from "@/components/sections/ContactSection";
+import RSVPSection from "@/components/sections/RSVPSection";
+
+export default function Home() {
+  return (
+    <main>
+      <GSAPInit />
+      <EnvelopeScrollSection />
+      <IntroSection />
+      <GreetingSection />
+      <CalendarSection />
+      <GallerySection />
+      <LocationSection />
+      <ContactSection />
+      <RSVPSection />
+    </main>
+  );
+}
