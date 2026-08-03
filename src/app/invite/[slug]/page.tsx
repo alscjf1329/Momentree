@@ -1,6 +1,9 @@
 ﻿import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import fs from "fs/promises";
+import path from "path";
 import { getInvite, INVITES } from "@/invites";
+import type { WeddingData } from "@/types";
 import { WeddingProvider } from "@/context/WeddingContext";
 import ClassicTemplate from "@/templates/classic";
 import EditorialTemplate from "@/templates/editorial";
@@ -14,17 +17,38 @@ const TEMPLATE_MAP: Record<string, React.ComponentType> = {
   romantic: RomanticTemplate,
 };
 
+async function readClientFile(filename: string): Promise<WeddingData | null> {
+  try {
+    const raw = await fs.readFile(
+      path.join(process.cwd(), "data", "clients", `${filename}.json`),
+      "utf-8"
+    );
+    return JSON.parse(raw) as WeddingData;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateStaticParams() {
   return Object.keys(INVITES).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ file?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const data = getInvite(slug);
+  const { file } = await searchParams;
+
+  let data: WeddingData | null = null;
+  if (file && slug in TEMPLATE_MAP) {
+    data = await readClientFile(file);
+  } else {
+    data = getInvite(slug);
+  }
   if (!data) return {};
   return {
     title: `${data.groom.name} ♥ ${data.bride.name} 결혼합니다`,
@@ -34,12 +58,27 @@ export async function generateMetadata({
 
 export default async function InvitePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ file?: string }>;
 }) {
   const { slug } = await params;
-  const data = getInvite(slug);
-  if (!data) notFound();
+  const { file } = await searchParams;
+
+  let data: WeddingData;
+
+  if (file && slug in TEMPLATE_MAP) {
+    // 파일 기반 동적 렌더링: /invite/editorial?file=kim-minjun
+    const clientData = await readClientFile(file);
+    if (!clientData) notFound();
+    data = { ...clientData, template: slug };
+  } else {
+    // 기존 정적 slug 조회: /invite/demo-classic
+    const invited = getInvite(slug);
+    if (!invited) notFound();
+    data = invited;
+  }
 
   const Template = TEMPLATE_MAP[data.template] ?? ClassicTemplate;
 

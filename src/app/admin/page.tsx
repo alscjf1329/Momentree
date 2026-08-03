@@ -23,10 +23,20 @@ export default async function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">RSVP 참석 현황</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          새로고침하면 최신 데이터를 가져옵니다
-        </p>
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">RSVP 참석 현황</h1>
+            <p className="text-sm text-gray-500">새로고침하면 최신 데이터를 가져옵니다</p>
+          </div>
+          <div className="flex gap-2">
+            <a href="/admin/setup" className="px-3 py-2 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50">
+              고객 설정
+            </a>
+            <a href="/admin/templates" className="px-3 py-2 text-xs bg-gray-900 text-white rounded-lg hover:bg-gray-700">
+              템플릿 보기
+            </a>
+          </div>
+        </div>
 
         {/* 요약 카드 */}
         <div className="grid grid-cols-3 gap-4 mb-8">
