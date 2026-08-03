@@ -2,45 +2,60 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "rsvp.json");
+const RSVP_DIR = path.join(process.cwd(), "data", "rsvp");
 
 export interface RsvpEntry {
   name: string;
   attendance: "attending" | "not_attending";
   guests: string;
   message: string;
-  slug: string;
   submittedAt: string;
 }
 
-async function readRsvps(): Promise<RsvpEntry[]> {
+async function ensureDir() {
+  await fs.mkdir(RSVP_DIR, { recursive: true });
+}
+
+async function readFile(slug: string): Promise<RsvpEntry[]> {
   try {
-    const raw = await fs.readFile(DATA_FILE, "utf-8");
+    const raw = await fs.readFile(path.join(RSVP_DIR, `${slug}.json`), "utf-8");
     return JSON.parse(raw);
   } catch {
     return [];
   }
 }
 
-export async function GET() {
-  const rsvps = await readRsvps();
-  return NextResponse.json(rsvps);
+// GET /api/rsvp?file=kim-minjun  → 해당 클라이언트 RSVP
+// GET /api/rsvp                  → 전체 파일 목록
+export async function GET(req: NextRequest) {
+  await ensureDir();
+  const file = req.nextUrl.searchParams.get("file");
+
+  if (file) {
+    return NextResponse.json(await readFile(file));
+  }
+
+  // 파일 목록만 반환 (어드민 셀렉터용)
+  const files = await fs.readdir(RSVP_DIR).catch(() => [] as string[]);
+  const slugs = files.filter(f => f.endsWith(".json")).map(f => f.replace(".json", ""));
+  return NextResponse.json(slugs);
 }
 
+// POST /api/rsvp  body: { name, attendance, guests, message, slug }
 export async function POST(req: NextRequest) {
+  await ensureDir();
   const body = await req.json();
-  const rsvps = await readRsvps();
-  const entry: RsvpEntry = {
-    name: body.name,
-    attendance: body.attendance,
-    guests: body.guests ?? "1",
-    message: body.message ?? "",
-    slug: body.slug ?? "unknown",
-    submittedAt: new Date().toISOString(),
-  };
-  rsvps.push(entry);
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(rsvps, null, 2), "utf-8");
+  const { slug, ...rest } = body;
+
+  if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
+
+  const entries = await readFile(slug);
+  entries.push({ ...rest, submittedAt: new Date().toISOString() } as RsvpEntry);
+
+  await fs.writeFile(
+    path.join(RSVP_DIR, `${slug}.json`),
+    JSON.stringify(entries, null, 2),
+    "utf-8"
+  );
   return NextResponse.json({ ok: true });
 }
