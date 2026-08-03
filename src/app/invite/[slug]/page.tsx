@@ -1,16 +1,18 @@
-import { notFound } from "next/navigation";
+﻿import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getInvite, INVITES } from "@/invites";
 import { WeddingProvider } from "@/context/WeddingContext";
-import GSAPInit from "@/components/GSAPInit";
-import EnvelopeScrollSection from "@/components/EnvelopeScrollSection";
-import IntroSection from "@/components/sections/IntroSection";
-import GreetingSection from "@/components/sections/GreetingSection";
-import CalendarSection from "@/components/sections/CalendarSection";
-import GallerySection from "@/components/sections/GallerySection";
-import LocationSection from "@/components/sections/LocationSection";
-import ContactSection from "@/components/sections/ContactSection";
-import RSVPSection from "@/components/sections/RSVPSection";
+import ClassicTemplate from "@/templates/classic";
+import EditorialTemplate from "@/templates/editorial";
+import MinimalTemplate from "@/templates/minimal";
+import RomanticTemplate from "@/templates/romantic";
+
+const TEMPLATE_MAP: Record<string, React.ComponentType> = {
+  classic: ClassicTemplate,
+  editorial: EditorialTemplate,
+  minimal: MinimalTemplate,
+  romantic: RomanticTemplate,
+};
 
 export async function generateStaticParams() {
   return Object.keys(INVITES).map((slug) => ({ slug }));
@@ -39,19 +41,11 @@ export default async function InvitePage({
   const data = getInvite(slug);
   if (!data) notFound();
 
+  const Template = TEMPLATE_MAP[data.template] ?? ClassicTemplate;
+
   return (
     <WeddingProvider data={data}>
-      <main>
-        <GSAPInit />
-        <EnvelopeScrollSection />
-        <IntroSection />
-        <GreetingSection />
-        <CalendarSection />
-        <GallerySection />
-        <LocationSection />
-        <ContactSection />
-        <RSVPSection />
-      </main>
+      <Template />
     </WeddingProvider>
   );
 }

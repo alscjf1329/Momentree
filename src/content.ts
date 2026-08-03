@@ -4,6 +4,7 @@ import type { WeddingData } from "@/types";
 
 export const WEDDING: WeddingData = {
   slug: "sample",
+  template: "classic",
   theme: "classic-cream",
   groom: {
     name: "김민준",

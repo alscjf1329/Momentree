@@ -9,6 +9,7 @@ export interface PersonInfo {
 
 export interface WeddingData {
   slug: string;
+  template: string;
   theme: string;
   groom: PersonInfo;
   bride: PersonInfo;
