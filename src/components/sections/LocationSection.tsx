@@ -1,12 +1,13 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
 export default function LocationSection() {
+  const wedding = useWedding();
   const [copied, setCopied] = useState(false);
-  const { venue } = WEDDING;
+  const { venue } = wedding;
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(venue.address);
@@ -30,7 +31,6 @@ export default function LocationSection() {
         <p className="text-sm text-[var(--color-text-light)] mt-2">{venue.address}</p>
       </motion.div>
 
-      {/* 지도 */}
       <motion.div
         className="mt-6 mx-4 rounded-2xl overflow-hidden shadow-md"
         initial={{ opacity: 0 }}
@@ -48,7 +48,6 @@ export default function LocationSection() {
         />
       </motion.div>
 
-      {/* 버튼 */}
       <motion.div
         className="mt-4 px-4 flex gap-2"
         initial={{ opacity: 0, y: 10 }}

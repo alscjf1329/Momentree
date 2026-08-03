@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
 export default function GallerySection() {
+  const wedding = useWedding();
   const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -76,7 +77,7 @@ export default function GallerySection() {
     return () => { ctx?.revert(); };
   }, []);
 
-  const images = WEDDING.gallery;
+  const images = wedding.gallery;
 
   return (
     <section

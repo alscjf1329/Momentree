@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
 export default function EnvelopeScrollSection() {
+  const wedding = useWedding();
   const sectionRef = useRef<HTMLElement>(null);
   const closedImgRef = useRef<HTMLDivElement>(null);
   const openImgRef = useRef<HTMLDivElement>(null);
@@ -22,18 +23,16 @@ export default function EnvelopeScrollSection() {
       if (!sectionRef.current) return;
 
       ctx = gsap.context(() => {
-        // 핀: 200vh 스크롤 동안 고정
         ScrollTrigger.create({
           trigger: sectionRef.current,
           pin: true,
           start: "top top",
           end: "+=200vh",
           pinSpacing: true,
-          anticipatePin: 1,          // 핀 진입 직전 튐 방지
-          invalidateOnRefresh: true, // 주소창 높이 변동 시 재계산
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
         });
 
-        // Phase 1 (0→100vh): 닫힘→열림 크로스페이드
         gsap.to(closedImgRef.current, {
           opacity: 0,
           scale: 1.04,
@@ -42,7 +41,7 @@ export default function EnvelopeScrollSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "+=100vh",
-            scrub: 2,              // 높을수록 부드럽게 따라옴
+            scrub: 2,
             invalidateOnRefresh: true,
           },
         });
@@ -64,7 +63,6 @@ export default function EnvelopeScrollSection() {
           }
         );
 
-        // 힌트 페이드아웃
         gsap.to(hintRef.current, {
           opacity: 0,
           y: 10,
@@ -77,7 +75,6 @@ export default function EnvelopeScrollSection() {
           },
         });
 
-        // Phase 2 (100vh→200vh): 카드 등장
         gsap.fromTo(
           cardRef.current,
           { y: 70, opacity: 0 },
@@ -105,17 +102,15 @@ export default function EnvelopeScrollSection() {
     <section
       ref={sectionRef}
       className="relative overflow-hidden"
-      // 100dvh: 모바일 주소창 제외한 실제 화면 높이 (100vh 잘림 문제 해결)
       style={{ height: "100dvh", background: "#1a1208" }}
     >
-      {/* 닫힌 봉투 */}
       <div
         ref={closedImgRef}
         className="absolute inset-0"
         style={{ willChange: "transform, opacity" }}
       >
         <Image
-          src="/images/envelope-closed.jpg"
+          src={wedding.envelopeClosed}
           alt="closed envelope"
           fill
           priority
@@ -125,14 +120,13 @@ export default function EnvelopeScrollSection() {
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* 열린 봉투 */}
       <div
         ref={openImgRef}
         className="absolute inset-0"
         style={{ opacity: 0, willChange: "transform, opacity" }}
       >
         <Image
-          src="/images/envelope-open.jpg"
+          src={wedding.envelopeOpen}
           alt="open envelope"
           fill
           className="object-cover"
@@ -141,7 +135,6 @@ export default function EnvelopeScrollSection() {
         <div className="absolute inset-0 bg-black/25" />
       </div>
 
-      {/* 카드 */}
       <div
         ref={cardRef}
         className="absolute inset-x-8 bottom-0 flex justify-center"
@@ -163,23 +156,22 @@ export default function EnvelopeScrollSection() {
           </p>
           <div className="w-8 h-px mx-auto my-4" style={{ background: "var(--color-gold)" }} />
           <p className="font-serif text-xl tracking-[0.2em]" style={{ color: "var(--color-text)" }}>
-            {WEDDING.groom.name}
+            {wedding.groom.name}
           </p>
           <p className="text-sm my-2" style={{ color: "var(--color-gold)" }}>♥</p>
           <p className="font-serif text-xl tracking-[0.2em]" style={{ color: "var(--color-text)" }}>
-            {WEDDING.bride.name}
+            {wedding.bride.name}
           </p>
           <div className="w-8 h-px mx-auto my-4" style={{ background: "var(--color-gold)" }} />
           <p className="text-xs tracking-widest" style={{ color: "var(--color-text-light)" }}>
-            {WEDDING.date.year} · {String(WEDDING.date.month).padStart(2, "0")} · {String(WEDDING.date.day).padStart(2, "0")}
+            {wedding.date.year} · {String(wedding.date.month).padStart(2, "0")} · {String(wedding.date.day).padStart(2, "0")}
           </p>
           <p className="text-xs mt-1 tracking-wide" style={{ color: "var(--color-text-light)" }}>
-            {WEDDING.date.dayOfWeek} {WEDDING.date.time}
+            {wedding.date.dayOfWeek} {wedding.date.time}
           </p>
         </div>
       </div>
 
-      {/* 스크롤 힌트 */}
       <div
         ref={hintRef}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"

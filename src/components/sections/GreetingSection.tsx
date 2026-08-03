@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
 export default function GreetingSection() {
-  const lines = WEDDING.greeting.filter((l) => l !== "");
+  const wedding = useWedding();
+  const lines = wedding.greeting.filter((l) => l !== "");
 
   return (
     <section className="py-24 px-8 text-center bg-[var(--color-cream)]">
@@ -42,12 +43,12 @@ export default function GreetingSection() {
       >
         <div className="section-divider mb-8" />
         <p className="text-sm text-[var(--color-text-light)] font-light tracking-wider">
-          {WEDDING.groom.fatherName} · {WEDDING.groom.motherName}의 아들{" "}
-          <span className="text-[var(--color-primary)] font-medium">{WEDDING.groom.name}</span>
+          {wedding.groom.fatherName} · {wedding.groom.motherName}의 아들{" "}
+          <span className="text-[var(--color-primary)] font-medium">{wedding.groom.name}</span>
         </p>
         <p className="text-sm text-[var(--color-text-light)] font-light tracking-wider mt-2">
-          {WEDDING.bride.fatherName} · {WEDDING.bride.motherName}의 딸{" "}
-          <span className="text-[var(--color-primary)] font-medium">{WEDDING.bride.name}</span>
+          {wedding.bride.fatherName} · {wedding.bride.motherName}의 딸{" "}
+          <span className="text-[var(--color-primary)] font-medium">{wedding.bride.name}</span>
         </p>
       </motion.div>
     </section>

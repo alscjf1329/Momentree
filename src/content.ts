@@ -1,6 +1,10 @@
+import type { WeddingData } from "@/types";
+
 // 클라이언트 요청으로 텍스트/이미지 변경 시 이 파일만 수정하면 됩니다
 
-export const WEDDING = {
+export const WEDDING: WeddingData = {
+  slug: "sample",
+  theme: "classic-cream",
   groom: {
     name: "김민준",
     nameFull: "김 민 준",

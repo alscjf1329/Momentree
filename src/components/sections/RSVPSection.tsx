@@ -1,24 +1,39 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
 type Attendance = "attending" | "not_attending" | "";
 
 export default function RSVPSection() {
+  const wedding = useWedding();
   const [name, setName] = useState("");
   const [attendance, setAttendance] = useState<Attendance>("");
   const [guests, setGuests] = useState("1");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !attendance) return;
-    // ponytail: 실제 연동 시 API 호출로 교체 (현재는 로컬 상태만)
-    console.log({ name, attendance, guests, message });
-    setSubmitted(true);
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, attendance, guests, message, slug: wedding.slug }),
+      });
+      if (!res.ok) throw new Error("failed");
+      setSubmitted(true);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -132,24 +147,29 @@ export default function RSVPSection() {
             />
           </div>
 
+          {error && (
+            <p className="text-xs text-red-500 text-center">
+              전송에 실패했습니다. 다시 시도해주세요.
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled={!name || !attendance}
+            disabled={!name || !attendance || loading}
             className="w-full py-4 rounded-xl bg-[var(--color-primary)] text-white text-sm tracking-widest font-medium disabled:opacity-40 transition-opacity active:opacity-80"
           >
-            전달하기
+            {loading ? "전송 중..." : "전달하기"}
           </button>
         </motion.form>
       )}
 
-      {/* 푸터 */}
       <div className="mt-20 text-center">
         <div className="section-divider mb-6" />
         <p className="font-serif text-[var(--color-text-light)] text-sm tracking-widest">
-          {WEDDING.groom.name} · {WEDDING.bride.name}
+          {wedding.groom.name} · {wedding.bride.name}
         </p>
         <p className="text-xs text-[var(--color-warm-gray)] mt-2 tracking-widest">
-          {WEDDING.date.year}.{String(WEDDING.date.month).padStart(2, "0")}.{String(WEDDING.date.day).padStart(2, "0")}
+          {wedding.date.year}.{String(wedding.date.month).padStart(2, "0")}.{String(wedding.date.day).padStart(2, "0")}
         </p>
       </div>
     </section>

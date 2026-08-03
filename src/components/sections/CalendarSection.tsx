@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
-function getDDay() {
+function getDDay(iso: string) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const wedding = new Date(WEDDING.date.iso);
+  const wedding = new Date(iso);
   wedding.setHours(0, 0, 0, 0);
   const diff = Math.ceil((wedding.getTime() - today.getTime()) / 86400000);
   if (diff > 0) return `D - ${diff}`;
@@ -15,9 +15,8 @@ function getDDay() {
   return `D + ${Math.abs(diff)}`;
 }
 
-// 해당 월의 달력 생성 (Sun~Sat)
 function buildCalendar(year: number, month: number) {
-  const firstDay = new Date(year, month - 1, 1).getDay(); // 0=Sun
+  const firstDay = new Date(year, month - 1, 1).getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
   const cells: (number | null)[] = Array(firstDay).fill(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
@@ -28,13 +27,14 @@ function buildCalendar(year: number, month: number) {
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 export default function CalendarSection() {
+  const wedding = useWedding();
   const [dday, setDday] = useState("");
-  const { year, month, day } = WEDDING.date;
+  const { year, month, day } = wedding.date;
   const cells = buildCalendar(year, month);
 
   useEffect(() => {
-    setDday(getDDay());
-  }, []);
+    setDday(getDDay(wedding.date.iso));
+  }, [wedding.date.iso]);
 
   return (
     <section className="py-20 px-6 bg-white">
@@ -52,7 +52,7 @@ export default function CalendarSection() {
           {year}.{String(month).padStart(2, "0")}.{String(day).padStart(2, "0")}
         </p>
         <p className="text-sm text-[var(--color-text-light)] tracking-wider mb-2">
-          {WEDDING.date.dayOfWeek} {WEDDING.date.time}
+          {wedding.date.dayOfWeek} {wedding.date.time}
         </p>
         {dday && (
           <span className="inline-block text-xs tracking-widest bg-[var(--color-primary)] text-white px-4 py-1 rounded-full mt-2">
@@ -61,7 +61,6 @@ export default function CalendarSection() {
         )}
       </motion.div>
 
-      {/* 달력 */}
       <motion.div
         className="mt-10 max-w-xs mx-auto"
         initial={{ opacity: 0, y: 16 }}

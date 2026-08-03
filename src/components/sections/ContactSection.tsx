@@ -1,13 +1,14 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { WEDDING } from "@/content";
+import { useWedding } from "@/context/WeddingContext";
 
 type Side = "groom" | "bride";
 type CopiedKey = string | null;
 
 export default function ContactSection() {
+  const wedding = useWedding();
   const [tab, setTab] = useState<Side>("groom");
   const [copied, setCopied] = useState<CopiedKey>(null);
 
@@ -17,12 +18,7 @@ export default function ContactSection() {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const data = {
-    groom: WEDDING.groom,
-    bride: WEDDING.bride,
-  };
-
-  const current = data[tab];
+  const current = tab === "groom" ? wedding.groom : wedding.bride;
 
   return (
     <section className="py-20 bg-white">
@@ -36,7 +32,6 @@ export default function ContactSection() {
         <p className="text-xs tracking-[0.3em] text-[var(--color-warm-gray)] mb-2">CONTACT</p>
         <div className="section-divider mb-8" />
 
-        {/* 탭 */}
         <div className="flex rounded-full border border-[var(--color-primary-light)] overflow-hidden mx-8">
           {(["groom", "bride"] as Side[]).map((side) => (
             <button
@@ -61,7 +56,6 @@ export default function ContactSection() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.35 }}
       >
-        {/* 연락처 */}
         <div className="rounded-2xl border border-[var(--color-accent)] p-5 space-y-3">
           <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)]">연락처</p>
           <div className="flex items-center justify-between">
@@ -78,7 +72,6 @@ export default function ContactSection() {
           </div>
         </div>
 
-        {/* 계좌번호 */}
         <div className="rounded-2xl border border-[var(--color-accent)] p-5 space-y-3">
           <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)]">계좌번호</p>
           <div className="flex items-center justify-between">
