@@ -66,7 +66,8 @@ export default function SetupForm() {
   const router = useRouter();
   const fileParam = searchParams.get("file") ?? "";
 
-  const [filename, setFilename] = useState(fileParam || generateFilename());
+  // 서버/클라이언트 동일한 초기값 — Date.now() 는 useEffect 에서만 호출
+  const [filename, setFilename] = useState(fileParam);
   const [data, setData] = useState<WeddingData>(DEFAULT_DATA);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -87,10 +88,12 @@ export default function SetupForm() {
   }, []);
 
   useEffect(() => {
-    if (fileParam) loadFile(fileParam);
-    else {
+    if (fileParam) {
+      loadFile(fileParam);
+    } else {
       const last = localStorage.getItem(LS_KEY);
       if (last) loadFile(last);
+      else setFilename(generateFilename()); // Date.now() — 클라이언트 전용
     }
   }, [fileParam, loadFile]);
 
