@@ -27,10 +27,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body
-        className="max-w-[480px] mx-auto"
-        style={{ minHeight: "100dvh" }}
-      >
+      <body style={{ minHeight: "100dvh" }}>
         {children}
       </body>
     </html>

@@ -48,13 +48,31 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const INPUT = "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white";
+const LS_KEY = "momentree_last_file";
+
+function generateFilename() {
+  return `client-${Date.now().toString(36)}`;
+}
+
+// 신랑+신부 이름 → 파일명 슬러그 (한글 초성 코드 포인트 기반)
+function namestoSlug(groom: string, bride: string) {
+  const clean = (s: string) => s.trim().replace(/\s/g, "").replace(/[^a-z0-9가-힣]/gi, "");
+  const g = clean(groom);
+  const b = clean(bride);
+  if (!g || !b) return generateFilename();
+  // 한글이면 유니코드 인덱스로 단순 식별, 영문이면 그대로
+  const toSlug = (s: string) => /[가-힣]/.test(s)
+    ? (s.codePointAt(0)! - 0xAC00).toString(36)
+    : s.toLowerCase().slice(0, 8);
+  return `${toSlug(g)}-${toSlug(b)}`;
+}
 
 export default function SetupForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const fileParam = searchParams.get("file") ?? "";
 
-  const [filename, setFilename] = useState(fileParam);
+  const [filename, setFilename] = useState(fileParam || generateFilename());
   const [data, setData] = useState<WeddingData>(DEFAULT_DATA);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -73,11 +91,18 @@ export default function SetupForm() {
       const loaded = await res.json();
       setData(loaded);
       setFilename(f);
+      localStorage.setItem(LS_KEY, f);
     }
   }, []);
 
   useEffect(() => {
-    if (fileParam) loadFile(fileParam);
+    if (fileParam) {
+      loadFile(fileParam);
+    } else {
+      // localStorage에서 마지막 파일 복원
+      const last = localStorage.getItem(LS_KEY);
+      if (last) loadFile(last);
+    }
   }, [fileParam, loadFile]);
 
   const set = (path: string, value: unknown) => {
@@ -92,7 +117,6 @@ export default function SetupForm() {
   };
 
   const handleSave = async () => {
-    if (!filename) return alert("파일명을 입력해주세요");
     setSaving(true);
     const saveData = { ...data, slug: filename };
     const res = await fetch("/api/clients", {
@@ -103,10 +127,18 @@ export default function SetupForm() {
     setSaving(false);
     if (res.ok) {
       setSaved(true);
+      localStorage.setItem(LS_KEY, filename);
       setClientList(prev => prev.includes(filename) ? prev : [...prev, filename]);
       setTimeout(() => setSaved(false), 3000);
       router.push(`/admin/setup?file=${filename}`);
     }
+  };
+
+  const handleNewClient = () => {
+    localStorage.removeItem(LS_KEY);
+    setData(DEFAULT_DATA);
+    setFilename(generateFilename());
+    router.push("/admin/setup");
   };
 
   return (
@@ -119,6 +151,10 @@ export default function SetupForm() {
           <h1 className="text-sm font-semibold text-gray-800">고객 정보 설정</h1>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={handleNewClient}
+            className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50">
+            + 새 고객
+          </button>
           {filename && (
             <a
               href={`/admin/templates?file=${filename}`}
@@ -141,14 +177,24 @@ export default function SetupForm() {
         {/* 파일 선택/생성 */}
         <div className="bg-white rounded-xl border border-gray-100 p-5 mb-6">
           <p className="text-xs font-semibold text-gray-500 mb-3 tracking-wide">파일 관리</p>
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2 mb-1">
             <input
-              className={INPUT + " flex-1"}
-              placeholder="파일명 (영문, 숫자, 하이픈만)"
+              className={INPUT + " flex-1 font-mono text-xs"}
+              placeholder="자동생성됨"
               value={filename}
               onChange={e => setFilename(e.target.value.replace(/[^a-z0-9-_]/gi, "").toLowerCase())}
             />
+            <button
+              onClick={() => setFilename(namestoSlug(data.groom.name, data.bride.name))}
+              className="px-3 py-2 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 whitespace-nowrap"
+              title="신랑+신부 이름으로 파일명 재생성"
+            >
+              이름으로 생성
+            </button>
           </div>
+          <p className="text-[10px] text-gray-400 mb-3">
+            저장하면 localStorage에 기억됩니다 — 다음 방문 시 자동 복원
+          </p>
           {clientList.length > 0 && (
             <div>
               <p className="text-[10px] text-gray-400 mb-2">기존 파일 불러오기</p>
@@ -172,7 +218,11 @@ export default function SetupForm() {
         <div className="bg-white rounded-xl border border-gray-100 p-5">
           <Section title="신랑 정보">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="이름"><input className={INPUT} value={data.groom.name} onChange={e => set("groom.name", e.target.value)} placeholder="홍길동" /></Field>
+              <Field label="이름"><input className={INPUT} value={data.groom.name} onChange={e => {
+                set("groom.name", e.target.value);
+                // 파일이 아직 저장 전(URL에 file 파람 없음)이면 자동 slug 업데이트
+                if (!fileParam) setFilename(namestoSlug(e.target.value, data.bride.name));
+              }} placeholder="홍길동" /></Field>
               <Field label="전체이름 (띄어쓰기 포함)"><input className={INPUT} value={data.groom.nameFull} onChange={e => set("groom.nameFull", e.target.value)} placeholder="홍 길 동" /></Field>
               <Field label="부친"><input className={INPUT} value={data.groom.fatherName} onChange={e => set("groom.fatherName", e.target.value)} /></Field>
               <Field label="모친"><input className={INPUT} value={data.groom.motherName} onChange={e => set("groom.motherName", e.target.value)} /></Field>
@@ -187,7 +237,10 @@ export default function SetupForm() {
 
           <Section title="신부 정보">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="이름"><input className={INPUT} value={data.bride.name} onChange={e => set("bride.name", e.target.value)} placeholder="김지수" /></Field>
+              <Field label="이름"><input className={INPUT} value={data.bride.name} onChange={e => {
+                set("bride.name", e.target.value);
+                if (!fileParam) setFilename(namestoSlug(data.groom.name, e.target.value));
+              }} placeholder="김지수" /></Field>
               <Field label="전체이름 (띄어쓰기 포함)"><input className={INPUT} value={data.bride.nameFull} onChange={e => set("bride.nameFull", e.target.value)} placeholder="김 지 수" /></Field>
               <Field label="부친"><input className={INPUT} value={data.bride.fatherName} onChange={e => set("bride.fatherName", e.target.value)} /></Field>
               <Field label="모친"><input className={INPUT} value={data.bride.motherName} onChange={e => set("bride.motherName", e.target.value)} /></Field>
