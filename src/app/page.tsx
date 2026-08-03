@@ -56,14 +56,25 @@ export default function Home() {
           <span className="font-serif text-lg tracking-widest" style={{ color: "var(--color-primary-dark)" }}>
             Momentree
           </span>
-          <div className="flex items-center gap-3">
-            <Link href="/admin" className="text-sm px-4 py-1.5 rounded-full border transition-colors hover:bg-gray-50"
-              style={{ borderColor: "rgba(0,0,0,0.15)", color: "#555" }}>
+          <div className="flex items-center gap-2">
+            {/* 게스트: 템플릿 데모 보기 */}
+            <Link href="/invite/demo-classic" target="_blank"
+              className="text-xs px-4 py-1.5 rounded-full border transition-colors hover:bg-gray-50 hidden sm:block"
+              style={{ borderColor: "rgba(0,0,0,0.12)", color: "#777" }}>
+              청첩장 예시 보기
+            </Link>
+            {/* 구분선 */}
+            <span className="text-gray-200 hidden sm:block">|</span>
+            {/* 어드민 */}
+            <Link href="/admin"
+              className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-gray-50"
+              style={{ borderColor: "rgba(0,0,0,0.12)", color: "#555" }}>
               어드민
             </Link>
-            <Link href="/admin/setup" className="text-sm px-4 py-1.5 rounded-full text-white transition-colors"
+            <Link href="/admin/setup"
+              className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90"
               style={{ background: "var(--color-primary-dark)" }}>
-              시작하기
+              청첩장 만들기
             </Link>
           </div>
         </div>

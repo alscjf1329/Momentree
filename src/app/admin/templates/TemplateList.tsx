@@ -106,19 +106,16 @@ export default function TemplateList() {
   const [selectedFile, setSelectedFile] = useState(fileParam);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <a href="/admin" className="text-gray-400 text-sm hover:text-gray-600">← 어드민</a>
-          <span className="text-gray-200">|</span>
-          <h1 className="text-sm font-semibold text-gray-800">템플릿 선택</h1>
-        </div>
-        <Link href="/admin/setup" className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50">
+    <div className="min-h-screen">
+      <div className="max-w-5xl mx-auto px-6 pt-6 pb-2 flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-gray-800">템플릿 선택</h1>
+        <Link href="/admin/setup" className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white">
           + 새 고객
         </Link>
       </div>
 
-      <div className="max-w-xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-4">
+      <div className="max-w-xl">
         <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
           <p className="text-xs text-gray-500 mb-2">고객 파일명</p>
           <div className="flex gap-2">
@@ -186,6 +183,7 @@ export default function TemplateList() {
             </div>
           </div>
         )}
+        </div>{/* /max-xl */}
       </div>
     </div>
   );

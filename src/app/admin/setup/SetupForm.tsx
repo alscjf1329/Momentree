@@ -142,25 +142,21 @@ export default function SetupForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <div className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <a href="/admin" className="text-gray-400 text-sm hover:text-gray-600">← 어드민</a>
-          <span className="text-gray-200">|</span>
-          <h1 className="text-sm font-semibold text-gray-800">고객 정보 설정</h1>
-        </div>
+    <div className="min-h-screen">
+      {/* 페이지 액션 바 */}
+      <div className="max-w-5xl mx-auto px-6 pt-6 pb-2 flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-gray-800">고객 정보 설정</h1>
         <div className="flex items-center gap-2">
           <button onClick={handleNewClient}
-            className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50">
+            className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white">
             + 새 고객
           </button>
           {filename && (
             <a
               href={`/admin/templates?file=${filename}`}
-              className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50"
+              className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white"
             >
-              템플릿 보기 →
+              템플릿 선택 →
             </a>
           )}
           <button
@@ -173,7 +169,8 @@ export default function SetupForm() {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="max-w-xl">
         {/* 파일 선택/생성 */}
         <div className="bg-white rounded-xl border border-gray-100 p-5 mb-6">
           <p className="text-xs font-semibold text-gray-500 mb-3 tracking-wide">파일 관리</p>
@@ -304,10 +301,11 @@ export default function SetupForm() {
             ))}
           </Section>
         </div>
+        </div>{/* /max-xl */}
 
         {/* 저장 후 링크 */}
         {filename && (
-          <div className="mt-6 bg-white rounded-xl border border-gray-100 p-5">
+          <div className="mt-4 max-w-xl bg-white rounded-xl border border-gray-100 p-5">
             <p className="text-xs font-semibold text-gray-500 mb-3">공유 링크</p>
             <div className="space-y-2">
               {["classic","editorial","minimal","romantic"].map(t => (
