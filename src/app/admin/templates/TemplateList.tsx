@@ -107,14 +107,14 @@ export default function TemplateList() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-6 pt-6 pb-2 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between gap-2">
         <h1 className="text-lg font-semibold text-gray-800">템플릿 선택</h1>
         <Link href="/admin/setup" className="px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white">
           + 새 고객
         </Link>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
       <div className="max-w-xl">
         <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
           <p className="text-xs text-gray-500 mb-2">고객 파일명</p>

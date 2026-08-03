@@ -144,7 +144,7 @@ export default function SetupForm() {
   return (
     <div className="min-h-screen">
       {/* 페이지 액션 바 */}
-      <div className="max-w-5xl mx-auto px-6 pt-6 pb-2 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between gap-2 flex-wrap">
         <h1 className="text-lg font-semibold text-gray-800">고객 정보 설정</h1>
         <div className="flex items-center gap-2">
           <button onClick={handleNewClient}
@@ -169,7 +169,7 @@ export default function SetupForm() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <div className="max-w-xl">
         {/* 파일 선택/생성 */}
         <div className="bg-white rounded-xl border border-gray-100 p-5 mb-6">
@@ -214,7 +214,7 @@ export default function SetupForm() {
         {/* 폼 */}
         <div className="bg-white rounded-xl border border-gray-100 p-5">
           <Section title="신랑 정보">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="이름"><input className={INPUT} value={data.groom.name} onChange={e => {
                 set("groom.name", e.target.value);
                 // 파일이 아직 저장 전(URL에 file 파람 없음)이면 자동 slug 업데이트
@@ -225,7 +225,7 @@ export default function SetupForm() {
               <Field label="모친"><input className={INPUT} value={data.groom.motherName} onChange={e => set("groom.motherName", e.target.value)} /></Field>
             </div>
             <Field label="전화번호"><input className={INPUT} value={data.groom.phone} onChange={e => set("groom.phone", e.target.value)} placeholder="010-0000-0000" /></Field>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Field label="은행"><input className={INPUT} value={data.groom.account.bank} onChange={e => set("groom.account.bank", e.target.value)} placeholder="카카오뱅크" /></Field>
               <Field label="계좌번호"><input className={INPUT} value={data.groom.account.number} onChange={e => set("groom.account.number", e.target.value)} /></Field>
               <Field label="예금주"><input className={INPUT} value={data.groom.account.holder} onChange={e => set("groom.account.holder", e.target.value)} /></Field>
@@ -233,7 +233,7 @@ export default function SetupForm() {
           </Section>
 
           <Section title="신부 정보">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="이름"><input className={INPUT} value={data.bride.name} onChange={e => {
                 set("bride.name", e.target.value);
                 if (!fileParam) setFilename(namestoSlug(data.groom.name, e.target.value));
@@ -243,7 +243,7 @@ export default function SetupForm() {
               <Field label="모친"><input className={INPUT} value={data.bride.motherName} onChange={e => set("bride.motherName", e.target.value)} /></Field>
             </div>
             <Field label="전화번호"><input className={INPUT} value={data.bride.phone} onChange={e => set("bride.phone", e.target.value)} placeholder="010-0000-0000" /></Field>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Field label="은행"><input className={INPUT} value={data.bride.account.bank} onChange={e => set("bride.account.bank", e.target.value)} /></Field>
               <Field label="계좌번호"><input className={INPUT} value={data.bride.account.number} onChange={e => set("bride.account.number", e.target.value)} /></Field>
               <Field label="예금주"><input className={INPUT} value={data.bride.account.holder} onChange={e => set("bride.account.holder", e.target.value)} /></Field>
@@ -251,26 +251,26 @@ export default function SetupForm() {
           </Section>
 
           <Section title="날짜 / 시간">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Field label="연도"><input className={INPUT} type="number" value={data.date.year} onChange={e => { const y = +e.target.value; set("date.year", y); set("date.iso", `${y}-${String(data.date.month).padStart(2,"0")}-${String(data.date.day).padStart(2,"0")}`); }} /></Field>
               <Field label="월"><input className={INPUT} type="number" min={1} max={12} value={data.date.month} onChange={e => { const m = +e.target.value; set("date.month", m); set("date.iso", `${data.date.year}-${String(m).padStart(2,"0")}-${String(data.date.day).padStart(2,"0")}`); }} /></Field>
               <Field label="일"><input className={INPUT} type="number" min={1} max={31} value={data.date.day} onChange={e => { const d = +e.target.value; set("date.day", d); set("date.iso", `${data.date.year}-${String(data.date.month).padStart(2,"0")}-${String(d).padStart(2,"0")}`); }} /></Field>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Field label="요일"><input className={INPUT} value={data.date.dayOfWeek} onChange={e => set("date.dayOfWeek", e.target.value)} placeholder="토요일" /></Field>
               <Field label="시간"><input className={INPUT} value={data.date.time} onChange={e => set("date.time", e.target.value)} placeholder="오후 2시 30분" /></Field>
             </div>
           </Section>
 
           <Section title="장소">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Field label="웨딩홀명"><input className={INPUT} value={data.venue.name} onChange={e => set("venue.name", e.target.value)} /></Field>
               <Field label="홀명"><input className={INPUT} value={data.venue.hall} onChange={e => set("venue.hall", e.target.value)} /></Field>
             </div>
             <Field label="주소"><input className={INPUT} value={data.venue.address} onChange={e => set("venue.address", e.target.value)} /></Field>
             <Field label="카카오맵 URL"><input className={INPUT} value={data.venue.kakaoMapUrl} onChange={e => set("venue.kakaoMapUrl", e.target.value)} /></Field>
             <Field label="네이버맵 URL"><input className={INPUT} value={data.venue.naverMapUrl} onChange={e => set("venue.naverMapUrl", e.target.value)} /></Field>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Field label="위도"><input className={INPUT} type="number" step="0.0001" value={data.venue.lat} onChange={e => set("venue.lat", +e.target.value)} /></Field>
               <Field label="경도"><input className={INPUT} type="number" step="0.0001" value={data.venue.lng} onChange={e => set("venue.lng", +e.target.value)} /></Field>
             </div>
