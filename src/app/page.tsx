@@ -32,16 +32,10 @@ export default function Home() {
               style={{ borderColor: "rgba(0,0,0,0.12)", color: "#777" }}>
               예시 보기
             </Link>
-            <span className="text-gray-200 hidden md:block">|</span>
-            <Link href="/admin"
-              className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-gray-50"
-              style={{ borderColor: "rgba(0,0,0,0.12)", color: "#555" }}>
-              어드민
-            </Link>
             <Link href="/admin/setup"
               className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90"
               style={{ background: "var(--color-primary-dark)" }}>
-              만들기
+              어드민 →
             </Link>
           </div>
         </div>
@@ -155,23 +149,13 @@ export default function Home() {
       </section>
 
       {/* 어드민 바로가기 */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {[
-            { href: "/admin/setup", title: "고객 정보 설정", sub: "신랑·신부 정보, 날짜, 장소 입력" },
-            { href: "/admin", title: "RSVP 참석 현황", sub: "참석 응답 확인 및 인원 집계" },
-          ].map(({ href, title, sub }) => (
-            <Link key={href} href={href}
-              className="flex items-center justify-between p-5 sm:p-6 rounded-2xl border bg-white group transition-all hover:shadow-md hover:border-gray-300"
-              style={{ borderColor: "rgba(0,0,0,0.08)" }}>
-              <div>
-                <p className="font-medium text-sm mb-0.5" style={{ color: "var(--color-text)" }}>{title}</p>
-                <p className="text-xs" style={{ color: "var(--color-text-light)" }}>{sub}</p>
-              </div>
-              <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">→</span>
-            </Link>
-          ))}
-        </div>
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 text-center">
+        <Link href="/admin/setup"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border bg-white group transition-all hover:shadow-md hover:border-gray-300 text-sm"
+          style={{ borderColor: "rgba(0,0,0,0.08)", color: "var(--color-text)" }}>
+          어드민 패널 열기
+          <span className="text-gray-300 group-hover:text-gray-500 transition-colors">→</span>
+        </Link>
       </section>
 
       {/* 푸터 */}

@@ -37,7 +37,7 @@ export default async function AdminPage({
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <div className="mb-5">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-800">RSVP 참석 현황</h1>
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-800">하객 현황</h1>
         <p className="text-xs text-gray-400 mt-0.5">고객을 선택하면 해당 청첩장의 응답을 확인합니다</p>
       </div>
 

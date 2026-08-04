@@ -55,7 +55,7 @@ export default function CalendarSection() {
           {wedding.date.dayOfWeek} {wedding.date.time}
         </p>
         {dday && (
-          <span className="inline-block text-xs tracking-widest bg-[var(--color-primary)] text-white px-4 py-1 rounded-full mt-2">
+          <span suppressHydrationWarning className="inline-block text-xs tracking-widest bg-[var(--color-primary)] text-white px-4 py-1 rounded-full mt-2">
             {dday}
           </span>
         )}
