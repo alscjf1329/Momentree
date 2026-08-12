@@ -92,7 +92,7 @@ function PolaroidGallery() {
   return (
     <section className="py-16 bg-[#fdf5f6]">
       <motion.div className="text-center mb-10"
-        initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <p className="text-[9px] tracking-[0.5em] mb-3" style={{ color: "#b09098" }}>GALLERY</p>
         <Botanical className="text-[#b8758a] w-24 mx-auto" />
@@ -105,8 +105,8 @@ function PolaroidGallery() {
               maxWidth: 260,
               transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)`,
             }}
-            initial={{ opacity: 0, y: 30, rotate: ROTATIONS[i % ROTATIONS.length] }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ delay: i * 0.1, duration: 0.6 }}>
             {/* 폴라로이드 카드 */}

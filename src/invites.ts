@@ -12,6 +12,11 @@ export const INVITES: Record<string, WeddingData> = {
   "demo-editorial": { ...WEDDING, slug: "demo-editorial", template: "editorial", theme: "classic-cream" },
   "demo-minimal":   { ...WEDDING, slug: "demo-minimal",   template: "minimal",   theme: "classic-cream" },
   "demo-romantic":  { ...WEDDING, slug: "demo-romantic",  template: "romantic",  theme: "classic-cream" },
+  "demo-twilight":  { ...WEDDING, slug: "demo-twilight",  template: "twilight",  theme: "classic-cream" },
+  "demo-blossom":   { ...WEDDING, slug: "demo-blossom",   template: "blossom",   theme: "classic-cream" },
+  "demo-modern":    { ...WEDDING, slug: "demo-modern",    template: "modern",    theme: "classic-cream" },
+  "demo-luxury":    { ...WEDDING, slug: "demo-luxury",    template: "luxury",    theme: "classic-cream" },
+  "demo-garden":    { ...WEDDING, slug: "demo-garden",    template: "garden",    theme: "classic-cream" },
 
   // ── 테마 데모 (같은 레이아웃, 다른 컬러) ───────────────────────────────
   "demo-minimal-white":   { ...WEDDING, slug: "demo-minimal-white",   template: "classic", theme: "minimal-white" },

@@ -33,6 +33,41 @@ const TEMPLATES = [
     desc: "보태니컬 SVG 데코 + 폴라로이드",
     bg: "linear-gradient(160deg,#fdf5f6 0%,#f0dde2 100%)",
   },
+  {
+    id: "twilight",
+    name: "트와이라잇",
+    mood: "시네마틱 다크",
+    desc: "별빛 + 블루퍼플 무드 + 무디 갤러리",
+    bg: "linear-gradient(160deg,#080a14 0%,#0e1230 100%)",
+  },
+  {
+    id: "blossom",
+    name: "블로섬",
+    mood: "봄 벚꽃",
+    desc: "떨어지는 꽃잎 + 플로럴 라인아트",
+    bg: "linear-gradient(160deg,#fdf0f4 0%,#f8e4ec 100%)",
+  },
+  {
+    id: "modern",
+    name: "모던",
+    mood: "인스타 감성",
+    desc: "웜톤 풀블리드 + 인스타그램 갤러리 그리드",
+    bg: "linear-gradient(160deg,#f5efe7 0%,#e8d8c8 100%)",
+  },
+  {
+    id: "luxury",
+    name: "럭셔리",
+    mood: "프리미엄 네이비",
+    desc: "딥 네이비 + 골드 코너 프레임 + 샴페인",
+    bg: "linear-gradient(160deg,#070d1a 0%,#0e1628 100%)",
+  },
+  {
+    id: "garden",
+    name: "가든",
+    mood: "풀 + 화이트",
+    desc: "풀숲 풀블리드 히어로 + 캘리그래피 + 화이트 그리드 갤러리",
+    bg: "linear-gradient(160deg,#eaf0e4 0%,#d6e2cc 100%)",
+  },
 ];
 
 function TemplatePreview({ id }: { id: string }) {
@@ -72,7 +107,7 @@ function TemplatePreview({ id }: { id: string }) {
       </div>
     </div>
   );
-  return (
+  if (id === "romantic") return (
     <div className="w-full h-full flex flex-col items-center justify-center"
       style={{ background: "linear-gradient(160deg,#fdf5f6,#f0dde2)" }}>
       <svg viewBox="0 0 80 35" style={{ width: 64, marginBottom: 10, opacity: 0.4 }} fill="none">
@@ -91,6 +126,80 @@ function TemplatePreview({ id }: { id: string }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+  if (id === "twilight") return (
+    <div className="w-full h-full flex flex-col justify-center px-5 relative overflow-hidden"
+      style={{ background: "linear-gradient(160deg,#080a14,#0e1230)" }}>
+      {/* stars */}
+      {[{x:15,y:18},{x:42,y:9},{x:68,y:22},{x:85,y:12},{x:30,y:35},{x:78,y:40}].map((s,i) => (
+        <div key={i} className="absolute rounded-full bg-white" style={{ left:`${s.x}%`, top:`${s.y}%`, width:i%2===0?2:1, height:i%2===0?2:1, opacity:0.4 }} />
+      ))}
+      <p style={{ fontSize: 7, letterSpacing: "0.6em", color: "rgba(139,158,196,0.4)", marginBottom: 14 }}>INVITATION</p>
+      <p className="font-serif font-light tracking-widest text-white" style={{ fontSize: "clamp(14px,2.5vw,20px)", opacity: 0.9 }}>Kim</p>
+      <span style={{ color: "rgba(139,158,196,0.55)", fontSize: 12, margin: "4px 0" }}>✦</span>
+      <p className="font-serif font-light tracking-widest text-white" style={{ fontSize: "clamp(14px,2.5vw,20px)", opacity: 0.9 }}>Lee</p>
+      <div style={{ width: 28, height: 1, background: "rgba(139,158,196,0.25)", marginTop: 14 }} />
+      <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "rgba(200,210,232,0.3)", marginTop: 8 }}>2025.10.18</p>
+    </div>
+  );
+  if (id === "blossom") return (
+    <div className="w-full h-full flex flex-col items-center justify-center"
+      style={{ background: "linear-gradient(160deg,#fdf0f4,#f8e4ec)" }}>
+      <svg viewBox="0 0 80 36" style={{ width: 60, marginBottom: 8, opacity: 0.35 }} fill="none">
+        <path d="M40 30 Q26 20 14 24 Q22 11 38 17" stroke="#c4758a" strokeWidth="1"/>
+        <path d="M40 30 Q54 20 66 24 Q58 11 42 17" stroke="#c4758a" strokeWidth="1"/>
+        <path d="M38 17 Q35 7 40 2 Q45 7 42 17" stroke="#c4758a" strokeWidth="1"/>
+      </svg>
+      <p className="font-serif font-light tracking-widest" style={{ fontSize: "clamp(14px,2.5vw,20px)", color: "#3a2030" }}>Kim</p>
+      <span style={{ color: "#c4758a", fontSize: 12, margin: "4px 0" }}>♡</span>
+      <p className="font-serif font-light tracking-widest" style={{ fontSize: "clamp(14px,2.5vw,20px)", color: "#3a2030" }}>Lee</p>
+      <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "rgba(58,32,48,0.35)", marginTop: 10 }}>2025.10.18</p>
+    </div>
+  );
+  if (id === "modern") return (
+    <div className="w-full h-full flex flex-col" style={{ background: "#f0e8dc" }}>
+      {/* top half: warm bg */}
+      <div className="flex-1" style={{ background: "linear-gradient(160deg,#ddd0c0,#c8b8a0)" }} />
+      {/* bottom: text block */}
+      <div className="px-4 py-3" style={{ background: "#f5efe7" }}>
+        <p style={{ fontSize: 7, letterSpacing: "0.5em", color: "rgba(45,30,18,0.35)", marginBottom: 5 }}>WEDDING</p>
+        <p className="font-serif font-light" style={{ fontSize: "clamp(16px,3vw,22px)", color: "#2d1e12", letterSpacing: "0.08em", lineHeight: 1.2 }}>Kim</p>
+        <p style={{ color: "rgba(45,30,18,0.2)", fontSize: 12, letterSpacing: "0.3em", margin: "1px 0" }}>&amp;</p>
+        <p className="font-serif font-light" style={{ fontSize: "clamp(16px,3vw,22px)", color: "#2d1e12", letterSpacing: "0.08em", lineHeight: 1.2 }}>Lee</p>
+      </div>
+    </div>
+  );
+  if (id === "luxury") return (
+    <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ background: "linear-gradient(160deg,#070d1a,#0e1628)" }}>
+      {/* corner lines */}
+      {[["top-2 left-2"],["top-2 right-2"],["bottom-2 left-2"],["bottom-2 right-2"]].map(([cls],i) => (
+        <div key={i} className={`absolute ${cls}`} style={{ opacity:0.25 }}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M0 0 L8 0 L8 1 M0 0 L0 8 L1 8" stroke="#c9a96e" strokeWidth="0.8"/>
+          </svg>
+        </div>
+      ))}
+      <div style={{ width: 40, height: 1, background: "rgba(201,169,110,0.25)", marginBottom: 12 }} />
+      <p className="font-serif font-light tracking-widest text-white" style={{ fontSize: "clamp(13px,2.2vw,18px)", opacity: 0.85 }}>Kim</p>
+      <span style={{ color: "rgba(201,169,110,0.5)", fontSize: 10, margin: "5px 0" }}>✦</span>
+      <p className="font-serif font-light tracking-widest text-white" style={{ fontSize: "clamp(13px,2.2vw,18px)", opacity: 0.85 }}>Lee</p>
+      <div style={{ width: 40, height: 1, background: "rgba(201,169,110,0.25)", marginTop: 12, marginBottom: 8 }} />
+      <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "rgba(201,169,110,0.35)" }}>2025.10.18</p>
+    </div>
+  );
+  // garden
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ background: "linear-gradient(160deg,#eaf0e4,#d6e2cc)" }}>
+      <svg viewBox="0 0 160 40" width="70" style={{ opacity: 0.5, marginBottom: 8 }} fill="none">
+        <path d="M80 33 Q54 24 28 28 Q40 14 68 20" stroke="#6e8a5e" strokeWidth="1.2"/>
+        <path d="M80 33 Q106 24 132 28 Q120 14 92 20" stroke="#6e8a5e" strokeWidth="1.2"/>
+        <path d="M68 20 Q64 8 80 2 Q96 8 92 20" stroke="#6e8a5e" strokeWidth="1.2"/>
+      </svg>
+      <p style={{ fontFamily: "'Sacramento',cursive", fontSize: 26, color: "#8a7a3a" }}>married</p>
+      <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "rgba(44,50,38,0.4)", marginTop: 8 }}>2025.10.18</p>
     </div>
   );
 }

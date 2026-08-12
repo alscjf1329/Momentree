@@ -40,8 +40,8 @@ export default function RSVPSection() {
     <section className="py-20 px-6 bg-[var(--color-cream)]">
       <motion.div
         className="text-center"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
@@ -67,8 +67,8 @@ export default function RSVPSection() {
         <motion.form
           onSubmit={handleSubmit}
           className="mt-8 space-y-4"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
@@ -82,7 +82,7 @@ export default function RSVPSection() {
               onChange={(e) => setName(e.target.value)}
               placeholder="성함을 입력해주세요"
               required
-              className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-[var(--color-text)] text-sm outline-none focus:border-[var(--color-primary)] transition-colors"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors"
             />
           </div>
 
@@ -116,6 +116,7 @@ export default function RSVPSection() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               transition={{ duration: 0.3 }}
+              style={{ overflow: "hidden" }}
             >
               <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">
                 참석 인원
@@ -123,7 +124,7 @@ export default function RSVPSection() {
               <select
                 value={guests}
                 onChange={(e) => setGuests(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-[var(--color-text)] text-sm outline-none focus:border-[var(--color-primary)]"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)]"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
@@ -143,7 +144,7 @@ export default function RSVPSection() {
               onChange={(e) => setMessage(e.target.value)}
               placeholder="두 분께 전하고 싶은 말을 남겨주세요"
               rows={3}
-              className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-[var(--color-text)] text-sm outline-none focus:border-[var(--color-primary)] transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors resize-none"
             />
           </div>
 

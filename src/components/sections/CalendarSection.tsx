@@ -37,11 +37,11 @@ export default function CalendarSection() {
   }, [wedding.date.iso]);
 
   return (
-    <section className="py-20 px-6 bg-white">
+    <section className="py-20 px-6 bg-[var(--color-cream)]">
       <motion.div
         className="text-center"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
@@ -63,8 +63,8 @@ export default function CalendarSection() {
 
       <motion.div
         className="mt-10 max-w-xs mx-auto"
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.7, delay: 0.15 }}
       >

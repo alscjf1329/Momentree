@@ -21,11 +21,11 @@ export default function ContactSection() {
   const current = tab === "groom" ? wedding.groom : wedding.bride;
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-[var(--color-cream)]">
       <motion.div
         className="text-center px-6"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
@@ -52,8 +52,8 @@ export default function ContactSection() {
       <motion.div
         key={tab}
         className="mt-8 px-6 space-y-4"
-        initial={{ opacity: 0, x: tab === "groom" ? -12 : 12 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.35 }}
       >
         <div className="rounded-2xl border border-[var(--color-accent)] p-5 space-y-3">

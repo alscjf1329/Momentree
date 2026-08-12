@@ -19,8 +19,8 @@ export default function LocationSection() {
     <section className="py-20 bg-[var(--color-cream)]">
       <motion.div
         className="text-center px-6"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
@@ -50,8 +50,8 @@ export default function LocationSection() {
 
       <motion.div
         className="mt-4 px-4 flex gap-2"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >

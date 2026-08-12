@@ -66,7 +66,7 @@ function GridGallery() {
   return (
     <section className="py-16 bg-white">
       <motion.div className="px-8 mb-8 text-center"
-        initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <p className="text-[9px] tracking-[0.5em] text-gray-300 mb-3">GALLERY</p>
         <div className="w-8 h-px bg-gray-200 mx-auto" />
@@ -75,8 +75,8 @@ function GridGallery() {
         {w.gallery.map((img, i) => (
           <motion.div key={i} className="relative"
             style={{ aspectRatio: i % 3 === 0 ? "1/1.2" : "1/1" }}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.07, duration: 0.5 }}>
             <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="240px" />

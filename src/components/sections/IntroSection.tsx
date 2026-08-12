@@ -114,7 +114,8 @@ export default function IntroSection() {
           >
             <span className="text-[10px] tracking-[0.3em]">SCROLL</span>
             <motion.div
-              animate={{ y: [0, 6, 0] }}
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: [0.3, 1, 0.3] }}
               transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
               className="w-px h-8 bg-white/30"
             />

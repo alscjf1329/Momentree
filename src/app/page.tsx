@@ -2,10 +2,14 @@ import Link from "next/link";
 import InstallBanner from "@/components/InstallBanner";
 
 const TEMPLATES = [
-  { id: "classic",   name: "클래식",    mood: "다크 로맨틱",  desc: "봉투 오프닝 + 골드 포인트",   bg: "linear-gradient(150deg,#1a1208,#2d1f0f)", accent: "#c9a96e", text: "#fff" },
-  { id: "editorial", name: "에디토리얼", mood: "모던 매거진",  desc: "풀블리드 타이포 + 필름스트립", bg: "linear-gradient(150deg,#0d0d0d,#1a1a1a)",  accent: "#f2ede8", text: "#fff" },
-  { id: "minimal",   name: "미니멀",    mood: "클린 모던",    desc: "화이트 히어로 + 그리드 갤러리", bg: "linear-gradient(150deg,#ffffff,#f4f4f4)",  accent: "#3a3a3a", text: "#1a1a1a" },
-  { id: "romantic",  name: "로맨틱",    mood: "드리미 플로럴", desc: "보태니컬 SVG + 폴라로이드",    bg: "linear-gradient(150deg,#fdf5f6,#f0dde2)",  accent: "#b8758a", text: "#3d1f28" },
+  { id: "classic",   name: "클래식",     mood: "다크 로맨틱",    desc: "봉투 오프닝 + 골드 포인트",    bg: "linear-gradient(150deg,#1a1208,#2d1f0f)", accent: "#c9a96e", text: "#fff" },
+  { id: "editorial", name: "에디토리얼",  mood: "모던 매거진",    desc: "풀블리드 타이포 + 필름스트립",  bg: "linear-gradient(150deg,#0d0d0d,#1a1a1a)",  accent: "#f2ede8", text: "#fff" },
+  { id: "minimal",   name: "미니멀",     mood: "클린 모던",      desc: "화이트 히어로 + 그리드 갤러리",  bg: "linear-gradient(150deg,#ffffff,#f4f4f4)",  accent: "#3a3a3a", text: "#1a1a1a" },
+  { id: "romantic",  name: "로맨틱",     mood: "드리미 플로럴",   desc: "보태니컬 SVG + 폴라로이드",    bg: "linear-gradient(150deg,#fdf5f6,#f0dde2)",  accent: "#b8758a", text: "#3d1f28" },
+  { id: "twilight",  name: "트와이라잇",  mood: "시네마틱 다크",  desc: "별빛 + 블루퍼플 무드",          bg: "linear-gradient(150deg,#080a14,#0e1230)",  accent: "#8b9ec4", text: "#dde2f0" },
+  { id: "blossom",   name: "블로섬",     mood: "봄 벚꽃",        desc: "떨어지는 꽃잎 + 플로럴",        bg: "linear-gradient(150deg,#fdf0f4,#f8e4ec)",  accent: "#c4758a", text: "#3a2030" },
+  { id: "modern",    name: "모던",       mood: "인스타 감성",     desc: "웜톤 풀블리드 + IG 그리드",     bg: "linear-gradient(150deg,#f5efe7,#e8d8c8)",  accent: "#c47a5a", text: "#2d1e12" },
+  { id: "luxury",    name: "럭셔리",     mood: "프리미엄 네이비", desc: "딥 네이비 + 골드 프레임",        bg: "linear-gradient(150deg,#070d1a,#0e1628)",  accent: "#c9a96e", text: "#f0ece4" },
 ];
 
 const STEPS = [
@@ -72,7 +76,7 @@ export default function Home() {
 
       {/* 템플릿 카드 그리드 */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-14 sm:pb-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {TEMPLATES.map(t => (
             <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank"
               className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"

@@ -37,3 +37,6 @@ next-env.d.ts
 
 # RSVP data (개인정보 포함)
 data/
+
+# Claude Code
+.claude/

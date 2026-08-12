@@ -27,7 +27,7 @@ const DEFAULT_DATA: WeddingData = {
   envelopeOpen: "/images/envelope-open.jpg",
 };
 
-const TEMPLATES = ["classic", "editorial", "minimal", "romantic"] as const;
+const TEMPLATES = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden"] as const;
 const LS_KEY = "momentree_last_file";
 
 const INPUT = "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white transition-colors";

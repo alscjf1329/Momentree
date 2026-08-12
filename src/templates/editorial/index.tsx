@@ -63,7 +63,8 @@ function Hero() {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
         <span className="text-[8px] tracking-[0.5em] text-white/25">SCROLL</span>
         <motion.div className="w-px h-8 bg-white/25"
-          animate={{ scaleY: [1, 1.6, 1] }}
+          initial={{ opacity: 0.25 }}
+          animate={{ opacity: [0.25, 0.9, 0.25] }}
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} />
       </motion.div>
     </section>
@@ -75,7 +76,7 @@ function FilmstripGallery() {
   return (
     <section className="py-14 bg-[#0d0d0d]">
       <motion.div className="px-8 mb-7 flex items-center gap-4"
-        initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.5 }}>
         <span className="text-[8px] tracking-[0.5em] text-white/25">GALLERY</span>
         <div className="flex-1 h-px bg-white/10" />
