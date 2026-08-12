@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
+import { submitRSVP } from "@/lib/rsvp";
 
 type Attendance = "attending" | "not_attending" | "";
 
@@ -22,12 +23,7 @@ export default function RSVPSection() {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, attendance, guests, message, slug: wedding.slug }),
-      });
-      if (!res.ok) throw new Error("failed");
+      await submitRSVP({ name, attendance, guests, message, slug: wedding.slug });
       setSubmitted(true);
     } catch {
       setError(true);
@@ -37,7 +33,7 @@ export default function RSVPSection() {
   };
 
   return (
-    <section className="py-20 px-6 bg-[var(--color-cream)]">
+    <section id="rsvp" className="py-20 px-6 bg-[var(--color-cream)]">
       <motion.div
         className="text-center"
         initial={{ opacity: 0 }}

@@ -7,6 +7,7 @@ import { useWedding } from "@/context/WeddingContext";
 export default function LocationSection() {
   const wedding = useWedding();
   const [copied, setCopied] = useState(false);
+  const [mapVisible, setMapVisible] = useState(false);
   const { venue } = wedding;
 
   const copyAddress = async () => {
@@ -33,19 +34,22 @@ export default function LocationSection() {
 
       <motion.div
         className="mt-6 mx-4 rounded-2xl overflow-hidden shadow-md"
+        style={{ height: 260, background: "var(--color-accent)" }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
+        onViewportEnter={() => setMapVisible(true)}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        <iframe
-          src={`https://map.kakao.com/link/map/${venue.name},${venue.lat},${venue.lng}`}
-          width="100%"
-          height="260"
-          style={{ border: 0 }}
-          loading="lazy"
-          title="웨딩홀 위치"
-        />
+        {mapVisible && (
+          <iframe
+            src={`https://map.kakao.com/link/map/${venue.name},${venue.lat},${venue.lng}`}
+            width="100%"
+            height="260"
+            style={{ border: 0 }}
+            title="웨딩홀 위치"
+          />
+        )}
       </motion.div>
 
       <motion.div
