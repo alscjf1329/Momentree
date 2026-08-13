@@ -15,6 +15,7 @@ const DEFAULT_DATA: WeddingData = {
   date: { year: 2025, month: 10, day: 18, dayOfWeek: "토요일", time: "오후 2시 30분", iso: "2025-10-18" },
   venue: { name: "", hall: "", address: "", addressShort: "", kakaoMapUrl: "", naverMapUrl: "", lat: 0, lng: 0 },
   greeting: ["서로가 마주보며 다져온 사랑을", "이제 함께 걸어갈 큰 사랑으로 키우고자 합니다.", "", "오시는 모든 분들을 환영합니다."],
+  rsvpMessage: ["참석에 부담 가지지 말아주시고,", "편하게 알려주세요.", "저희의 정성을 다하는 준비에 도움이 될 것 같아", "참석 여부를 알려주시면 감사하겠습니다."],
   gallery: [
     { src: "/images/gallery-1.jpg", alt: "" },
     { src: "/images/gallery-2.jpg", alt: "" },
@@ -419,6 +420,16 @@ export default function SetupForm() {
                 rows={7}
                 value={data.greeting.join("\n")}
                 onChange={e => set("greeting", e.target.value.split("\n"))}
+              />
+            </SectionCard>
+
+            <SectionCard title="참석여부 팝업 문구">
+              <p className="text-[10px] text-gray-400 -mt-2">가든 템플릿 첫 진입 팝업에 표시 (줄바꿈 = 새 줄)</p>
+              <textarea
+                className={INPUT + " resize-none"}
+                rows={7}
+                value={data.rsvpMessage.join("\n")}
+                onChange={e => set("rsvpMessage", e.target.value.split("\n"))}
               />
             </SectionCard>
 

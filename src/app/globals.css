@@ -58,3 +58,12 @@ body {
   background: var(--color-gold);
   margin: 0 auto;
 }
+
+/* 가로 스크롤 캐러셀용 — 스크롤바 숨김 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

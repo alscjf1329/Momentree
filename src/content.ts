@@ -55,6 +55,13 @@ export const WEDDING: WeddingData = {
     "",
     "오시는 모든 분들을 환영합니다.",
   ],
+  // 참석여부 팝업 안내 문구 (가든 템플릿)
+  rsvpMessage: [
+    "참석에 부담 가지지 말아주시고,",
+    "편하게 알려주세요.",
+    "저희의 정성을 다하는 준비에 도움이 될 것 같아",
+    "참석 여부를 알려주시면 감사하겠습니다.",
+  ],
   // 갤러리 이미지 (public/images/ 에 넣어주세요)
   gallery: [
     { src: "/images/gallery-1.jpg", alt: "두 사람의 첫 번째 사진" },

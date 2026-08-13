@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useWedding } from "@/context/WeddingContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { submitRSVP } from "@/lib/rsvp";
 import GreetingSection from "@/components/sections/GreetingSection";
 import CalendarSection from "@/components/sections/CalendarSection";
@@ -78,8 +78,9 @@ function RSVPIntroModal() {
               <>
                 <p className="font-serif text-lg text-[var(--color-text)] mb-4">참석여부</p>
                 <p className="text-[13px] text-[var(--color-text-light)] leading-relaxed">
-                  참석에 부담 가지지 말아주시고,<br />편하게 알려주세요.<br />
-                  저희의 정성을 다하는 준비에 도움이 될 것 같아<br />참석 여부를 알려주시면 감사하겠습니다.
+                  {w.rsvpMessage.map((line, i) => (
+                    <span key={i}>{line}<br /></span>
+                  ))}
                 </p>
                 <div className="h-px bg-[var(--color-accent)] my-6" />
                 <p className="text-sm text-[var(--color-text)]">
@@ -131,15 +132,21 @@ function RSVPIntroModal() {
                   ))}
                 </div>
 
-                {attendance === "attending" && (
-                  <div className="mb-4">
-                    <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">참석 인원</label>
-                    <select value={guests} onChange={(e) => setGuests(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)]">
-                      {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}명</option>)}
-                    </select>
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {attendance === "attending" && (
+                    <motion.div className="mb-4" style={{ overflow: "hidden" }}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}>
+                      <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">참석 인원</label>
+                      <select value={guests} onChange={(e) => setGuests(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)]">
+                        {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}명</option>)}
+                      </select>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">축하 메시지 (선택)</label>
                 <textarea value={message} onChange={(e) => setMessage(e.target.value)}
@@ -198,18 +205,20 @@ function Hero() {
         background: "linear-gradient(180deg,rgba(30,35,20,0.05) 0%,rgba(20,25,12,0.15) 55%,rgba(15,20,10,0.55) 100%)"
       }} />
 
-      <motion.p className="absolute top-10 left-0 right-0 text-center text-[9px] tracking-[0.5em] text-white/70"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.9 }}>
-        WE ARE GETTING
-      </motion.p>
+      <div className="absolute top-16 left-0 right-0 text-center px-6">
+        <motion.p className="text-[9px] tracking-[0.5em] text-white/70"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.9 }}>
+          WE ARE GETTING
+        </motion.p>
 
-      <motion.p
-        className="absolute top-1/2 left-0 right-0 text-center leading-none -translate-y-1/2"
-        style={{ fontFamily: "'Sacramento', cursive", fontSize: "clamp(56px,18vw,96px)", color: "#e8dfa0" }}
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 1 }}>
-        married
-      </motion.p>
+        <motion.p
+          className="leading-none -mt-1"
+          style={{ fontFamily: "'Sacramento', cursive", fontSize: "clamp(56px,18vw,96px)", color: "#e8dfa0" }}
+          initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 1 }}>
+          married
+        </motion.p>
+      </div>
 
       <div className="absolute bottom-10 left-7 right-7 flex items-end justify-between">
         <motion.span className="font-serif text-white text-sm tracking-[0.15em]"
@@ -231,25 +240,97 @@ function Hero() {
   );
 }
 
+function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d={direction === "left" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"}
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function GardenGallery() {
   const w = useWedding();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -260 : 260, behavior: "smooth" });
+  };
+
   return (
-    <section className="py-16 px-3 bg-[var(--color-cream)]">
-      <motion.div className="text-center mb-8"
+    <section className="py-16 bg-[var(--color-cream)]">
+      <motion.div className="flex items-center justify-between px-6 mb-6"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <p className="font-serif text-lg text-[var(--color-text)] tracking-wide mb-3">웨딩 갤러리</p>
-        <FloralDivider />
+        <div>
+          <p className="font-serif text-lg text-[var(--color-text)] tracking-wide">웨딩 갤러리</p>
+          <div className="section-divider mt-3" style={{ margin: 0 }} />
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => scroll("left")} aria-label="이전 사진"
+            className="w-8 h-8 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-text-light)] hover:bg-[var(--color-accent)] transition-colors">
+            <ChevronIcon direction="left" />
+          </button>
+          <button onClick={() => scroll("right")} aria-label="다음 사진"
+            className="w-8 h-8 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-text-light)] hover:bg-[var(--color-accent)] transition-colors">
+            <ChevronIcon direction="right" />
+          </button>
+        </div>
       </motion.div>
-      <div className="grid grid-cols-2 gap-1.5">
+
+      <div ref={scrollRef}
+        className="no-scrollbar flex gap-3 overflow-x-auto px-6 pb-2"
+        style={{ scrollSnapType: "x mandatory" }}>
         {w.gallery.map((img, i) => (
-          <motion.div key={i} className="relative overflow-hidden rounded-sm"
-            style={{ aspectRatio: i % 3 === 0 ? "3/4" : "1/1" }}
+          <motion.div key={i}
+            className="relative flex-none overflow-hidden rounded-2xl"
+            style={{ width: "78%", maxWidth: 280, aspectRatio: "3/4", scrollSnapAlign: "start" }}
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.08, duration: 0.6 }}>
-            <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="240px" />
+            <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="280px" />
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+type GuestMessage = { name: string; message: string };
+
+function MessageWall() {
+  const w = useWedding();
+  const [messages, setMessages] = useState<GuestMessage[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/rsvp?file=${w.slug}`)
+      .then((r) => r.json())
+      .then((entries: GuestMessage[]) => {
+        setMessages(entries.filter((e) => e.message?.trim()).reverse());
+      })
+      .catch(() => {});
+  }, [w.slug]);
+
+  if (messages.length === 0) return null;
+
+  return (
+    <section className="py-16 px-6 bg-[var(--color-cream)]">
+      <motion.div className="text-center mb-8"
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6 }}>
+        <p className="font-serif text-lg text-[var(--color-text)] tracking-wide mb-3">축하 메시지</p>
+        <FloralDivider />
+      </motion.div>
+      <div className="space-y-3 max-w-sm mx-auto">
+        {messages.map((m, i) => (
+          <motion.div key={i} className="rounded-2xl bg-white border border-[var(--color-accent)] p-4"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: Math.min(i, 6) * 0.06 }}>
+            <p className="text-sm text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">{m.message}</p>
+            <p className="text-xs text-[var(--color-text-light)] mt-3 text-right">- {m.name}</p>
           </motion.div>
         ))}
       </div>
@@ -268,6 +349,7 @@ export default function GardenTemplate() {
       <LocationSection />
       <ContactSection />
       <RSVPSection />
+      <MessageWall />
     </div>
   );
 }

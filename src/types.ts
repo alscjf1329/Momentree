@@ -32,6 +32,7 @@ export interface WeddingData {
     lng: number;
   };
   greeting: string[];
+  rsvpMessage: string[];
   gallery: { src: string; alt: string }[];
   introBg: string;
   envelopeClosed: string;

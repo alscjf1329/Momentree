@@ -2,7 +2,8 @@
 import type { Metadata } from "next";
 import fs from "fs/promises";
 import path from "path";
-import { getInvite, INVITES } from "@/invites";
+import { getInvite } from "@/invites";
+import { WEDDING } from "@/content";
 import type { WeddingData } from "@/types";
 import { WeddingProvider } from "@/context/WeddingContext";
 import ClassicTemplate from "@/templates/classic";
@@ -33,15 +34,17 @@ async function readClientFile(filename: string): Promise<WeddingData | null> {
       path.join(process.cwd(), "data", "clients", `${filename}.json`),
       "utf-8"
     );
-    return JSON.parse(raw) as WeddingData;
+    // 필드 추가 이전에 저장된 레거시 클라이언트 파일 대비 기본값과 병합
+    return { ...WEDDING, ...JSON.parse(raw) } as WeddingData;
   } catch {
     return null;
   }
 }
 
-export async function generateStaticParams() {
-  return Object.keys(INVITES).map((slug) => ({ slug }));
-}
+// ?file= 쿼리로 실시간 파일시스템 데이터를 읽는 완전 동적 라우트라
+// 정적 생성(generateStaticParams)을 쓰지 않음 — dev 모드 on-demand ISR
+// 동시 요청 레이스로 인한 hydration mismatch를 원천 차단
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
