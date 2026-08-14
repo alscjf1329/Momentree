@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 
 const NAV = [
@@ -12,8 +12,15 @@ const NAV = [
 
 function NavInner() {
   const path = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const file = searchParams.get("file") ?? "";
+
+  const logout = async () => {
+    await fetch("/api/admin/auth/logout", { method: "POST" });
+    router.push("/admin/login");
+    router.refresh();
+  };
 
   const active = (href: string) =>
     href === "/admin" ? path === "/admin" : path.startsWith(href);
@@ -60,11 +67,20 @@ function NavInner() {
         className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 shrink-0 hidden sm:block">
         ← 홈
       </Link>
+
+      {/* 로그아웃 */}
+      <button onClick={logout}
+        className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 shrink-0">
+        로그아웃
+      </button>
     </div>
   );
 }
 
 export default function AdminNav() {
+  const path = usePathname();
+  if (path === "/admin/login") return null;
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100"
       style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.04)" }}>

@@ -7,4 +7,6 @@ services:
       - ./data:/app/data
     environment:
       - NODE_ENV=production
+    env_file:
+      - .env.local
     restart: unless-stopped

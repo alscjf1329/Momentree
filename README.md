@@ -86,6 +86,28 @@ export const WEDDING = {
 
 ---
 
+## 어드민 인증
+
+`/admin` 페이지는 이메일 인증 코드 방식으로 보호됩니다. 로그인 시 지정된 관리자 이메일로 6자리 코드가 발송되고, 입력한 코드가 맞으면 7일간 유지되는 세션이 발급됩니다.
+
+`.env.local` 에 다음 값을 설정하세요 (`.env.example` 참고):
+
+```bash
+ADMIN_EMAIL=본인 이메일 주소            # 코드를 받을 관리자 이메일
+GMAIL_USER=코드를 발송할 Gmail 주소     # ADMIN_EMAIL과 같아도 됨
+GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx  # Gmail 앱 비밀번호 (아래 참고)
+ADMIN_SESSION_SECRET=랜덤 문자열         # openssl rand -hex 32 로 생성
+```
+
+`GMAIL_APP_PASSWORD` 발급 방법:
+1. Google 계정에서 2단계 인증을 활성화
+2. [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) 접속 → 앱 비밀번호 생성
+3. 생성된 16자리 값을 그대로 사용 (일반 로그인 비밀번호가 아님)
+
+값이 설정되지 않으면 `/admin`, `/api/clients` 접근이 모두 차단됩니다. Docker로 배포할 경우 `docker-compose.yml` 이 `.env.local` 을 자동으로 읽습니다.
+
+---
+
 ## 컬러 테마 변경
 
 `src/app/globals.css` 의 `:root` 변수만 바꾸면 전 섹션 색상이 바뀝니다.
