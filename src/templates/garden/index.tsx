@@ -17,7 +17,7 @@ const VARS = {
   "--color-primary-dark": "#4f6544",
   "--color-accent": "#f2f4ee",
   "--color-gold": "#c2b686",
-  "--color-cream": "#fdfcf9",
+  "--color-cream": "#faf7f0",
   "--color-warm-gray": "#a5ac9c",
   "--color-text": "#31352c",
   "--color-text-light": "#767d6d",
@@ -196,103 +196,237 @@ function FloralDivider() {
   );
 }
 
-function Hero() {
-  const w = useWedding();
+function TypedText({
+  text,
+  delay = 0,
+  className,
+  style,
+}: {
+  text: string;
+  delay?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const letters = Array.from(text);
   return (
-    <section className="relative" style={{ height: "100dvh" }}>
-      <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" />
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(180deg,rgba(30,35,20,0.05) 0%,rgba(20,25,12,0.15) 55%,rgba(15,20,10,0.55) 100%)"
-      }} />
-
-      <div className="absolute top-16 left-0 right-0 text-center px-6">
-        <motion.p className="text-[9px] tracking-[0.5em] text-white/70"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.9 }}>
-          WE ARE GETTING
-        </motion.p>
-
-        <motion.p
-          className="leading-none -mt-1"
-          style={{ fontFamily: "'Sacramento', cursive", fontSize: "clamp(56px,18vw,96px)", color: "#e8dfa0" }}
-          initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 1 }}>
-          married
-        </motion.p>
-      </div>
-
-      <div className="absolute bottom-10 left-7 right-7 flex items-end justify-between">
-        <motion.span className="font-serif text-white text-sm tracking-[0.15em]"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}>
-          {w.groom.name}
+    <motion.span
+      className={className}
+      style={style}
+      initial="hidden"
+      animate="visible"
+      variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: delay } } }}
+    >
+      {letters.map((char, i) => (
+        <motion.span
+          key={i}
+          style={{ display: "inline-block", whiteSpace: char === " " ? "pre" : "normal" }}
+          variants={{
+            hidden: { opacity: 0, y: 10 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+          }}
+        >
+          {char}
         </motion.span>
-        <motion.div className="text-center"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.8 }}>
-          <p className="text-[10px] tracking-[0.2em] text-white/75">
-            {w.date.year}.{String(w.date.month).padStart(2, "0")}.{String(w.date.day).padStart(2, "0")}
-          </p>
-        </motion.div>
-        <motion.span className="font-serif text-white text-sm tracking-[0.15em]"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}>
-          {w.bride.name}
-        </motion.span>
-      </div>
-    </section>
+      ))}
+    </motion.span>
   );
 }
 
-function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+function Hero() {
+  const w = useWedding();
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d={direction === "left" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"}
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <section className="relative overflow-hidden" style={{ height: "100dvh" }}>
+      <motion.div
+        className="absolute inset-0"
+        initial={{ scale: 1 }}
+        animate={{ scale: 1.09 }}
+        transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+      >
+        <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" />
+      </motion.div>
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(180deg,rgba(30,35,20,0.1) 0%,rgba(20,25,12,0.2) 55%,rgba(15,20,10,0.6) 100%)"
+      }} />
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+        <motion.p className="text-[10px] tracking-[0.45em] text-white/75"
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.9 }}>
+          WE&apos;RE GETTING MARRIED
+        </motion.p>
+
+        <TypedText
+          text="TAEYEON • HA"
+          delay={1.1}
+          className="font-serif block mt-4 text-white"
+          style={{ fontSize: "clamp(40px,11vw,64px)", letterSpacing: "0.06em" }}
+        />
+
+        <motion.p className="text-[10px] tracking-[0.35em] text-white/70 mt-6"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ delay: 2.6, duration: 0.8 }}>
+          PARTY THE FULLMOON
+        </motion.p>
+
+        <motion.p className="text-xs tracking-[0.1em] text-white/85 mt-2"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ delay: 2.9, duration: 0.8 }}>
+          Sun. October 11. 2026 at 12:30 pm
+        </motion.p>
+      </div>
+
+      <motion.div className="absolute bottom-8 left-0 right-0 flex justify-center text-white/70"
+        animate={{ y: [0, 8, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" strokeWidth="1.5"
+            strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </motion.div>
+    </section>
   );
 }
 
 function GardenGallery() {
   const w = useWedding();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [active, setActive] = useState(0);
 
-  const scroll = (dir: "left" | "right") => {
-    scrollRef.current?.scrollBy({ left: dir === "left" ? -260 : 260, behavior: "smooth" });
+  // 슬라이드 실제 폭(컨테이너 좌우 패딩만큼 clientWidth보다 작음)
+  const slideWidth = () =>
+    (mainRef.current?.firstElementChild as HTMLElement | null)?.offsetWidth || mainRef.current?.clientWidth || 1;
+
+  const handleScroll = () => {
+    const el = mainRef.current;
+    if (!el) return;
+    setActive(Math.round(el.scrollLeft / slideWidth()));
   };
+
+  const goTo = (i: number) => {
+    const el = mainRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    thumbRefs.current[active]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [active]);
 
   return (
     <section className="py-16 bg-[var(--color-cream)]">
-      <motion.div className="flex items-center justify-between px-6 mb-6"
+      <motion.div className="px-6 mb-6"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <div>
-          <p className="font-serif text-lg text-[var(--color-text)] tracking-wide">웨딩 갤러리</p>
-          <div className="section-divider mt-3" style={{ margin: 0 }} />
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => scroll("left")} aria-label="이전 사진"
-            className="w-8 h-8 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-text-light)] hover:bg-[var(--color-accent)] transition-colors">
-            <ChevronIcon direction="left" />
-          </button>
-          <button onClick={() => scroll("right")} aria-label="다음 사진"
-            className="w-8 h-8 rounded-full border border-[var(--color-accent)] flex items-center justify-center text-[var(--color-text-light)] hover:bg-[var(--color-accent)] transition-colors">
-            <ChevronIcon direction="right" />
-          </button>
-        </div>
+        <p className="font-serif text-lg text-[var(--color-text)] tracking-wide">웨딩 갤러리</p>
+        <div className="section-divider mt-3" style={{ margin: 0 }} />
       </motion.div>
 
-      <div ref={scrollRef}
-        className="no-scrollbar flex gap-3 overflow-x-auto px-6 pb-2"
+      {/* 메인 뷰어 — 한 장씩 스와이프 */}
+      <div ref={mainRef} onScroll={handleScroll}
+        className="no-scrollbar flex overflow-x-auto px-6"
         style={{ scrollSnapType: "x mandatory" }}>
         {w.gallery.map((img, i) => (
-          <motion.div key={i}
+          <div key={i}
             className="relative flex-none overflow-hidden rounded-2xl"
-            style={{ width: "78%", maxWidth: 280, aspectRatio: "3/4", scrollSnapAlign: "start" }}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.08, duration: 0.6 }}>
-            <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="280px" />
-          </motion.div>
+            style={{
+              width: "100%",
+              aspectRatio: "4/3",
+              scrollSnapAlign: "center",
+              background: "var(--color-accent)",
+            }}>
+            {/* 가로/세로 사진 모두 대응 — 잘리지 않게 contain, 세로 사진은 좌우 여백 생김 */}
+            <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} />
+          </div>
         ))}
       </div>
+
+      <p className="text-center text-xs text-[var(--color-warm-gray)] tracking-[0.2em] mt-3">
+        {active + 1} / {w.gallery.length}
+      </p>
+
+      {/* 썸네일 목록 — 횡스크롤, 다 들어가면 가운데 정렬 */}
+      <div className="no-scrollbar flex gap-2 overflow-x-auto px-6 mt-4"
+        style={{ justifyContent: "safe center" }}>
+        {w.gallery.map((img, i) => (
+          <button key={i}
+            ref={(el) => { thumbRefs.current[i] = el; }}
+            onClick={() => goTo(i)}
+            aria-label={`${i + 1}번째 사진 보기`}
+            className="relative flex-none overflow-hidden rounded-lg transition-opacity"
+            style={{
+              width: 56,
+              height: 56,
+              opacity: active === i ? 1 : 0.5,
+              outline: active === i ? "2px solid var(--color-primary)" : "none",
+              outlineOffset: 2,
+            }}>
+            <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="56px" />
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function InfoSection() {
+  const w = useWedding();
+  const mainRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const slideWidth = () =>
+    (mainRef.current?.firstElementChild as HTMLElement | null)?.offsetWidth || mainRef.current?.clientWidth || 1;
+
+  const handleScroll = () => {
+    const el = mainRef.current;
+    if (!el) return;
+    setActive(Math.round(el.scrollLeft / slideWidth()));
+  };
+
+  const goTo = (i: number) => {
+    mainRef.current?.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
+  };
+
+  if (w.info.length === 0) return null;
+
+  return (
+    <section className="py-16 bg-[var(--color-cream)]">
+      <motion.div className="px-6 mb-6 text-center"
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+        viewport={{ once: true }} transition={{ duration: 0.6 }}>
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">INFORMATION</p>
+        <div className="section-divider" />
+      </motion.div>
+
+      {/* 안내사항 — 한 장씩 스와이프 */}
+      <div ref={mainRef} onScroll={handleScroll}
+        className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
+        style={{ scrollSnapType: "x mandatory" }}>
+        {w.info.map((item, i) => (
+          <div key={i}
+            className="flex-none rounded-2xl border border-[var(--color-accent)] p-6"
+            style={{ width: "100%", scrollSnapAlign: "center" }}>
+            <p className="font-serif text-lg text-[var(--color-text)] mb-3">{item.title}</p>
+            <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
+              {item.content}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* 점 인디케이터 */}
+      {w.info.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-5">
+          {w.info.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)} aria-label={`${i + 1}번째 안내사항 보기`}
+              className="rounded-full transition-all"
+              style={{
+                width: active === i ? 16 : 6,
+                height: 6,
+                background: active === i ? "var(--color-primary)" : "var(--color-accent)",
+              }} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -347,6 +481,7 @@ export default function GardenTemplate() {
       <CalendarSection />
       <GardenGallery />
       <LocationSection />
+      <InfoSection />
       <ContactSection />
       <RSVPSection />
       <MessageWall />

@@ -45,7 +45,7 @@ export default function CalendarSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-warm-gray)] mb-2">DATE</p>
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">DATE</p>
         <div className="section-divider mb-8" />
 
         <p className="font-serif text-2xl text-[var(--color-text)] tracking-widest mb-1">
@@ -104,9 +104,6 @@ export default function CalendarSection() {
                       }`}
                     >
                       {d}
-                      {isWedding && (
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px]">♥</span>
-                      )}
                     </span>
                   </>
                 )}

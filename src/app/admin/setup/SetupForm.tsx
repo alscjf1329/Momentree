@@ -9,13 +9,14 @@ const DEFAULT_DATA: WeddingData = {
   template: "classic",
   theme: "classic-cream",
   groom: { name: "", nameFull: "", fatherName: "", motherName: "", phone: "",
-    account: { bank: "", number: "", holder: "" } },
+    accounts: [{ name: "", bank: "", number: "", holder: "" }] },
   bride: { name: "", nameFull: "", fatherName: "", motherName: "", phone: "",
-    account: { bank: "", number: "", holder: "" } },
+    accounts: [{ name: "", bank: "", number: "", holder: "" }] },
   date: { year: 2025, month: 10, day: 18, dayOfWeek: "토요일", time: "오후 2시 30분", iso: "2025-10-18" },
   venue: { name: "", hall: "", address: "", addressShort: "", kakaoMapUrl: "", naverMapUrl: "", lat: 0, lng: 0 },
   greeting: ["서로가 마주보며 다져온 사랑을", "이제 함께 걸어갈 큰 사랑으로 키우고자 합니다.", "", "오시는 모든 분들을 환영합니다."],
   rsvpMessage: ["참석에 부담 가지지 말아주시고,", "편하게 알려주세요.", "저희의 정성을 다하는 준비에 도움이 될 것 같아", "참석 여부를 알려주시면 감사하겠습니다."],
+  info: [{ title: "", content: "" }],
   gallery: [
     { src: "/images/gallery-1.jpg", alt: "" },
     { src: "/images/gallery-2.jpg", alt: "" },
@@ -105,6 +106,38 @@ export default function SetupForm() {
       let cur: Record<string, unknown> = next as unknown as Record<string, unknown>;
       for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]] as Record<string, unknown>;
       cur[keys[keys.length - 1]] = value;
+      return next;
+    });
+  };
+
+  const addAccount = (side: "groom" | "bride") => {
+    setData(prev => {
+      const next = structuredClone(prev);
+      next[side].accounts.push({ name: "", bank: "", number: "", holder: "" });
+      return next;
+    });
+  };
+
+  const removeAccount = (side: "groom" | "bride", idx: number) => {
+    setData(prev => {
+      const next = structuredClone(prev);
+      next[side].accounts.splice(idx, 1);
+      return next;
+    });
+  };
+
+  const addInfo = () => {
+    setData(prev => {
+      const next = structuredClone(prev);
+      next.info.push({ title: "", content: "" });
+      return next;
+    });
+  };
+
+  const removeInfo = (idx: number) => {
+    setData(prev => {
+      const next = structuredClone(prev);
+      next.info.splice(idx, 1);
       return next;
     });
   };
@@ -301,11 +334,29 @@ export default function SetupForm() {
                   onChange={e => set("groom.phone", e.target.value)} />
               </div>
               <div>
-                <Label>계좌 (은행 / 번호 / 예금주)</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  <input className={INPUT} value={data.groom.account.bank} placeholder="은행" onChange={e => set("groom.account.bank", e.target.value)} />
-                  <input className={INPUT} value={data.groom.account.number} placeholder="계좌번호" onChange={e => set("groom.account.number", e.target.value)} />
-                  <input className={INPUT} value={data.groom.account.holder} placeholder="예금주" onChange={e => set("groom.account.holder", e.target.value)} />
+                <div className="flex items-center justify-between mb-1">
+                  <Label>계좌 목록</Label>
+                  <button type="button" onClick={() => addAccount("groom")}
+                    className="text-[11px] text-blue-500 hover:underline">+ 계좌 추가</button>
+                </div>
+                <div className="space-y-2">
+                  {data.groom.accounts.map((acc, i) => (
+                    <div key={i} className="border border-gray-100 rounded-lg p-2.5 space-y-2 bg-gray-50/60">
+                      <div className="flex items-center gap-2">
+                        <input className={INPUT + " flex-1"} value={acc.name} placeholder="예: 신랑 본인 / 신랑측 아버지"
+                          onChange={e => set(`groom.accounts.${i}.name`, e.target.value)} />
+                        {data.groom.accounts.length > 1 && (
+                          <button type="button" onClick={() => removeAccount("groom", i)}
+                            className="text-[11px] text-red-400 hover:underline shrink-0">삭제</button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <input className={INPUT} value={acc.bank} placeholder="은행" onChange={e => set(`groom.accounts.${i}.bank`, e.target.value)} />
+                        <input className={INPUT} value={acc.number} placeholder="계좌번호" onChange={e => set(`groom.accounts.${i}.number`, e.target.value)} />
+                        <input className={INPUT} value={acc.holder} placeholder="예금주" onChange={e => set(`groom.accounts.${i}.holder`, e.target.value)} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </SectionCard>
@@ -337,11 +388,29 @@ export default function SetupForm() {
                   onChange={e => set("bride.phone", e.target.value)} />
               </div>
               <div>
-                <Label>계좌 (은행 / 번호 / 예금주)</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  <input className={INPUT} value={data.bride.account.bank} placeholder="은행" onChange={e => set("bride.account.bank", e.target.value)} />
-                  <input className={INPUT} value={data.bride.account.number} placeholder="계좌번호" onChange={e => set("bride.account.number", e.target.value)} />
-                  <input className={INPUT} value={data.bride.account.holder} placeholder="예금주" onChange={e => set("bride.account.holder", e.target.value)} />
+                <div className="flex items-center justify-between mb-1">
+                  <Label>계좌 목록</Label>
+                  <button type="button" onClick={() => addAccount("bride")}
+                    className="text-[11px] text-blue-500 hover:underline">+ 계좌 추가</button>
+                </div>
+                <div className="space-y-2">
+                  {data.bride.accounts.map((acc, i) => (
+                    <div key={i} className="border border-gray-100 rounded-lg p-2.5 space-y-2 bg-gray-50/60">
+                      <div className="flex items-center gap-2">
+                        <input className={INPUT + " flex-1"} value={acc.name} placeholder="예: 신부 본인 / 신부측 어머니"
+                          onChange={e => set(`bride.accounts.${i}.name`, e.target.value)} />
+                        {data.bride.accounts.length > 1 && (
+                          <button type="button" onClick={() => removeAccount("bride", i)}
+                            className="text-[11px] text-red-400 hover:underline shrink-0">삭제</button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <input className={INPUT} value={acc.bank} placeholder="은행" onChange={e => set(`bride.accounts.${i}.bank`, e.target.value)} />
+                        <input className={INPUT} value={acc.number} placeholder="계좌번호" onChange={e => set(`bride.accounts.${i}.number`, e.target.value)} />
+                        <input className={INPUT} value={acc.holder} placeholder="예금주" onChange={e => set(`bride.accounts.${i}.holder`, e.target.value)} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </SectionCard>
@@ -431,6 +500,30 @@ export default function SetupForm() {
                 value={data.rsvpMessage.join("\n")}
                 onChange={e => set("rsvpMessage", e.target.value.split("\n"))}
               />
+            </SectionCard>
+
+            <SectionCard title="안내사항 (Information)">
+              <div className="flex items-center justify-between -mt-2">
+                <p className="text-[10px] text-gray-400">가든 템플릿 Location-Contact 사이, 한 장씩 스와이프로 표시</p>
+                <button type="button" onClick={addInfo}
+                  className="text-[11px] text-blue-500 hover:underline shrink-0 ml-2">+ 항목 추가</button>
+              </div>
+              <div className="space-y-2">
+                {data.info.map((item, i) => (
+                  <div key={i} className="border border-gray-100 rounded-lg p-2.5 space-y-2 bg-gray-50/60">
+                    <div className="flex items-center gap-2">
+                      <input className={INPUT + " flex-1"} value={item.title} placeholder="제목 (예: 주차 안내)"
+                        onChange={e => set(`info.${i}.title`, e.target.value)} />
+                      {data.info.length > 1 && (
+                        <button type="button" onClick={() => removeInfo(i)}
+                          className="text-[11px] text-red-400 hover:underline shrink-0">삭제</button>
+                      )}
+                    </div>
+                    <textarea className={INPUT + " resize-none"} rows={2} value={item.content}
+                      placeholder="내용" onChange={e => set(`info.${i}.content`, e.target.value)} />
+                  </div>
+                ))}
+              </div>
             </SectionCard>
 
             <SectionCard title="이미지 경로">

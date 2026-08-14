@@ -41,7 +41,7 @@ export default function RSVPSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-warm-gray)] mb-2">RSVP</p>
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">RSVP</p>
         <div className="section-divider mb-4" />
         <h2 className="font-serif text-xl text-[var(--color-text)]">참석 의사 전달</h2>
         <p className="text-sm text-[var(--color-text-light)] mt-2">

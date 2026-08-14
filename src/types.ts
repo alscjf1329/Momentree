@@ -1,10 +1,17 @@
+export interface AccountEntry {
+  name: string;
+  bank: string;
+  number: string;
+  holder: string;
+}
+
 export interface PersonInfo {
   name: string;
   nameFull: string;
   fatherName: string;
   motherName: string;
   phone: string;
-  account: { bank: string; number: string; holder: string };
+  accounts: AccountEntry[];
 }
 
 export interface WeddingData {
@@ -33,6 +40,7 @@ export interface WeddingData {
   };
   greeting: string[];
   rsvpMessage: string[];
+  info: { title: string; content: string }[];
   gallery: { src: string; alt: string }[];
   introBg: string;
   envelopeClosed: string;

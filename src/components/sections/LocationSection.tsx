@@ -25,7 +25,7 @@ export default function LocationSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-warm-gray)] mb-2">LOCATION</p>
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">LOCATION</p>
         <div className="section-divider mb-6" />
         <h2 className="font-serif text-xl text-[var(--color-text)] mb-1">{venue.name}</h2>
         <p className="text-sm text-[var(--color-text-light)] tracking-wide">{venue.hall}</p>
