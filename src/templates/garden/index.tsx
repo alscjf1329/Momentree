@@ -282,29 +282,34 @@ function Hero() {
         background: "linear-gradient(180deg,rgba(10,12,8,0.35) 0%,rgba(10,12,8,0.4) 55%,rgba(10,12,8,0.65) 100%)"
       }} />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-start pt-20 sm:pt-24 px-6 text-center">
-        {(() => {
-          const lines = w.mainTitle.split("\n");
-          let charsBefore = 0;
-          return lines.map((line, i) => {
-            const delay = HERO_TITLE_DELAY + charsBefore * HERO_TITLE_STAGGER;
-            charsBefore += Array.from(line).length;
-            return (
-              <TypedText
-                key={i}
-                text={line}
-                delay={delay}
-                className="block text-white"
-                style={{
-                  fontFamily: "'Alex Brush', 'Noto Serif KR', serif",
-                  fontSize: "clamp(65px,8vw,46px)",
-                  lineHeight: 1.25,
-                  textShadow: "0 2px 16px rgba(0,0,0,0.5)",
-                }}
-              />
-            );
-          });
-        })()}
+      <div className="absolute inset-0 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center">
+        <div className="self-start pl-2 sm:pl-4">
+          {(() => {
+            const lines = w.mainTitle.split("\n");
+            let charsBefore = 0;
+            return lines.map((line, i) => {
+              const delay = HERO_TITLE_DELAY + charsBefore * HERO_TITLE_STAGGER;
+              charsBefore += Array.from(line).length;
+              return (
+                <div key={i} style={{ marginLeft: `${i * 9}%`, marginTop: i === 0 ? 0 : "-0.12em" }}>
+                  <TypedText
+                    text={line}
+                    delay={delay}
+                    className="block text-white text-left"
+                    style={{
+                      fontFamily: "'Alex Brush', 'Noto Serif KR', serif",
+                      fontSize: "clamp(28px,8vw,48px)",
+                      lineHeight: 1.1,
+                      whiteSpace: "nowrap",
+                      textTransform: "uppercase",
+                      textShadow: "0 2px 16px rgba(0,0,0,0.5)",
+                    }}
+                  />
+                </div>
+              );
+            });
+          })()}
+        </div>
 
         {w.subInfo.map((line, i) => (
           <motion.p key={i} className="text-xs tracking-[0.15em] text-white/80 mt-2"
