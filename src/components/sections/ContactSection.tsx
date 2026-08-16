@@ -62,22 +62,6 @@ export default function ContactSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.35 }}
       >
-        <div className="rounded-2xl border border-[var(--color-accent)] p-5 space-y-3">
-          <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)]">연락처</p>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-serif text-[var(--color-text)] text-lg">{current.name}</p>
-              <p className="text-sm text-[var(--color-text-light)] mt-0.5">{current.phone}</p>
-            </div>
-            <a
-              href={`tel:${current.phone}`}
-              className="px-4 py-2 rounded-full bg-[var(--color-primary)] text-white text-xs tracking-wide"
-            >
-              전화하기
-            </a>
-          </div>
-        </div>
-
         <div className="space-y-2">
           <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] px-1">계좌번호</p>
           {current.accounts.map((acc, i) => {

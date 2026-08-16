@@ -5,28 +5,11 @@ import path from "path";
 import { getInvite } from "@/invites";
 import { WEDDING } from "@/content";
 import type { WeddingData } from "@/types";
+import { applyToEncryptedFields, decrypt } from "@/lib/accountCrypto";
+import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { WeddingProvider } from "@/context/WeddingContext";
+import { TEMPLATE_MAP } from "@/templates/registry";
 import ClassicTemplate from "@/templates/classic";
-import EditorialTemplate from "@/templates/editorial";
-import MinimalTemplate from "@/templates/minimal";
-import RomanticTemplate from "@/templates/romantic";
-import TwilightTemplate from "@/templates/twilight";
-import BlossomTemplate from "@/templates/blossom";
-import ModernTemplate from "@/templates/modern";
-import LuxuryTemplate from "@/templates/luxury";
-import GardenTemplate from "@/templates/garden";
-
-const TEMPLATE_MAP: Record<string, React.ComponentType> = {
-  classic: ClassicTemplate,
-  editorial: EditorialTemplate,
-  minimal: MinimalTemplate,
-  romantic: RomanticTemplate,
-  twilight: TwilightTemplate,
-  blossom: BlossomTemplate,
-  modern: ModernTemplate,
-  luxury: LuxuryTemplate,
-  garden: GardenTemplate,
-};
 
 async function readClientFile(filename: string): Promise<WeddingData | null> {
   try {
@@ -35,7 +18,9 @@ async function readClientFile(filename: string): Promise<WeddingData | null> {
       "utf-8"
     );
     // 필드 추가 이전에 저장된 레거시 클라이언트 파일 대비 기본값과 병합
-    return { ...WEDDING, ...JSON.parse(raw) } as WeddingData;
+    const data = { ...WEDDING, ...JSON.parse(raw) } as WeddingData;
+    const schema = getSchemaForTemplate(data.template);
+    return applyToEncryptedFields(data, schema, decrypt);
   } catch {
     return null;
   }

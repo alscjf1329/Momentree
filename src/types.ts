@@ -10,7 +10,6 @@ export interface PersonInfo {
   nameFull: string;
   fatherName: string;
   motherName: string;
-  phone: string;
   accounts: AccountEntry[];
 }
 
@@ -38,11 +37,26 @@ export interface WeddingData {
     lat: number;
     lng: number;
   };
+  // 히어로 메인 타이틀(큰 폰트)과 그 아래 보조 정보(작은 폰트, 이름/장소/날짜 등)
+  mainTitle: string;
+  subInfo: string[];
   greeting: string[];
   rsvpMessage: string[];
+  // RSVP 폼 상단 안내 문구
+  rsvpNotice: string;
+  // RSVP 폼 하단 마감 안내 문구
+  rsvpDeadlineText: string;
   info: { title: string; content: string }[];
+  // 화환 안내 문구
+  flowerNotice: string;
+  // 셔틀버스 시간표
+  shuttleTimetable: { from: string[]; to: string[] };
+  // 서울에서 오시는 길 (경로별 안내)
+  directionsFromSeoul: { route: string; steps: string[] }[];
   gallery: { src: string; alt: string }[];
   introBg: string;
   envelopeClosed: string;
   envelopeOpen: string;
+  // 배경음악
+  bgm: { title: string; src: string };
 }

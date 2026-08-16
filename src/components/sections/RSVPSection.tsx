@@ -12,6 +12,7 @@ export default function RSVPSection() {
   const [name, setName] = useState("");
   const [attendance, setAttendance] = useState<Attendance>("");
   const [guests, setGuests] = useState("1");
+  const [companionName, setCompanionName] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export default function RSVPSection() {
     setLoading(true);
     setError(false);
     try {
-      await submitRSVP({ name, attendance, guests, message, slug: wedding.slug });
+      await submitRSVP({ name, attendance, guests, companionName, message, slug: wedding.slug });
       setSubmitted(true);
     } catch {
       setError(true);
@@ -44,8 +45,13 @@ export default function RSVPSection() {
         <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">RSVP</p>
         <div className="section-divider mb-4" />
         <h2 className="font-serif text-xl text-[var(--color-text)]">참석 의사 전달</h2>
+        {wedding.rsvpNotice && (
+          <p className="text-sm text-[var(--color-text-light)] mt-3 leading-relaxed whitespace-pre-wrap">
+            {wedding.rsvpNotice}
+          </p>
+        )}
         <p className="text-sm text-[var(--color-text-light)] mt-2">
-          10월 10일까지 알려주시면 감사하겠습니다
+          {wedding.rsvpDeadlineText}
         </p>
       </motion.div>
 
@@ -130,6 +136,19 @@ export default function RSVPSection() {
               </select>
             </motion.div>
           )}
+
+          <div>
+            <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">
+              동반인 이름 (선택)
+            </label>
+            <input
+              type="text"
+              value={companionName}
+              onChange={(e) => setCompanionName(e.target.value)}
+              placeholder="함께 오시는 분의 성함"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors"
+            />
+          </div>
 
           <div>
             <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">

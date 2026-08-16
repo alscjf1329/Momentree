@@ -15,18 +15,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "관리자 인증이 설정되지 않았습니다" }, { status: 500 });
   }
 
-  const { code } = await req.json().catch(() => ({ code: undefined }));
-  if (!code || typeof code !== "string") {
-    return NextResponse.json({ error: "코드를 입력하세요" }, { status: 400 });
+  const { email, code } = await req.json().catch(() => ({ email: undefined, code: undefined }));
+  if (!email || typeof email !== "string" || !code || typeof code !== "string") {
+    return NextResponse.json({ error: "이메일과 코드를 입력하세요" }, { status: 400 });
   }
 
-  const result = await verifyOtp(code, secret);
-  if (result !== "ok") {
-    const status = result === "too_many_attempts" ? 429 : 401;
-    return NextResponse.json({ error: ERROR_MESSAGES[result] }, { status });
+  const result = await verifyOtp(email, code, secret);
+  if (result.status !== "ok") {
+    const status = result.status === "too_many_attempts" ? 429 : 401;
+    return NextResponse.json({ error: ERROR_MESSAGES[result.status] }, { status });
   }
 
-  const token = await createSessionToken(secret);
+  const token = await createSessionToken(secret, { role: result.role, file: result.file });
   const res = NextResponse.json({ ok: true });
   res.cookies.set(ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,

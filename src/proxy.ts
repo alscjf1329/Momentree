@@ -8,11 +8,11 @@ export async function proxy(req: NextRequest) {
 
   const secret = process.env.ADMIN_SESSION_SECRET;
   const token = req.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-  const authed = secret ? await verifySessionToken(token, secret) : false;
+  const session = secret ? await verifySessionToken(token, secret) : null;
 
-  if (authed) return NextResponse.next();
+  if (session) return NextResponse.next();
 
-  if (pathname.startsWith("/api/clients")) {
+  if (pathname.startsWith("/api/clients") || pathname.startsWith("/api/upload")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -20,5 +20,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/clients/:path*"],
+  matcher: ["/admin/:path*", "/api/clients/:path*", "/api/upload/:path*"],
 };

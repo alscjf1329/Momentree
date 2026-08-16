@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { getSession } from "@/lib/session";
 
 const RSVP_DIR = path.join(process.cwd(), "data", "rsvp");
 
@@ -8,7 +9,8 @@ export interface RsvpEntry {
   name: string;
   attendance: "attending" | "not_attending";
   guests: string;
-  message: string;
+  companionName?: string;
+  message?: string;
   submittedAt: string;
 }
 
@@ -51,6 +53,64 @@ export async function POST(req: NextRequest) {
 
   const entries = await readFile(slug);
   entries.push({ ...rest, submittedAt: new Date().toISOString() } as RsvpEntry);
+
+  await fs.writeFile(
+    path.join(RSVP_DIR, `${slug}.json`),
+    JSON.stringify(entries, null, 2),
+    "utf-8"
+  );
+  return NextResponse.json({ ok: true });
+}
+
+async function canEdit(req: NextRequest, slug: string): Promise<boolean> {
+  const session = await getSession(req);
+  if (!session) return false;
+  return session.role === "admin" || session.file === slug;
+}
+
+// PATCH /api/rsvp  body: { slug, index, ...fields }  → 항목 수정 (본인 파일 또는 관리자만)
+export async function PATCH(req: NextRequest) {
+  await ensureDir();
+  const { slug, index, ...updates } = await req.json();
+  if (!slug || typeof index !== "number") {
+    return NextResponse.json({ error: "slug, index required" }, { status: 400 });
+  }
+  if (!(await canEdit(req, slug))) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const entries = await readFile(slug);
+  if (index < 0 || index >= entries.length) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+  entries[index] = { ...entries[index], ...updates };
+
+  await fs.writeFile(
+    path.join(RSVP_DIR, `${slug}.json`),
+    JSON.stringify(entries, null, 2),
+    "utf-8"
+  );
+  return NextResponse.json({ ok: true });
+}
+
+// DELETE /api/rsvp?file=slug&index=n  → 항목 삭제 (본인 파일 또는 관리자만)
+export async function DELETE(req: NextRequest) {
+  await ensureDir();
+  const slug = req.nextUrl.searchParams.get("file");
+  const indexParam = req.nextUrl.searchParams.get("index");
+  const index = indexParam !== null ? Number(indexParam) : NaN;
+  if (!slug || Number.isNaN(index)) {
+    return NextResponse.json({ error: "file, index required" }, { status: 400 });
+  }
+  if (!(await canEdit(req, slug))) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const entries = await readFile(slug);
+  if (index < 0 || index >= entries.length) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+  entries.splice(index, 1);
 
   await fs.writeFile(
     path.join(RSVP_DIR, `${slug}.json`),

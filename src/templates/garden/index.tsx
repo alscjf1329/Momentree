@@ -33,15 +33,18 @@ function RSVPIntroModal() {
   const [name, setName] = useState("");
   const [attendance, setAttendance] = useState<Attendance>("");
   const [guests, setGuests] = useState("1");
+  const [companionName, setCompanionName] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem("garden-rsvp-intro-seen")) return;
-    const t = setTimeout(() => setShow(true), 1000);
+    // 히어로 타이핑/보조정보 애니메이션이 다 끝난 뒤 팝업 노출
+    const delayMs = heroAnimationDuration(w.mainTitle, w.subInfo.length) * 1000 + 400;
+    const t = setTimeout(() => setShow(true), delayMs);
     return () => clearTimeout(t);
-  }, []);
+  }, [w.mainTitle, w.subInfo.length]);
 
   const close = () => {
     setShow(false);
@@ -54,7 +57,7 @@ function RSVPIntroModal() {
     setLoading(true);
     setError(false);
     try {
-      await submitRSVP({ name, attendance, guests, message, slug: w.slug });
+      await submitRSVP({ name, attendance, guests, companionName, message, slug: w.slug });
       setStep("done");
     } catch {
       setError(true);
@@ -108,7 +111,14 @@ function RSVPIntroModal() {
 
             {step === "form" && (
               <form onSubmit={handleSubmit} className="text-left">
-                <p className="font-serif text-lg text-[var(--color-text)] mb-5 text-center">참석여부 전달하기</p>
+                <div className="mb-5">
+                  <p className="font-serif text-lg text-[var(--color-text)] text-center">참석여부 전달하기</p>
+                  {w.rsvpNotice && (
+                    <p className="text-[12px] text-[var(--color-text-light)] leading-relaxed text-center mt-2 whitespace-pre-wrap">
+                      {w.rsvpNotice}
+                    </p>
+                  )}
+                </div>
 
                 <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">이름</label>
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)}
@@ -147,6 +157,11 @@ function RSVPIntroModal() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">동반인 이름 (선택)</label>
+                <input type="text" value={companionName} onChange={(e) => setCompanionName(e.target.value)}
+                  placeholder="함께 오시는 분의 성함"
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors mb-4" />
 
                 <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">축하 메시지 (선택)</label>
                 <textarea value={message} onChange={(e) => setMessage(e.target.value)}
@@ -196,6 +211,25 @@ function FloralDivider() {
   );
 }
 
+// 히어로 타이핑/보조정보 애니메이션 타이밍 — RSVP 팝업이 이 애니메이션 종료 후 뜨도록 공유
+const HERO_TITLE_DELAY = 0.4;
+const HERO_TITLE_STAGGER = 0.06;
+const HERO_TITLE_CHAR_DURATION = 0.45;
+const HERO_SUBINFO_START = 2.2;
+const HERO_SUBINFO_STAGGER = 0.25;
+const HERO_SUBINFO_DURATION = 0.8;
+
+function heroAnimationDuration(mainTitle: string, subInfoCount: number): number {
+  const charCount = Array.from(mainTitle).length;
+  const titleFinish = charCount > 0
+    ? HERO_TITLE_DELAY + (charCount - 1) * HERO_TITLE_STAGGER + HERO_TITLE_CHAR_DURATION
+    : 0;
+  const subInfoFinish = subInfoCount > 0
+    ? HERO_SUBINFO_START + (subInfoCount - 1) * HERO_SUBINFO_STAGGER + HERO_SUBINFO_DURATION
+    : 0;
+  return Math.max(titleFinish, subInfoFinish);
+}
+
 function TypedText({
   text,
   delay = 0,
@@ -214,7 +248,7 @@ function TypedText({
       style={style}
       initial="hidden"
       animate="visible"
-      variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: delay } } }}
+      variants={{ visible: { transition: { staggerChildren: HERO_TITLE_STAGGER, delayChildren: delay } } }}
     >
       {letters.map((char, i) => (
         <motion.span
@@ -222,7 +256,7 @@ function TypedText({
           style={{ display: "inline-block", whiteSpace: char === " " ? "pre" : "normal" }}
           variants={{
             hidden: { opacity: 0, y: 10 },
-            visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+            visible: { opacity: 1, y: 0, transition: { duration: HERO_TITLE_CHAR_DURATION, ease: "easeOut" } },
           }}
         >
           {char}
@@ -249,30 +283,20 @@ function Hero() {
       }} />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-        <motion.p className="text-[10px] tracking-[0.45em] text-white/75"
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.9 }}>
-          WE&apos;RE GETTING MARRIED
-        </motion.p>
-
         <TypedText
-          text="TAEYEON • HA"
-          delay={1.1}
-          className="font-serif block mt-4 text-white"
-          style={{ fontSize: "clamp(40px,11vw,64px)", letterSpacing: "0.06em" }}
+          text={w.mainTitle}
+          delay={HERO_TITLE_DELAY}
+          className="font-serif block text-white"
+          style={{ fontSize: "clamp(32px,9vw,52px)", letterSpacing: "0.03em" }}
         />
 
-        <motion.p className="text-[10px] tracking-[0.35em] text-white/70 mt-6"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ delay: 2.6, duration: 0.8 }}>
-          PARTY THE FULLMOON
-        </motion.p>
-
-        <motion.p className="text-xs tracking-[0.1em] text-white/85 mt-2"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ delay: 2.9, duration: 0.8 }}>
-          Sun. October 11. 2026 at 12:30 pm
-        </motion.p>
+        {w.subInfo.map((line, i) => (
+          <motion.p key={i} className="text-xs tracking-[0.15em] text-white/80 mt-2"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ delay: HERO_SUBINFO_START + i * HERO_SUBINFO_STAGGER, duration: HERO_SUBINFO_DURATION }}>
+            {line}
+          </motion.p>
+        ))}
       </div>
 
       <motion.div className="absolute bottom-8 left-0 right-0 flex justify-center text-white/70"
@@ -289,8 +313,10 @@ function Hero() {
 function GardenGallery() {
   const w = useWedding();
   const mainRef = useRef<HTMLDivElement>(null);
+  const thumbStripRef = useRef<HTMLDivElement>(null);
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [active, setActive] = useState(0);
+  const isFirstRender = useRef(true);
 
   // 슬라이드 실제 폭(컨테이너 좌우 패딩만큼 clientWidth보다 작음)
   const slideWidth = () =>
@@ -308,8 +334,18 @@ function GardenGallery() {
     el.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
   };
 
+  // 썸네일 스트립 내부에서만 스크롤 — scrollIntoView는 세로 스크롤 컨테이너까지 타고 올라가
+  // 마운트 시 페이지 전체를 갤러리 위치까지 끌어내리는 버그가 있어 직접 계산으로 대체
   useEffect(() => {
-    thumbRefs.current[active]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const strip = thumbStripRef.current;
+    const thumb = thumbRefs.current[active];
+    if (!strip || !thumb) return;
+    const target = thumb.offsetLeft - strip.clientWidth / 2 + thumb.clientWidth / 2;
+    strip.scrollTo({ left: target, behavior: "smooth" });
   }, [active]);
 
   return (
@@ -345,7 +381,7 @@ function GardenGallery() {
       </p>
 
       {/* 썸네일 목록 — 횡스크롤, 다 들어가면 가운데 정렬 */}
-      <div className="no-scrollbar flex gap-2 overflow-x-auto px-6 mt-4"
+      <div ref={thumbStripRef} className="no-scrollbar flex gap-2 overflow-x-auto px-6 mt-4"
         style={{ justifyContent: "safe center" }}>
         {w.gallery.map((img, i) => (
           <button key={i}
@@ -386,7 +422,11 @@ function InfoSection() {
     mainRef.current?.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
   };
 
-  if (w.info.length === 0) return null;
+  const hasInfo = w.info.length > 0;
+  const hasFlower = !!w.flowerNotice;
+  const hasDirections = w.directionsFromSeoul.length > 0;
+
+  if (!hasInfo && !hasFlower && !hasDirections) return null;
 
   return (
     <section className="py-16 bg-[var(--color-cream)]">
@@ -397,35 +437,76 @@ function InfoSection() {
         <div className="section-divider" />
       </motion.div>
 
-      {/* 안내사항 — 한 장씩 스와이프 */}
-      <div ref={mainRef} onScroll={handleScroll}
-        className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
-        style={{ scrollSnapType: "x mandatory" }}>
-        {w.info.map((item, i) => (
-          <div key={i}
-            className="flex-none rounded-2xl border border-[var(--color-accent)] p-6"
-            style={{ width: "100%", scrollSnapAlign: "center" }}>
-            <p className="font-serif text-lg text-[var(--color-text)] mb-3">{item.title}</p>
+      {hasInfo && (
+        <>
+          {/* 안내사항 — 한 장씩 스와이프 */}
+          <div ref={mainRef} onScroll={handleScroll}
+            className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
+            style={{ scrollSnapType: "x mandatory" }}>
+            {w.info.map((item, i) => (
+              <div key={i}
+                className="flex-none rounded-2xl border border-[var(--color-accent)] p-6"
+                style={{ width: "100%", scrollSnapAlign: "center" }}>
+                <p className="font-serif text-lg text-[var(--color-text)] mb-3">{item.title}</p>
+                <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
+                  {item.content}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* 점 인디케이터 */}
+          {w.info.length > 1 && (
+            <div className="flex justify-center gap-1.5 mt-5">
+              {w.info.map((_, i) => (
+                <button key={i} onClick={() => goTo(i)} aria-label={`${i + 1}번째 안내사항 보기`}
+                  className="rounded-full transition-all"
+                  style={{
+                    width: active === i ? 16 : 6,
+                    height: 6,
+                    background: active === i ? "var(--color-primary)" : "var(--color-accent)",
+                  }} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {hasFlower && (
+        <>
+          {hasInfo && <div className="h-px bg-[var(--color-accent)] mx-6 my-8" />}
+          <div className="px-6 text-center">
+            <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] mb-2">화환 안내</p>
             <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
-              {item.content}
+              {w.flowerNotice}
             </p>
           </div>
-        ))}
-      </div>
+        </>
+      )}
 
-      {/* 점 인디케이터 */}
-      {w.info.length > 1 && (
-        <div className="flex justify-center gap-1.5 mt-5">
-          {w.info.map((_, i) => (
-            <button key={i} onClick={() => goTo(i)} aria-label={`${i + 1}번째 안내사항 보기`}
-              className="rounded-full transition-all"
-              style={{
-                width: active === i ? 16 : 6,
-                height: 6,
-                background: active === i ? "var(--color-primary)" : "var(--color-accent)",
-              }} />
-          ))}
-        </div>
+      {hasDirections && (
+        <>
+          {(hasInfo || hasFlower) && <div className="h-px bg-[var(--color-accent)] mx-6 my-8" />}
+          <div className="px-6">
+            <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] mb-4 text-center">
+              서울에서 오시는 길
+            </p>
+            <div className="space-y-4 max-w-sm mx-auto">
+              {w.directionsFromSeoul.map((d, i) => (
+                <div key={i} className="rounded-2xl border border-[var(--color-accent)] p-5">
+                  <p className="font-serif text-[var(--color-text)] mb-2">{d.route}</p>
+                  <ol className="space-y-1">
+                    {d.steps.map((step, j) => (
+                      <li key={j} className="text-sm text-[var(--color-text-light)] leading-relaxed">
+                        {j + 1}. {step}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </section>
   );
@@ -472,9 +553,54 @@ function MessageWall() {
   );
 }
 
+function BgmPlayer() {
+  const w = useWedding();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  const toggle = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+    } else {
+      audio.play().catch(() => {});
+    }
+    setPlaying((p) => !p);
+  };
+
+  if (!w.bgm.src) return null;
+
+  return (
+    <>
+      <audio ref={audioRef} src={w.bgm.src} loop preload="none" />
+      <button
+        onClick={toggle}
+        aria-label={playing ? "배경음악 정지" : "배경음악 재생"}
+        className="fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center shadow-lg text-white"
+        style={{ background: "var(--color-primary-dark)" }}
+      >
+        {playing ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="5" y="4" width="5" height="16" rx="1" />
+            <rect x="14" y="4" width="5" height="16" rx="1" />
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18V5l12-2v13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="6" cy="18" r="3" fill="currentColor" />
+            <circle cx="18" cy="16" r="3" fill="currentColor" />
+          </svg>
+        )}
+      </button>
+    </>
+  );
+}
+
 export default function GardenTemplate() {
   return (
     <div style={VARS}>
+      <BgmPlayer />
       <RSVPIntroModal />
       <Hero />
       <GreetingSection />

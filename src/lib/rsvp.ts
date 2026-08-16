@@ -2,7 +2,8 @@ export type RSVPPayload = {
   name: string;
   attendance: "attending" | "not_attending" | "";
   guests: string;
-  message: string;
+  companionName?: string;
+  message?: string;
   slug: string;
 };
 

@@ -1,8 +1,10 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import type { WeddingData } from "@/types";
+import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY } from "@/lib/newClient";
 
 const TEMPLATES = [
   {
@@ -206,26 +208,84 @@ function TemplatePreview({ id }: { id: string }) {
 
 export default function TemplateList() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const fileParam = searchParams.get("file") ?? "";
   const [selectedFile, setSelectedFile] = useState(fileParam);
   const [clientList, setClientList] = useState<string[]>([]);
+  const [selecting, setSelecting] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [isCustomer, setIsCustomer] = useState(false);
 
   useEffect(() => {
-    fetch("/api/clients").then(r => r.json()).then(setClientList).catch(() => {});
+    fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(me => {
+      if (me?.role === "customer" && me.file) {
+        setIsCustomer(true);
+        setSelectedFile(me.file);
+      }
+    }).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (isCustomer) return; // customer는 고객 목록을 볼 필요가 없음(항상 자기 파일)
+    fetch("/api/clients").then(r => r.json()).then(setClientList).catch(() => {});
+  }, [isCustomer]);
+
   const active = !!selectedFile;
+
+  // 템플릿 카드를 고르면: 기존 고객이면 template 필드만 바꿔 저장, 신규면 고객을 새로 만들고
+  // 저장한 뒤 변수 입력(/admin/setup)으로 이동. 나머지 값은 그대로 유지되므로
+  // 나중에 템플릿을 다시 바꿔도 이미 입력한 공통 정보는 사라지지 않는다.
+  const selectTemplate = async (templateId: string) => {
+    setSelecting(templateId);
+    setError("");
+    try {
+      let filename = selectedFile;
+      let data: WeddingData;
+
+      if (filename) {
+        const res = await fetch(`/api/clients?file=${filename}`);
+        data = res.ok ? await res.json() : { ...DEFAULT_WEDDING_DATA };
+      } else {
+        filename = generateFilename();
+        data = { ...DEFAULT_WEDDING_DATA };
+      }
+
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, data: { ...data, template: templateId, slug: filename } }),
+      });
+      if (!res.ok) throw new Error("저장에 실패했습니다");
+
+      localStorage.setItem(LAST_FILE_KEY, filename);
+      router.push(`/admin/setup?file=${filename}`);
+    } catch {
+      setError("템플릿을 저장하지 못했습니다. 다시 시도해주세요.");
+      setSelecting(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* 액션바 */}
       <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
-          <h1 className="text-sm font-semibold text-gray-700">템플릿 선택</h1>
-          <Link href="/admin/setup"
-            className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white">
-            + 새 고객
-          </Link>
+          <div>
+            <h1 className="text-sm font-semibold text-gray-700">템플릿 선택</h1>
+            <p className="text-[10px] text-gray-400 hidden sm:block">
+              {active
+                ? `"${selectedFile}" 고객의 템플릿을 바꿉니다 — 이미 입력한 정보는 유지됩니다`
+                : isCustomer
+                ? "템플릿을 먼저 고르면 변수 입력 화면으로 이동합니다"
+                : "템플릿을 먼저 고르면 변수 입력 화면으로 이동합니다 · 고객이 직접 로그인하게 하려면 파일명을 이메일 형식으로 입력하세요"}
+            </p>
+          </div>
+          {!isCustomer && (
+            <button onClick={() => setSelectedFile("")}
+              className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white shrink-0">
+              + 새 고객
+            </button>
+          )}
         </div>
       </div>
 
@@ -235,6 +295,7 @@ export default function TemplateList() {
         <aside className="w-56 shrink-0 sticky top-[104px] hidden lg:flex flex-col gap-4">
 
           {/* 고객 선택 */}
+          {!isCustomer && (
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
               <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">고객 선택</p>
@@ -244,7 +305,7 @@ export default function TemplateList() {
                 className="w-full px-2.5 py-2 text-[11px] font-mono border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white"
                 placeholder="파일명 직접 입력"
                 value={selectedFile}
-                onChange={e => setSelectedFile(e.target.value.replace(/[^a-z0-9-_]/gi, "").toLowerCase())}
+                onChange={e => setSelectedFile(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
               />
               {clientList.length > 0 && (
                 <div className="space-y-0.5 max-h-48 overflow-y-auto">
@@ -260,6 +321,7 @@ export default function TemplateList() {
               )}
             </div>
           </div>
+          )}
 
           {/* 공유 링크 */}
           {active && (
@@ -293,6 +355,7 @@ export default function TemplateList() {
         <div className="flex-1 min-w-0">
 
           {/* 모바일 고객 선택 */}
+          {!isCustomer && (
           <div className="lg:hidden mb-4 bg-white rounded-2xl border border-gray-100 p-4">
             <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">고객 선택</p>
             <div className="flex gap-2 mb-2">
@@ -300,7 +363,7 @@ export default function TemplateList() {
                 className="flex-1 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg outline-none focus:border-blue-400"
                 placeholder="파일명 입력 (예: kim-minjun)"
                 value={selectedFile}
-                onChange={e => setSelectedFile(e.target.value.replace(/[^a-z0-9-_]/gi, "").toLowerCase())}
+                onChange={e => setSelectedFile(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
               />
               {active && (
                 <Link href={`/admin/setup?file=${selectedFile}`}
@@ -325,6 +388,11 @@ export default function TemplateList() {
               <p className="text-[10px] text-amber-500 mt-2">고객을 선택해야 미리보기 링크가 활성화됩니다</p>
             )}
           </div>
+          )}
+
+          {error && (
+            <p className="text-xs text-red-500 mb-3">{error}</p>
+          )}
 
           {/* 템플릿 그리드 */}
           <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
@@ -353,18 +421,13 @@ export default function TemplateList() {
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{t.mood}</span>
                   </div>
                   <p className="text-[10px] text-gray-400 mb-3 leading-relaxed">{t.desc}</p>
-                  <a
-                    href={active ? `/invite/${t.id}?file=${selectedFile}` : "#"}
-                    target={active ? "_blank" : undefined}
-                    onClick={!active ? e => e.preventDefault() : undefined}
-                    className={`block w-full py-2 text-center text-xs rounded-xl font-medium transition-colors ${
-                      active
-                        ? "bg-gray-900 text-white hover:bg-gray-700"
-                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    }`}
+                  <button
+                    onClick={() => selectTemplate(t.id)}
+                    disabled={selecting !== null}
+                    className="block w-full py-2 text-center text-xs rounded-xl font-medium transition-colors bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50"
                   >
-                    {active ? "이 템플릿으로 보기" : "고객 선택 필요"}
-                  </a>
+                    {selecting === t.id ? "저장 중…" : active ? "이 템플릿 선택" : "이 템플릿으로 시작하기"}
+                  </button>
                 </div>
               </div>
             ))}

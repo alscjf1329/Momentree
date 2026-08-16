@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import type { WeddingData } from "@/types";
+import { WEDDING } from "@/content";
+import { applyToEncryptedFields, decrypt, encrypt } from "@/lib/accountCrypto";
+import { getSchemaForTemplate } from "@/lib/templateSchemas";
+import { getSession } from "@/lib/session";
 
 const CLIENTS_DIR = path.join(process.cwd(), "data", "clients");
 
@@ -8,19 +13,31 @@ async function ensureDir() {
   await fs.mkdir(CLIENTS_DIR, { recursive: true });
 }
 
-// GET /api/clients         → 파일 목록
-// GET /api/clients?file=x  → 특정 파일 읽기
+// GET /api/clients         → 파일 목록 (customer는 자기 파일만)
+// GET /api/clients?file=x  → 특정 파일 읽기 (customer는 자기 파일만 허용)
 export async function GET(req: NextRequest) {
   await ensureDir();
-  const file = req.nextUrl.searchParams.get("file");
+  const session = await getSession(req);
+  if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const requested = req.nextUrl.searchParams.get("file");
+  const file = session.role === "customer" ? session.file : requested;
 
   if (file) {
     try {
       const raw = await fs.readFile(path.join(CLIENTS_DIR, `${file}.json`), "utf-8");
-      return NextResponse.json(JSON.parse(raw));
+      // 필드 추가 이전에 저장된 레거시 클라이언트 파일 대비 기본값과 병합
+      const data = { ...WEDDING, ...JSON.parse(raw) } as WeddingData;
+      const schema = getSchemaForTemplate(data.template);
+      const decrypted = applyToEncryptedFields(data, schema, decrypt);
+      return NextResponse.json(decrypted);
     } catch {
       return NextResponse.json({ error: "not found" }, { status: 404 });
     }
+  }
+
+  if (session.role === "customer") {
+    return NextResponse.json(session.file ? [session.file] : []);
   }
 
   const files = await fs.readdir(CLIENTS_DIR).catch(() => [] as string[]);
@@ -28,25 +45,38 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(names);
 }
 
-// POST /api/clients  → { filename, data } 저장
+// POST /api/clients  → { filename, data } 저장 (customer는 자기 파일로 강제)
 export async function POST(req: NextRequest) {
   await ensureDir();
-  const { filename, data } = await req.json();
+  const session = await getSession(req);
+  if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  if (!filename || !/^[a-z0-9-_]+$/i.test(filename)) {
+  const body = await req.json();
+  const { data } = body;
+  const filename = session.role === "customer" ? session.file : body.filename;
+
+  if (!filename || !/^[a-zA-Z0-9.@_+-]+$/.test(filename)) {
     return NextResponse.json({ error: "invalid filename" }, { status: 400 });
   }
 
+  const schema = getSchemaForTemplate((data as WeddingData).template);
+  const toSave = applyToEncryptedFields(data as WeddingData, schema, encrypt);
+
   await fs.writeFile(
     path.join(CLIENTS_DIR, `${filename}.json`),
-    JSON.stringify(data, null, 2),
+    JSON.stringify(toSave, null, 2),
     "utf-8"
   );
   return NextResponse.json({ ok: true });
 }
 
-// DELETE /api/clients?file=x
+// DELETE /api/clients?file=x (admin 전용)
 export async function DELETE(req: NextRequest) {
+  const session = await getSession(req);
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const file = req.nextUrl.searchParams.get("file");
   if (!file) return NextResponse.json({ error: "file required" }, { status: 400 });
   try {

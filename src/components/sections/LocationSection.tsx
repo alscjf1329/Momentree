@@ -8,7 +8,9 @@ export default function LocationSection() {
   const wedding = useWedding();
   const [copied, setCopied] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
-  const { venue } = wedding;
+  const { venue, shuttleTimetable } = wedding;
+  const hasShuttle = shuttleTimetable.from.length > 0 || shuttleTimetable.to.length > 0;
+  const hasCoords = venue.lat !== 0 || venue.lng !== 0;
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(venue.address);
@@ -41,7 +43,7 @@ export default function LocationSection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        {mapVisible && (
+        {mapVisible && hasCoords && (
           <iframe
             src={`https://map.kakao.com/link/map/${venue.name},${venue.lat},${venue.lng}`}
             width="100%"
@@ -49,6 +51,11 @@ export default function LocationSection() {
             style={{ border: 0 }}
             title="웨딩홀 위치"
           />
+        )}
+        {mapVisible && !hasCoords && (
+          <div className="w-full h-full flex items-center justify-center">
+            <p className="text-xs text-[var(--color-text-light)]">지도 좌표가 설정되지 않았습니다</p>
+          </div>
         )}
       </motion.div>
 
@@ -82,6 +89,40 @@ export default function LocationSection() {
           네이버맵
         </a>
       </motion.div>
+
+      {hasShuttle && (
+        <motion.div
+          className="mt-8 mx-4 rounded-2xl border border-[var(--color-accent)] p-5"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] mb-3">셔틀버스 시간표</p>
+          <div className="grid grid-cols-2 gap-4">
+            {shuttleTimetable.from.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">가는 편</p>
+                <ul className="space-y-1">
+                  {shuttleTimetable.from.map((line, i) => (
+                    <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {shuttleTimetable.to.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">오는 편</p>
+                <ul className="space-y-1">
+                  {shuttleTimetable.to.map((line, i) => (
+                    <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
     </section>
   );
 }

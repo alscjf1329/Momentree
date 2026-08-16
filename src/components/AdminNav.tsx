@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const NAV = [
   { href: "/admin", label: "하객 현황" },
@@ -10,11 +10,24 @@ const NAV = [
   { href: "/admin/templates", label: "템플릿" },
 ];
 
+interface Me {
+  role: "admin" | "customer";
+  file: string | null;
+  email: string | null;
+}
+
 function NavInner() {
   const path = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const file = searchParams.get("file") ?? "";
+  const [me, setMe] = useState<Me | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(setMe).catch(() => {});
+  }, []);
+
+  const isCustomer = me?.role === "customer";
 
   const logout = async () => {
     await fetch("/api/admin/auth/logout", { method: "POST" });
@@ -25,8 +38,8 @@ function NavInner() {
   const active = (href: string) =>
     href === "/admin" ? path === "/admin" : path.startsWith(href);
 
-  // 파일 컨텍스트 유지하며 링크 생성
-  const href = (base: string) => file ? `${base}?file=${file}` : base;
+  // 파일 컨텍스트 유지하며 링크 생성 (customer는 항상 자기 파일에 고정되므로 굳이 붙이지 않아도 됨)
+  const href = (base: string) => (!isCustomer && file) ? `${base}?file=${file}` : base;
 
   return (
     <div className="px-4 sm:px-6 h-14 flex items-center gap-2 max-w-6xl mx-auto">
@@ -47,19 +60,27 @@ function NavInner() {
             style={active(base)
               ? { background: "var(--color-primary-dark)", color: "#fff" }
               : { color: "#666" }}>
-            {label}
+            {base === "/admin/setup" && isCustomer ? "내 정보 설정" : label}
           </Link>
         ))}
       </nav>
 
-      {/* 현재 선택된 파일 */}
-      {file && (
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-[10px] text-gray-400 hidden sm:block">파일</span>
-          <span className="text-[11px] font-mono px-2.5 py-1 bg-gray-100 rounded-lg text-gray-600 max-w-[120px] truncate">
-            {file}
+      {/* 로그인 이메일 / 현재 선택된 파일 */}
+      {isCustomer ? (
+        me?.email && (
+          <span className="text-[11px] text-gray-400 max-w-[160px] truncate hidden sm:block">
+            {me.email}
           </span>
-        </div>
+        )
+      ) : (
+        file && (
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[10px] text-gray-400 hidden sm:block">파일</span>
+            <span className="text-[11px] font-mono px-2.5 py-1 bg-gray-100 rounded-lg text-gray-600 max-w-[120px] truncate">
+              {file}
+            </span>
+          </div>
+        )
       )}
 
       {/* 홈 */}

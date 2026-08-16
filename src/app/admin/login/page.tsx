@@ -6,15 +6,24 @@ import { useRouter } from "next/navigation";
 export default function AdminLoginPage() {
   const router = useRouter();
   const [step, setStep] = useState<"request" | "verify">("request");
+  const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const requestCode = async () => {
+    if (!email) {
+      setError("이메일을 입력하세요");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/auth/request-code", { method: "POST" });
+      const res = await fetch("/api/admin/auth/request-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "요청에 실패했습니다");
       setStep("verify");
@@ -32,7 +41,7 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/admin/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ email, code }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "인증에 실패했습니다");
@@ -48,20 +57,31 @@ export default function AdminLoginPage() {
   return (
     <div style={{ minHeight: "100dvh" }} className="flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <h1 className="text-lg font-semibold text-gray-800 mb-1">관리자 로그인</h1>
+        <h1 className="text-lg font-semibold text-gray-800 mb-1">로그인</h1>
         <p className="text-xs text-gray-400 mb-6">
-          등록된 관리자 이메일로 인증 코드를 보내드립니다
+          등록된 이메일로 인증 코드를 보내드립니다
         </p>
 
         {step === "request" ? (
-          <button
-            onClick={requestCode}
-            disabled={loading}
-            className="w-full py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50"
-            style={{ background: "var(--color-primary-dark, #1f2937)" }}
-          >
-            {loading ? "발송 중..." : "인증 코드 받기"}
-          </button>
+          <>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value.trim())}
+              placeholder="이메일 주소"
+              type="email"
+              autoFocus
+              onKeyDown={(e) => e.key === "Enter" && requestCode()}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm mb-3"
+            />
+            <button
+              onClick={requestCode}
+              disabled={loading}
+              className="w-full py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50"
+              style={{ background: "var(--color-primary-dark, #1f2937)" }}
+            >
+              {loading ? "발송 중..." : "인증 코드 받기"}
+            </button>
+          </>
         ) : (
           <>
             <input

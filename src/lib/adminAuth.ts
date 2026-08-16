@@ -41,17 +41,31 @@ export function generateOtpCode(): string {
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7일
 
-export async function createSessionToken(secret: string): Promise<string> {
-  const payload = JSON.stringify({ exp: Date.now() + SESSION_TTL_MS });
+export type SessionRole = "admin" | "customer";
+
+export interface SessionPayload {
+  exp: number;
+  role: SessionRole;
+  file?: string;
+}
+
+export async function createSessionToken(
+  secret: string,
+  identity: { role: SessionRole; file?: string }
+): Promise<string> {
+  const payload = JSON.stringify({ exp: Date.now() + SESSION_TTL_MS, ...identity });
   const payloadB64 = base64url(encoder.encode(payload));
   const sig = await hmac(payloadB64, secret);
   return `${payloadB64}.${sig}`;
 }
 
-export async function verifySessionToken(token: string | undefined, secret: string): Promise<boolean> {
-  if (!token) return false;
+export async function verifySessionToken(
+  token: string | undefined,
+  secret: string
+): Promise<SessionPayload | null> {
+  if (!token) return null;
   const [payloadB64, sigB64] = token.split(".");
-  if (!payloadB64 || !sigB64) return false;
+  if (!payloadB64 || !sigB64) return null;
 
   try {
     const key = await getKey(secret);
@@ -61,11 +75,18 @@ export async function verifySessionToken(token: string | undefined, secret: stri
       base64urlToBytes(sigB64),
       encoder.encode(payloadB64)
     );
-    if (!valid) return false;
+    if (!valid) return null;
 
     const payload = JSON.parse(new TextDecoder().decode(base64urlToBytes(payloadB64)));
-    return typeof payload.exp === "number" && payload.exp > Date.now();
+    if (
+      typeof payload.exp !== "number" ||
+      payload.exp <= Date.now() ||
+      (payload.role !== "admin" && payload.role !== "customer")
+    ) {
+      return null;
+    }
+    return payload as SessionPayload;
   } catch {
-    return false;
+    return null;
   }
 }

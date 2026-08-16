@@ -1,66 +1,107 @@
-import fs from "fs/promises";
-import path from "path";
-import Link from "next/link";
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
 import type { RsvpEntry } from "@/app/api/rsvp/route";
 
-const RSVP_DIR = path.join(process.cwd(), "data", "rsvp");
-
-async function getSlugs(): Promise<string[]> {
-  try {
-    const files = await fs.readdir(RSVP_DIR);
-    return files.filter(f => f.endsWith(".json")).map(f => f.replace(".json", "")).sort();
-  } catch {
-    return [];
-  }
+interface Me {
+  role: "admin" | "customer";
+  file: string | null;
 }
 
-async function getRsvps(slug: string): Promise<RsvpEntry[]> {
-  try {
-    const raw = await fs.readFile(path.join(RSVP_DIR, `${slug}.json`), "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
+export default function AdminPage() {
+  const [me, setMe] = useState<Me | null>(null);
+  const [slugs, setSlugs] = useState<string[]>([]);
+  const [file, setFile] = useState("");
+  const [rsvps, setRsvps] = useState<RsvpEntry[]>([]);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [draft, setDraft] = useState<Partial<RsvpEntry>>({});
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ file?: string }>;
-}) {
-  const { file } = await searchParams;
-  const slugs = await getSlugs();
-  const rsvps = file ? await getRsvps(file) : [];
+  const loadRsvps = useCallback(async (f: string) => {
+    if (!f) { setRsvps([]); return; }
+    const res = await fetch(`/api/rsvp?file=${f}`);
+    setRsvps(res.ok ? await res.json() : []);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then((data: Me | null) => {
+      setMe(data);
+      if (data?.role === "customer" && data.file) {
+        setFile(data.file);
+        loadRsvps(data.file);
+      } else if (data?.role === "admin") {
+        fetch("/api/rsvp").then(r => r.json()).then(setSlugs).catch(() => {});
+      }
+    }).catch(() => {});
+  }, [loadRsvps]);
+
+  const selectFile = (f: string) => {
+    setFile(f);
+    setEditIndex(null);
+    loadRsvps(f);
+  };
+
   const attending = rsvps.filter(r => r.attendance === "attending");
   const totalGuests = attending.reduce((sum, r) => sum + parseInt(r.guests || "1"), 0);
+
+  const startEdit = (i: number) => {
+    setEditIndex(i);
+    setDraft(rsvps[i]);
+  };
+
+  const cancelEdit = () => {
+    setEditIndex(null);
+    setDraft({});
+  };
+
+  const saveEdit = async (i: number) => {
+    await fetch("/api/rsvp", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: file, index: i, ...draft }),
+    });
+    setEditIndex(null);
+    await loadRsvps(file);
+  };
+
+  const remove = async (i: number) => {
+    if (!confirm("이 응답을 삭제할까요?")) return;
+    await fetch(`/api/rsvp?file=${file}&index=${i}`, { method: "DELETE" });
+    await loadRsvps(file);
+  };
+
+  const isCustomer = me?.role === "customer";
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <div className="mb-5">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-800">하객 현황</h1>
-        <p className="text-xs text-gray-400 mt-0.5">고객을 선택하면 해당 청첩장의 응답을 확인합니다</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          {isCustomer ? "내 청첩장의 응답을 확인하고 수정할 수 있습니다" : "고객을 선택하면 해당 청첩장의 응답을 확인합니다"}
+        </p>
       </div>
 
-      {/* 클라이언트 셀렉터 */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
-        <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">고객 선택</p>
-        {slugs.length === 0 ? (
-          <p className="text-xs text-gray-400">아직 RSVP 응답이 없습니다</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {slugs.map(s => (
-              <Link key={s} href={`/admin?file=${s}`}
-                className={`px-3 py-1.5 text-xs font-mono rounded-full border transition-colors ${
-                  file === s
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "border-gray-200 text-gray-600 hover:border-gray-400"
-                }`}>
-                {s}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* 클라이언트 셀렉터 (admin 전용) */}
+      {!isCustomer && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
+          <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">고객 선택</p>
+          {slugs.length === 0 ? (
+            <p className="text-xs text-gray-400">아직 RSVP 응답이 없습니다</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {slugs.map(s => (
+                <button key={s} onClick={() => selectFile(s)}
+                  className={`px-3 py-1.5 text-xs font-mono rounded-full border transition-colors ${
+                    file === s
+                      ? "bg-gray-900 text-white border-gray-900"
+                      : "border-gray-200 text-gray-600 hover:border-gray-400"
+                  }`}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 선택된 고객의 RSVP */}
       {file ? (
@@ -82,71 +123,71 @@ export default async function AdminPage({
           {rsvps.length === 0 ? (
             <div className="bg-white rounded-xl p-12 text-center text-gray-400 border border-gray-100">
               <p className="text-sm">아직 응답이 없습니다</p>
-              <p className="text-xs mt-1 font-mono text-gray-300">{file}</p>
             </div>
           ) : (
-            <>
-              {/* 모바일: 카드 */}
-              <div className="space-y-3 sm:hidden">
-                {rsvps.map((r, i) => (
-                  <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-800">{r.name}</span>
-                      {r.attendance === "attending"
-                        ? <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">✓ 참석 {r.guests}명</span>
-                        : <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">불참</span>
-                      }
+            <div className="space-y-3">
+              {rsvps.map((r, i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                  {editIndex === i ? (
+                    <div className="space-y-2">
+                      <input value={draft.name ?? ""} onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
+                        placeholder="이름" className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs" />
+                      <div className="flex gap-2">
+                        <select value={draft.attendance ?? "attending"}
+                          onChange={e => setDraft(d => ({ ...d, attendance: e.target.value as RsvpEntry["attendance"] }))}
+                          className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs">
+                          <option value="attending">참석</option>
+                          <option value="not_attending">불참</option>
+                        </select>
+                        <input value={draft.guests ?? ""} onChange={e => setDraft(d => ({ ...d, guests: e.target.value }))}
+                          placeholder="인원" className="w-20 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs" />
+                      </div>
+                      <input value={draft.companionName ?? ""} onChange={e => setDraft(d => ({ ...d, companionName: e.target.value }))}
+                        placeholder="동반인" className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs" />
+                      <textarea value={draft.message ?? ""} onChange={e => setDraft(d => ({ ...d, message: e.target.value }))}
+                        placeholder="메시지" rows={2} className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs" />
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={cancelEdit} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500">취소</button>
+                        <button onClick={() => saveEdit(i)} className="text-xs px-3 py-1.5 rounded-lg bg-gray-900 text-white">저장</button>
+                      </div>
                     </div>
-                    {r.message && <p className="text-xs text-gray-500 mb-2">{r.message}</p>}
-                    <p className="text-[10px] text-gray-400">
-                      {new Date(r.submittedAt).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* 데스크탑: 테이블 */}
-              <div className="hidden sm:block bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      {["이름", "참석", "인원", "메시지", "제출 시각"].map(h => (
-                        <th key={h} className="text-left px-4 py-3 text-gray-500 font-medium text-xs">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rsvps.map((r, i) => (
-                      <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-800">{r.name}</td>
-                        <td className="px-4 py-3">
-                          {r.attendance === "attending"
-                            ? <span className="text-green-600 text-xs font-medium">✓ 참석</span>
-                            : <span className="text-gray-400 text-xs">불참</span>}
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-600 text-xs">
-                          {r.attendance === "attending" ? `${r.guests}명` : "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-500 max-w-[240px] truncate text-xs">{r.message || "-"}</td>
-                        <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-800">{r.name}</span>
+                        {r.attendance === "attending"
+                          ? <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">✓ 참석 {r.guests}명</span>
+                          : <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">불참</span>
+                        }
+                      </div>
+                      {r.companionName && <p className="text-xs text-gray-500 mb-1">동반인: {r.companionName}</p>}
+                      {r.message && <p className="text-xs text-gray-500 mb-2">{r.message}</p>}
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] text-gray-400">
                           {new Date(r.submittedAt).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="px-4 py-3 bg-gray-50 text-xs text-gray-400 flex justify-between border-t border-gray-100">
-                  <span>불참: {rsvps.length - attending.length}명</span>
-                  <span>참석 총 인원: {totalGuests}명</span>
+                        </p>
+                        <div className="flex gap-2">
+                          <button onClick={() => startEdit(i)} className="text-[11px] text-gray-500 hover:text-gray-800">수정</button>
+                          <button onClick={() => remove(i)} className="text-[11px] text-red-400 hover:text-red-600">삭제</button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
+              ))}
+              <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 text-xs text-gray-400 flex justify-between">
+                <span>불참: {rsvps.length - attending.length}명</span>
+                <span>참석 총 인원: {totalGuests}명</span>
               </div>
-            </>
+            </div>
           )}
         </>
       ) : (
-        <div className="bg-white rounded-xl p-12 text-center text-gray-400 border border-gray-100">
-          <p className="text-sm">위에서 고객을 선택하세요</p>
-        </div>
+        !isCustomer && (
+          <div className="bg-white rounded-xl p-12 text-center text-gray-400 border border-gray-100">
+            <p className="text-sm">위에서 고객을 선택하세요</p>
+          </div>
+        )
       )}
     </div>
   );
