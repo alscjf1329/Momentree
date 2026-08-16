@@ -20,8 +20,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# 고객 데이터 / RSVP 데이터 디렉터리
-RUN mkdir -p data/clients data/rsvp && chown -R nextjs:nodejs data
+# 고객 데이터 / RSVP 데이터 / 업로드 파일 디렉터리
+RUN mkdir -p data/clients data/rsvp data/uploads/images data/uploads/audio && chown -R nextjs:nodejs data
 
 USER nextjs
 EXPOSE 3000

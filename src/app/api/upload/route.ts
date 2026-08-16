@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
-import { PUBLIC_DIR } from "@/lib/paths";
+import { DATA_DIR } from "@/lib/paths";
 
-const LIMITS: Record<string, { dir: string; publicPath: string; mime: string; maxBytes: number }> = {
-  image: { dir: "images", publicPath: "/images", mime: "image/", maxBytes: 10 * 1024 * 1024 },
-  audio: { dir: "audio", publicPath: "/audio", mime: "audio/", maxBytes: 20 * 1024 * 1024 },
+const LIMITS: Record<string, { dir: string; mime: string; maxBytes: number }> = {
+  image: { dir: "images", mime: "image/", maxBytes: 10 * 1024 * 1024 },
+  audio: { dir: "audio", mime: "audio/", maxBytes: 20 * 1024 * 1024 },
 };
 
 function safeExt(filename: string, fallback: string): string {
@@ -14,7 +14,9 @@ function safeExt(filename: string, fallback: string): string {
   return ext || fallback;
 }
 
-// 어드민 인증(proxy.ts)이 보호하는 라우트 — public/images, public/audio에만 쓴다
+// 어드민 인증(proxy.ts)이 보호하는 라우트 — DATA_DIR/uploads 밑에 저장하고
+// /uploads/[kind]/[filename] 라우트가 직접 읽어서 서빙한다 (public/ 의존 안 함 —
+// standalone 빌드 재생성 시 날아가는 문제 방지)
 export async function POST(req: NextRequest) {
   const form = await req.formData();
   const file = form.get("file");
@@ -40,11 +42,11 @@ export async function POST(req: NextRequest) {
 
   const ext = safeExt(file.name, kind === "image" ? ".jpg" : ".mp3");
   const filename = `${Date.now().toString(36)}-${crypto.randomBytes(4).toString("hex")}${ext}`;
-  const dir = path.join(PUBLIC_DIR, limit.dir);
+  const dir = path.join(DATA_DIR, "uploads", limit.dir);
   await fs.mkdir(dir, { recursive: true });
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await fs.writeFile(path.join(dir, filename), buffer);
 
-  return NextResponse.json({ path: `${limit.publicPath}/${filename}` });
+  return NextResponse.json({ path: `/uploads/${limit.dir}/${filename}` });
 }
