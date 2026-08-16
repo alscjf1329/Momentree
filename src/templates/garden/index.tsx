@@ -71,7 +71,7 @@ function RSVPIntroModal() {
       {show && (
         <motion.div className="fixed inset-0 z-50 flex items-center justify-center px-6"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="absolute inset-0" style={{ background: "rgba(30,32,24,0.45)" }}
+          <motion.div className="absolute inset-0" style={{ background: "#14160f" }}
             onClick={close} />
           <motion.div className="relative bg-white rounded-3xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-8 text-center shadow-xl"
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
