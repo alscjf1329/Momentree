@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { PUBLIC_DIR } from "@/lib/paths";
 
 const LIMITS: Record<string, { dir: string; publicPath: string; mime: string; maxBytes: number }> = {
   image: { dir: "images", publicPath: "/images", mime: "image/", maxBytes: 10 * 1024 * 1024 },
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   const ext = safeExt(file.name, kind === "image" ? ".jpg" : ".mp3");
   const filename = `${Date.now().toString(36)}-${crypto.randomBytes(4).toString("hex")}${ext}`;
-  const dir = path.join(process.cwd(), "public", limit.dir);
+  const dir = path.join(PUBLIC_DIR, limit.dir);
   await fs.mkdir(dir, { recursive: true });
 
   const buffer = Buffer.from(await file.arrayBuffer());

@@ -1,8 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
 import { hmac, type SessionRole } from "@/lib/adminAuth";
+import { DATA_DIR } from "@/lib/paths";
 
-const OTP_DIR = path.join(process.cwd(), "data", "otp");
+const OTP_DIR = path.join(DATA_DIR, "otp");
 export const OTP_TTL_MS = 5 * 60 * 1000;
 const REQUEST_COOLDOWN_MS = 30 * 1000;
 const MAX_ATTEMPTS = 5;

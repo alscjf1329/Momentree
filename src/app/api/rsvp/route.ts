@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 import { getSession } from "@/lib/session";
+import { DATA_DIR } from "@/lib/paths";
 
-const RSVP_DIR = path.join(process.cwd(), "data", "rsvp");
+const RSVP_DIR = path.join(DATA_DIR, "rsvp");
 
 export interface RsvpEntry {
   name: string;

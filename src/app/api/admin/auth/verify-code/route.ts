@@ -6,8 +6,9 @@ import { verifyOtp } from "@/lib/adminOtp";
 import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
 import { applyToEncryptedFields, encrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
+import { DATA_DIR } from "@/lib/paths";
 
-const CLIENTS_DIR = path.join(process.cwd(), "data", "clients");
+const CLIENTS_DIR = path.join(DATA_DIR, "clients");
 
 const ERROR_MESSAGES: Record<string, string> = {
   expired: "코드가 만료되었습니다. 다시 요청해주세요",

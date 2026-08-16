@@ -7,8 +7,9 @@ import { applyToEncryptedFields, decrypt, encrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { getSession } from "@/lib/session";
 import { isValidClientFilename } from "@/lib/newClient";
+import { DATA_DIR } from "@/lib/paths";
 
-const CLIENTS_DIR = path.join(process.cwd(), "data", "clients");
+const CLIENTS_DIR = path.join(DATA_DIR, "clients");
 
 async function ensureDir() {
   await fs.mkdir(CLIENTS_DIR, { recursive: true });

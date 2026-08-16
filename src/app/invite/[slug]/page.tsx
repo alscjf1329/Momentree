@@ -7,6 +7,7 @@ import { WEDDING } from "@/content";
 import type { WeddingData } from "@/types";
 import { applyToEncryptedFields, decrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
+import { DATA_DIR } from "@/lib/paths";
 import { WeddingProvider } from "@/context/WeddingContext";
 import { TEMPLATE_MAP } from "@/templates/registry";
 import ClassicTemplate from "@/templates/classic";
@@ -14,7 +15,7 @@ import ClassicTemplate from "@/templates/classic";
 async function readClientFile(filename: string): Promise<WeddingData | null> {
   try {
     const raw = await fs.readFile(
-      path.join(process.cwd(), "data", "clients", `${filename}.json`),
+      path.join(DATA_DIR, "clients", `${filename}.json`),
       "utf-8"
     );
     // 필드 추가 이전에 저장된 레거시 클라이언트 파일 대비 기본값과 병합

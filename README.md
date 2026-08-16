@@ -113,6 +113,15 @@ ENCRYPTION_KEY=openssl rand -base64 32 로 생성
 
 신랑·신부 계좌번호/예금주는 저장 시 AES-256-GCM으로 암호화되어 `data/clients/*.json`에 기록됩니다. `ENCRYPTION_KEY`가 없으면 계좌 저장/조회가 실패합니다. 암호화 이전에 저장된 평문 데이터는 그대로 읽히다가 다음 저장 시 자동으로 암호화됩니다.
 
+### 데이터/업로드 저장 경로 (PM2 등 standalone 배포 시 필수)
+
+기본적으로 고객·RSVP·OTP 데이터(`data/`)와 업로드 이미지·오디오(`public/`)는 `process.cwd()` 기준 상대경로에 저장됩니다. Docker로 실행하면 항상 프로젝트 루트에서 기동되니 문제없지만, PM2로 `next build`의 `.next/standalone/server.js`를 직접 실행하는 등 프로세스가 프로젝트 루트가 아닌 곳에서 뜨는 배포 환경이면 `process.cwd()`가 기대와 달라져 업로드한 파일이 실제 서빙되는 `public/`과 다른 곳에 저장되는 문제가 생길 수 있습니다. 이럴 땐 `.env.local`에 절대경로로 고정하세요:
+
+```bash
+DATA_DIR=/절대/경로/data
+PUBLIC_DIR=/절대/경로/public
+```
+
 ---
 
 ## 데이터 저장 구조
