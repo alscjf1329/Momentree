@@ -296,8 +296,8 @@ function Hero() {
                 delay={delay}
                 className="block text-white"
                 style={{
-                  fontFamily: "'Permanent Marker', 'Noto Serif KR', serif",
-                  fontSize: "clamp(30px,8vw,46px)",
+                  fontFamily: "'Alex Brush', 'Noto Serif KR', serif",
+                  fontSize: "clamp(65px,8vw,46px)",
                   lineHeight: 1.25,
                   textShadow: "0 2px 16px rgba(0,0,0,0.5)",
                 }}
@@ -580,10 +580,12 @@ function BgmPlayer() {
     if (!audio) return;
     if (playing) {
       audio.pause();
+      setPlaying(false);
     } else {
-      audio.play().catch(() => {});
+      audio.play()
+        .then(() => setPlaying(true))
+        .catch((e) => console.error("BGM 재생 실패:", e));
     }
-    setPlaying((p) => !p);
   };
 
   if (!w.bgm.src) return null;
