@@ -588,11 +588,39 @@ function BgmPlayer() {
     }
   };
 
+  // 브라우저 자동재생 정책상 사용자 상호작용 없이 소리 있는 오디오를 강제
+  // 재생할 방법은 없음 — 마운트 직후 재생을 시도하고, 막히면 페이지 첫
+  // 클릭/터치/키 입력 시점에 바로 재생되도록 한다 (사실상의 자동재생).
+  useEffect(() => {
+    if (!w.bgm.src) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const unlock = () => {
+      audio.play().then(() => setPlaying(true)).catch(() => {});
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchstart", unlock);
+      document.removeEventListener("keydown", unlock);
+    };
+
+    audio.play().then(() => setPlaying(true)).catch(() => {
+      document.addEventListener("click", unlock);
+      document.addEventListener("touchstart", unlock);
+      document.addEventListener("keydown", unlock);
+    });
+
+    return () => {
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchstart", unlock);
+      document.removeEventListener("keydown", unlock);
+    };
+  }, [w.bgm.src]);
+
   if (!w.bgm.src) return null;
 
   return (
     <>
-      <audio ref={audioRef} src={w.bgm.src} loop preload="none" />
+      <audio ref={audioRef} src={w.bgm.src} loop preload="auto" />
       <button
         onClick={toggle}
         aria-label={playing ? "배경음악 정지" : "배경음악 재생"}
