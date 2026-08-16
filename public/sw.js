@@ -69,6 +69,13 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
+  // 오디오/비디오 — Range 요청(206) 스트리밍이라 Cache API로 캐싱 불가능
+  // (스펙상 partial response는 cache.put()에서 거부됨) — 그냥 네트워크로 통과
+  if (request.destination === "audio" || request.destination === "video" || request.headers.has("range")) {
+    e.respondWith(fetch(request));
+    return;
+  }
+
   // HTML 페이지 — network-first, 오프라인 시 캐시 → /offline 폴백
   e.respondWith(
     fetch(request)
