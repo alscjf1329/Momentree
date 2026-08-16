@@ -78,7 +78,17 @@ export const gardenSchema: TemplateSchema = {
     },
     {
       title: "참석여부 팝업 문구",
-      fields: [{ key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구" }],
+      fields: [
+        { key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구" },
+        {
+          key: "rsvpPopupDelaySec",
+          type: "text",
+          label: "팝업 뜨는 시간 (초)",
+          placeholder: "비워두면 자동 계산 (예: 3.5)",
+          pattern: "^$|^[0-9]+(\\.[0-9]+)?$",
+          errorMessage: "숫자만 입력하세요 (예: 3.5)",
+        },
+      ],
     },
     {
       title: "RSVP 폼 문구",

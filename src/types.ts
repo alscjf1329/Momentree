@@ -42,6 +42,9 @@ export interface WeddingData {
   subInfo: string[];
   greeting: string[];
   rsvpMessage: string[];
+  // 가든 템플릿 첫 진입 참석여부 팝업이 뜨기까지 걸리는 시간(초). 비워두면 히어로
+  // 애니메이션 길이에 맞춰 자동 계산됨
+  rsvpPopupDelaySec?: string;
   // RSVP 폼 상단 안내 문구
   rsvpNotice: string;
   // RSVP 폼 하단 마감 안내 문구

@@ -43,11 +43,14 @@ function RSVPIntroModal() {
 
   useEffect(() => {
     if (sessionStorage.getItem("garden-rsvp-intro-seen")) return;
-    // 히어로 타이핑/보조정보 애니메이션이 다 끝난 뒤 팝업 노출
-    const delayMs = heroAnimationDuration(w.mainTitle, w.subInfo.length) * 1000 + 400;
+    // 직접 지정한 시간이 있으면 그걸 쓰고, 없으면 히어로 애니메이션 길이에 맞춰 자동 계산
+    const manualSec = parseFloat(w.rsvpPopupDelaySec ?? "");
+    const delayMs = !isNaN(manualSec)
+      ? manualSec * 1000
+      : heroAnimationDuration(w.mainTitle, w.subInfo.length) * 1000 + 400;
     const t = setTimeout(() => setShow(true), delayMs);
     return () => clearTimeout(t);
-  }, [w.mainTitle, w.subInfo.length]);
+  }, [w.mainTitle, w.subInfo.length, w.rsvpPopupDelaySec]);
 
   const close = () => {
     setShow(false);
