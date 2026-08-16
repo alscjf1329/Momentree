@@ -279,19 +279,31 @@ function Hero() {
         <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" />
       </motion.div>
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(180deg,rgba(30,35,20,0.1) 0%,rgba(20,25,12,0.2) 55%,rgba(15,20,10,0.6) 100%)"
+        background: "linear-gradient(180deg,rgba(10,12,8,0.35) 0%,rgba(10,12,8,0.4) 55%,rgba(10,12,8,0.65) 100%)"
       }} />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-        <TypedText
-          text={w.mainTitle}
-          delay={HERO_TITLE_DELAY}
-          className="font-serif block text-white"
-          style={{ fontSize: "clamp(32px,9vw,52px)", letterSpacing: "0.03em" }}
-        />
+        {(() => {
+          const lines = w.mainTitle.split("\n");
+          let charsBefore = 0;
+          return lines.map((line, i) => {
+            const delay = HERO_TITLE_DELAY + charsBefore * HERO_TITLE_STAGGER;
+            charsBefore += Array.from(line).length;
+            return (
+              <TypedText
+                key={i}
+                text={line}
+                delay={delay}
+                className="font-serif block text-white"
+                style={{ fontSize: "clamp(32px,9vw,52px)", letterSpacing: "0.03em", textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}
+              />
+            );
+          });
+        })()}
 
         {w.subInfo.map((line, i) => (
           <motion.p key={i} className="text-xs tracking-[0.15em] text-white/80 mt-2"
+            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ delay: HERO_SUBINFO_START + i * HERO_SUBINFO_STAGGER, duration: HERO_SUBINFO_DURATION }}>
             {line}

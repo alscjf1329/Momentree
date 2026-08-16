@@ -8,7 +8,7 @@ export const gardenSchema: TemplateSchema = {
     {
       title: "히어로 문구",
       fields: [
-        { key: "mainTitle", type: "text", label: "메인 타이틀 (큰 글씨)", placeholder: "We're getting married" },
+        { key: "mainTitle", type: "textarea", label: "메인 타이틀 (큰 글씨, 줄바꿈 가능)", placeholder: "We're getting married" },
         { key: "subInfo", type: "array", label: "보조 정보 (작은 글씨, 줄바꿈 = 새 줄)" },
       ],
     },
