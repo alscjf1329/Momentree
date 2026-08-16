@@ -26,6 +26,9 @@ const VARS = {
 type Step = "intro" | "form" | "done";
 type Attendance = "attending" | "not_attending" | "";
 
+// GIF는 next/image 최적화를 거치면 애니메이션이 정지 프레임으로 굳어버려서 원본 그대로 서빙해야 함
+const isGif = (src: string) => src.toLowerCase().endsWith(".gif");
+
 function RSVPIntroModal() {
   const w = useWedding();
   const [show, setShow] = useState(false);
@@ -276,7 +279,7 @@ function Hero() {
         animate={{ scale: 1.09 }}
         transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
       >
-        <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" />
+        <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
       </motion.div>
       <div className="absolute inset-0" style={{
         background: "linear-gradient(180deg,rgba(10,12,8,0.35) 0%,rgba(10,12,8,0.4) 55%,rgba(10,12,8,0.65) 100%)"
@@ -392,7 +395,7 @@ function GardenGallery() {
               background: "var(--color-accent)",
             }}>
             {/* 가로/세로 사진 모두 대응 — 잘리지 않게 contain, 세로 사진은 좌우 여백 생김 */}
-            <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} />
+            <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} unoptimized={isGif(img.src)} />
           </div>
         ))}
       </div>
@@ -417,7 +420,7 @@ function GardenGallery() {
               outline: active === i ? "2px solid var(--color-primary)" : "none",
               outlineOffset: 2,
             }}>
-            <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="56px" />
+            <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="56px" unoptimized={isGif(img.src)} />
           </button>
         ))}
       </div>
