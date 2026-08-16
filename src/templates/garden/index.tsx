@@ -297,11 +297,10 @@ function Hero() {
                     delay={delay}
                     className="block text-white text-left"
                     style={{
-                      fontFamily: "'Alex Brush', 'Noto Serif KR', serif",
+                      fontFamily: "'Mrs Saint Delafield', 'Noto Serif KR', serif",
                       fontSize: "clamp(28px,8vw,48px)",
                       lineHeight: 1.1,
-                      whiteSpace: "nowrap",
-                      textTransform: "uppercase",
+                      overflowWrap: "break-word",
                       textShadow: "0 2px 16px rgba(0,0,0,0.5)",
                     }}
                   />
