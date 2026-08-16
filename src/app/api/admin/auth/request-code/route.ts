@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import nodemailer from "nodemailer";
 import { generateOtpCode, type SessionRole } from "@/lib/adminAuth";
 import { isOnCooldown, issueOtp, OTP_TTL_MS } from "@/lib/adminOtp";
-
-const CLIENTS_DIR = path.join(process.cwd(), "data", "clients");
+import { isValidLoginEmail } from "@/lib/newClient";
 
 export async function POST(req: NextRequest) {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -28,12 +25,9 @@ export async function POST(req: NextRequest) {
   if (email === adminEmail) {
     role = "admin";
   } else {
-    const exists = await fs
-      .access(path.join(CLIENTS_DIR, `${email}.json`))
-      .then(() => true)
-      .catch(() => false);
-    if (!exists) {
-      return NextResponse.json({ error: "등록되지 않은 이메일입니다" }, { status: 404 });
+    // 관리자가 미리 만들어주지 않아도 이메일 인증만으로 고객 계정이 생성된다 (최초 로그인 시 자동 생성)
+    if (!isValidLoginEmail(email)) {
+      return NextResponse.json({ error: "올바른 이메일 형식이 아닙니다" }, { status: 400 });
     }
     role = "customer";
     file = email;

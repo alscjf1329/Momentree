@@ -39,6 +39,16 @@ export function generateFilename(): string {
   return `client-${Date.now().toString(36)}`;
 }
 
+// 파일명으로 안전한지(경로 순회 문자 없는지) 확인 — 관리자 슬러그와 고객 이메일 파일명 공통 검증
+export function isValidClientFilename(name: string): boolean {
+  return /^[a-zA-Z0-9.@_+-]+$/.test(name);
+}
+
+// 이메일 형식 + 파일명으로 안전한지 동시 검증 (로그인 이메일 → 파일명으로 쓰일 때)
+export function isValidLoginEmail(email: string): boolean {
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+}
+
 export function namesToSlug(groom: string, bride: string): string {
   const clean = (s: string) => s.trim().replace(/\s/g, "").replace(/[^a-z0-9가-힣]/gi, "");
   const g = clean(groom);

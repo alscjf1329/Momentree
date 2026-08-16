@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
         <h1 className="text-lg font-semibold text-gray-800 mb-1">로그인</h1>
         <p className="text-xs text-gray-400 mb-6">
-          등록된 이메일로 인증 코드를 보내드립니다
+          이메일로 인증 코드를 보내드립니다. 처음이면 계정이 자동으로 만들어져요.
         </p>
 
         {step === "request" ? (

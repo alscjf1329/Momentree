@@ -32,14 +32,14 @@ export default function Home() {
           </span>
           <div className="flex items-center gap-2">
             <Link href="/invite/demo-classic" target="_blank"
-              className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-gray-50 hidden md:block"
+              className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-gray-50 hidden sm:block"
               style={{ borderColor: "rgba(0,0,0,0.12)", color: "#777" }}>
               예시 보기
             </Link>
-            <Link href="/admin/setup"
+            <Link href="/admin/login"
               className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90"
               style={{ background: "var(--color-primary-dark)" }}>
-              어드민 →
+              로그인
             </Link>
           </div>
         </div>
@@ -61,15 +61,10 @@ export default function Home() {
           4가지 감성 템플릿 중 원하는 스타일을 선택하세요.
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <Link href="/admin/setup"
+          <Link href="/invite/demo-classic" target="_blank"
             className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-full text-sm font-medium text-white"
             style={{ background: "var(--color-primary-dark)" }}>
-            청첩장 만들기
-          </Link>
-          <Link href="/admin/templates"
-            className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-full text-sm font-medium border"
-            style={{ borderColor: "rgba(0,0,0,0.15)", color: "var(--color-text)" }}>
-            템플릿 보기
+            예시 보기
           </Link>
         </div>
       </section>
@@ -142,24 +137,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-10 sm:mt-12">
-            <Link href="/admin/setup"
-              className="inline-block px-7 sm:px-8 py-3 rounded-full text-sm font-medium"
-              style={{ background: "var(--color-gold)", color: "#1a1208" }}>
-              지금 시작하기
-            </Link>
-          </div>
         </div>
-      </section>
-
-      {/* 어드민 바로가기 */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 text-center">
-        <Link href="/admin/setup"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border bg-white group transition-all hover:shadow-md hover:border-gray-300 text-sm"
-          style={{ borderColor: "rgba(0,0,0,0.08)", color: "var(--color-text)" }}>
-          어드민 패널 열기
-          <span className="text-gray-300 group-hover:text-gray-500 transition-colors">→</span>
-        </Link>
       </section>
 
       {/* 푸터 */}

@@ -6,6 +6,7 @@ import { WEDDING } from "@/content";
 import { applyToEncryptedFields, decrypt, encrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { getSession } from "@/lib/session";
+import { isValidClientFilename } from "@/lib/newClient";
 
 const CLIENTS_DIR = path.join(process.cwd(), "data", "clients");
 
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
   const { data } = body;
   const filename = session.role === "customer" ? session.file : body.filename;
 
-  if (!filename || !/^[a-zA-Z0-9.@_+-]+$/.test(filename)) {
+  if (!filename || !isValidClientFilename(filename)) {
     return NextResponse.json({ error: "invalid filename" }, { status: 400 });
   }
 
