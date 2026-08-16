@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { DATA_DIR } from "@/lib/paths";
+import { forceGifInfiniteLoop } from "@/lib/gifLoop";
 
 const LIMITS: Record<string, { dir: string; mime: string; maxBytes: number }> = {
   image: { dir: "images", mime: "image/", maxBytes: 10 * 1024 * 1024 },
@@ -45,7 +46,8 @@ export async function POST(req: NextRequest) {
   const dir = path.join(DATA_DIR, "uploads", limit.dir);
   await fs.mkdir(dir, { recursive: true });
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  let buffer: Buffer = Buffer.from(await file.arrayBuffer());
+  if (ext === ".gif") buffer = forceGifInfiniteLoop(buffer);
   await fs.writeFile(path.join(dir, filename), buffer);
 
   return NextResponse.json({ path: `/uploads/${limit.dir}/${filename}` });

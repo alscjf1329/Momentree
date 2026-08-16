@@ -179,7 +179,7 @@ export default function RSVPSection() {
         </motion.form>
       )}
 
-      <div className="mt-20 text-center">
+      {/* <div className="mt-20 text-center">
         <div className="section-divider mb-6" />
         <p className="font-serif text-[var(--color-text-light)] text-sm tracking-widest">
           {wedding.groom.name} · {wedding.bride.name}
@@ -187,7 +187,7 @@ export default function RSVPSection() {
         <p className="text-xs text-[var(--color-warm-gray)] mt-2 tracking-widest">
           {wedding.date.year}.{String(wedding.date.month).padStart(2, "0")}.{String(wedding.date.day).padStart(2, "0")}
         </p>
-      </div>
+      </div> */}
     </section>
   );
 }

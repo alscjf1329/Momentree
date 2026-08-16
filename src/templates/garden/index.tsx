@@ -664,7 +664,7 @@ export default function GardenTemplate() {
       <InfoSection />
       <ContactSection />
       <RSVPSection />
-      <MessageWall />
+      {/* <MessageWall /> */}
     </div>
   );
 }
