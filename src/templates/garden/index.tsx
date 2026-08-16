@@ -282,7 +282,7 @@ function Hero() {
         background: "linear-gradient(180deg,rgba(10,12,8,0.35) 0%,rgba(10,12,8,0.4) 55%,rgba(10,12,8,0.65) 100%)"
       }} />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-start pt-20 sm:pt-24 px-6 text-center">
         {(() => {
           const lines = w.mainTitle.split("\n");
           let charsBefore = 0;
@@ -294,8 +294,13 @@ function Hero() {
                 key={i}
                 text={line}
                 delay={delay}
-                className="font-serif block text-white"
-                style={{ fontSize: "clamp(32px,9vw,52px)", letterSpacing: "0.03em", textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}
+                className="block text-white"
+                style={{
+                  fontFamily: "'Permanent Marker', 'Noto Serif KR', serif",
+                  fontSize: "clamp(30px,8vw,46px)",
+                  lineHeight: 1.25,
+                  textShadow: "0 2px 16px rgba(0,0,0,0.5)",
+                }}
               />
             );
           });
