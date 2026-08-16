@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
   if (!limit) {
     return NextResponse.json({ error: "지원하지 않는 업로드 종류입니다" }, { status: 400 });
   }
-  if (!file.type.startsWith(limit.mime)) {
+  if (!file.type.startsWith(limit.mime) || file.type === "image/svg+xml") {
     return NextResponse.json(
-      { error: kind === "image" ? "이미지 파일만 업로드할 수 있습니다" : "오디오 파일만 업로드할 수 있습니다" },
+      { error: kind === "image" ? "이미지 파일만 업로드할 수 있습니다 (SVG 제외)" : "오디오 파일만 업로드할 수 있습니다" },
       { status: 400 }
     );
   }

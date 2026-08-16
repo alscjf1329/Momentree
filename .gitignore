@@ -38,5 +38,9 @@ next-env.d.ts
 # RSVP data (개인정보 포함)
 data/
 
+# 고객이 업로드한 이미지/오디오 (파일명 패턴: {timestamp}-{8자리 hex}.ext) — 기본 템플릿 자산은 그대로 추적
+public/images/*-????????.*
+public/audio/*-????????.*
+
 # Claude Code
 .claude/

@@ -70,6 +70,7 @@ export default function AdminPage() {
   };
 
   const isCustomer = me?.role === "customer";
+  const isAdmin = me?.role === "admin";
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -81,7 +82,7 @@ export default function AdminPage() {
       </div>
 
       {/* 클라이언트 셀렉터 (admin 전용) */}
-      {!isCustomer && (
+      {isAdmin && (
         <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
           <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">고객 선택</p>
           {slugs.length === 0 ? (
@@ -183,7 +184,7 @@ export default function AdminPage() {
           )}
         </>
       ) : (
-        !isCustomer && (
+        isAdmin && (
           <div className="bg-white rounded-xl p-12 text-center text-gray-400 border border-gray-100">
             <p className="text-sm">위에서 고객을 선택하세요</p>
           </div>

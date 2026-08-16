@@ -214,21 +214,24 @@ export default function TemplateList() {
   const [clientList, setClientList] = useState<string[]>([]);
   const [selecting, setSelecting] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [isCustomer, setIsCustomer] = useState(false);
+  const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
+  const isCustomer = role === "customer";
 
   useEffect(() => {
     fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(me => {
       if (me?.role === "customer" && me.file) {
-        setIsCustomer(true);
+        setRole("customer");
         setSelectedFile(me.file);
+      } else {
+        setRole("admin");
       }
-    }).catch(() => {});
+    }).catch(() => setRole("admin"));
   }, []);
 
   useEffect(() => {
-    if (isCustomer) return; // customer는 고객 목록을 볼 필요가 없음(항상 자기 파일)
+    if (role !== "admin") return; // role 확인 전이거나 customer면 관리자 전용 목록을 건드리지 않음
     fetch("/api/clients").then(r => r.json()).then(setClientList).catch(() => {});
-  }, [isCustomer]);
+  }, [role]);
 
   const active = !!selectedFile;
 
@@ -280,7 +283,7 @@ export default function TemplateList() {
                 : "템플릿을 먼저 고르면 변수 입력 화면으로 이동합니다 · 고객은 이메일 로그인만으로도 스스로 계정을 만들 수 있어요 — 여기서는 직접 대신 만들어줄 때만 사용하세요"}
             </p>
           </div>
-          {!isCustomer && (
+          {role === "admin" && (
             <button onClick={() => setSelectedFile("")}
               className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white shrink-0">
               + 새 고객
@@ -295,7 +298,7 @@ export default function TemplateList() {
         <aside className="w-56 shrink-0 sticky top-[104px] hidden lg:flex flex-col gap-4">
 
           {/* 고객 선택 */}
-          {!isCustomer && (
+          {role === "admin" && (
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
               <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">고객 선택</p>
@@ -355,7 +358,7 @@ export default function TemplateList() {
         <div className="flex-1 min-w-0">
 
           {/* 모바일 고객 선택 */}
-          {!isCustomer && (
+          {role === "admin" && (
           <div className="lg:hidden mb-4 bg-white rounded-2xl border border-gray-100 p-4">
             <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">고객 선택</p>
             <div className="flex gap-2 mb-2">

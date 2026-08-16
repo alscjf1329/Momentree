@@ -24,7 +24,8 @@ export default function SetupForm() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [clientList, setClientList] = useState<string[]>([]);
-  const [isCustomer, setIsCustomer] = useState(false);
+  const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
+  const isCustomer = role === "customer";
 
   const schema = getSchemaForTemplate(data.template);
   const errors = validateBySchema(schema, data);
@@ -42,19 +43,21 @@ export default function SetupForm() {
   useEffect(() => {
     fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(me => {
       if (me?.role === "customer" && me.file) {
-        setIsCustomer(true);
+        setRole("customer");
         loadFile(me.file);
+      } else {
+        setRole("admin");
       }
-    }).catch(() => {});
+    }).catch(() => setRole("admin"));
   }, [loadFile]);
 
   useEffect(() => {
-    if (isCustomer) return; // customer는 위 useEffect가 자기 파일을 직접 로드
+    if (role !== "admin") return; // role 확인 전이거나 customer면 관리자 전용 목록을 건드리지 않음
     fetch("/api/clients").then(r => r.json()).then(setClientList).catch(() => {});
-  }, [isCustomer]);
+  }, [role]);
 
   useEffect(() => {
-    if (isCustomer) return; // URL의 ?file= 무시, 항상 자기 파일 고정
+    if (role !== "admin") return; // role 확인 전이거나 customer면 URL의 ?file= 무시, 항상 자기 파일 고정
     if (fileParam) {
       loadFile(fileParam);
     } else {
@@ -62,7 +65,7 @@ export default function SetupForm() {
       if (last) loadFile(last);
       else setFilename(generateFilename()); // Date.now() — 클라이언트 전용
     }
-  }, [fileParam, loadFile, isCustomer]);
+  }, [fileParam, loadFile, role]);
 
   const handleChange = (path: string, value: unknown) => {
     setData(prev => setByPath(prev, path, value));
@@ -98,14 +101,14 @@ export default function SetupForm() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <h1 className="text-sm font-semibold text-gray-700 truncate">{isCustomer ? "내 정보 설정" : "고객 정보 설정"}</h1>
-            {filename && !isCustomer && (
+            {filename && role === "admin" && (
               <span className="text-[10px] font-mono bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full truncate max-w-[140px] hidden sm:block">
                 {filename}
               </span>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {!isCustomer && (
+            {role === "admin" && (
               <button onClick={handleNewClient}
                 className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white">
                 + 새 고객
@@ -131,7 +134,7 @@ export default function SetupForm() {
         <aside className="w-56 shrink-0 sticky top-[104px] hidden lg:flex flex-col gap-4">
 
           {/* 파일 관리 (customer는 항상 자기 파일 고정이라 편집 불필요) */}
-          {!isCustomer && (
+          {role === "admin" && (
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
               <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">파일 관리</p>
@@ -153,7 +156,7 @@ export default function SetupForm() {
           )}
 
           {/* 고객 목록 */}
-          {!isCustomer && clientList.length > 0 && (
+          {role === "admin" && clientList.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
               <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
                 <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">고객 목록</p>
@@ -196,7 +199,7 @@ export default function SetupForm() {
         <div className="flex-1 min-w-0 space-y-4">
 
           {/* 모바일 전용: 파일 선택 + 고객 목록 */}
-          {!isCustomer && (
+          {role === "admin" && (
           <div className="lg:hidden space-y-3">
             <div className="bg-white rounded-2xl border border-gray-100 p-4">
               <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">파일 관리</p>
