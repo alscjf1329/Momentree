@@ -1,8 +1,8 @@
 import type { TemplateSchema } from "@/lib/schema";
 
-// common: true  → "기본 정보" 탭, 9개 템플릿 공유 (excludeTemplates로 특정 템플릿만 제외 가능 —
-//                 예: 봉투 이미지는 8개 템플릿엔 공용이지만 garden엔 봉투 UI가 없어서 제외)
-// common 없음   → "garden 전용 옵션" 탭, garden에서만 편집 가능
+// common: true  → "기본 정보" 탭, 10개 템플릿 공유 (excludeTemplates로 특정 템플릿만 제외 가능 —
+//                 예: 봉투 이미지는 8개 템플릿엔 공용이지만 mono엔 봉투 UI가 없어서 제외)
+// common 없음   → "mono 전용 옵션" 탭, mono에서만 편집 가능
 export const monoSchema: TemplateSchema = {
   name: "mono",
   sections: [
@@ -80,7 +80,7 @@ export const monoSchema: TemplateSchema = {
     {
       title: "참석여부 팝업 문구",
       fields: [
-        { key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구", common: true },
+        { key: "rsvpMessage", type: "array", label: "첫 진입 팝업 문구", common: true },
         {
           key: "rsvpPopupDelaySec",
           type: "text",

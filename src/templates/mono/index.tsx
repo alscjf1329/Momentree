@@ -251,7 +251,6 @@ function Hero() {
               fontSize: "clamp(24px,7vw,40px)",
               lineHeight: 1.4,
               overflowWrap: "break-word",
-              textShadow: w.introBg ? "0 2px 16px rgba(0,0,0,0.5)" : "none",
             }}
           >
             {line}
@@ -260,8 +259,7 @@ function Hero() {
 
         {w.subInfo.map((line, i) => (
           <p key={i}
-            className={`text-xs tracking-[0.3em] mt-3 ${w.introBg ? "text-white/80" : "text-black/60"}`}
-            style={{ textShadow: w.introBg ? "0 1px 8px rgba(0,0,0,0.5)" : "none" }}>
+            className={`text-xs tracking-[0.3em] mt-3 ${w.introBg ? "text-white/80" : "text-black/60"}`}>
             {line}
           </p>
         ))}
