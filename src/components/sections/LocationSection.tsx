@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Script from "next/script";
 import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
@@ -18,7 +18,6 @@ export default function LocationSection() {
   const [copied, setCopied] = useState(false);
   const [sdkLoaded, setSdkLoaded] = useState(false);
   const [mapFailed, setMapFailed] = useState(false);
-  const mapRef = useRef<HTMLDivElement>(null);
   const { venue, shuttleTimetable } = wedding;
   const hasShuttle = shuttleTimetable.from.length > 0 || shuttleTimetable.to.length > 0;
 
@@ -40,9 +39,13 @@ export default function LocationSection() {
   }, [sdkLoaded]);
 
   // 주소를 좌표로 지오코딩해서 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 —
-  // 위도/경도를 직접 입력받지 않아도 이미 입력받는 주소만으로 동작
-  useEffect(() => {
-    if (!sdkLoaded || !mapRef.current || !venue.address) return;
+  // 위도/경도를 직접 입력받지 않아도 이미 입력받는 주소만으로 동작.
+  // useRef+useEffect 조합은 ref가 붙는 시점과 effect 실행 시점이 어긋나는
+  // 경우가 있어서(콜백 ref는 DOM 노드가 실제로 붙을 때만 확실히 호출됨) 콜백
+  // ref 안에서 바로 처리 — sdkLoaded/address가 바뀌면 콜백 자체가 새로 만들어져
+  // React가 알아서 재호출해줌
+  const mapCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node || !sdkLoaded || !venue.address) return;
     window.kakao.maps.load(() => {
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoder.addressSearch(venue.address, (result: { x: string; y: string }[], status: string) => {
@@ -51,7 +54,7 @@ export default function LocationSection() {
           return;
         }
         const coords = new window.kakao.maps.LatLng(Number(result[0].y), Number(result[0].x));
-        const map = new window.kakao.maps.Map(mapRef.current, { center: coords, level: 4 });
+        const map = new window.kakao.maps.Map(node, { center: coords, level: 4 });
         new window.kakao.maps.Marker({ position: coords, map });
       });
     });
@@ -95,7 +98,7 @@ export default function LocationSection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        <div ref={mapRef} className="absolute inset-0" />
+        <div ref={mapCallbackRef} className="absolute inset-0" />
         {(!KAKAO_MAP_KEY || mapFailed) && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <p className="text-xs text-[var(--color-text-light)]">지도를 표시할 수 없습니다</p>
