@@ -17,7 +17,6 @@ export default function LocationSection() {
   const wedding = useWedding();
   const [copied, setCopied] = useState(false);
   const [sdkLoaded, setSdkLoaded] = useState(false);
-  const [mapVisible, setMapVisible] = useState(false);
   const [mapFailed, setMapFailed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const { venue, shuttleTimetable } = wedding;
@@ -43,7 +42,7 @@ export default function LocationSection() {
   // 주소를 좌표로 지오코딩해서 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 —
   // 위도/경도를 직접 입력받지 않아도 이미 입력받는 주소만으로 동작
   useEffect(() => {
-    if (!sdkLoaded || !mapVisible || !mapRef.current || !venue.address) return;
+    if (!sdkLoaded || !mapRef.current || !venue.address) return;
     window.kakao.maps.load(() => {
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoder.addressSearch(venue.address, (result: { x: string; y: string }[], status: string) => {
@@ -56,7 +55,7 @@ export default function LocationSection() {
         new window.kakao.maps.Marker({ position: coords, map });
       });
     });
-  }, [sdkLoaded, mapVisible, venue.address]);
+  }, [sdkLoaded, venue.address]);
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(venue.address);
@@ -93,12 +92,11 @@ export default function LocationSection() {
         style={{ height: 260, background: "var(--color-accent)" }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        onViewportEnter={() => setMapVisible(true)}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
         <div ref={mapRef} className="absolute inset-0" />
-        {mapVisible && (!KAKAO_MAP_KEY || mapFailed) && (
+        {(!KAKAO_MAP_KEY || mapFailed) && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <p className="text-xs text-[var(--color-text-light)]">지도를 표시할 수 없습니다</p>
           </div>
