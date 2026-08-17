@@ -16,6 +16,8 @@ export interface FieldSchema {
   label: string;
   /** true = 어드민 "기본 정보" 탭(전 템플릿 공유), 그 외 = 템플릿 전용 탭 */
   common?: boolean;
+  /** common:true여도 이 배열에 든 템플릿에서는 숨김 (예: 봉투 이미지는 공용이지만 garden엔 없음) */
+  excludeTemplates?: string[];
   required?: boolean;
   placeholder?: string;
   /** RegExp 문자열 */

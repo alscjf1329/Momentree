@@ -1,15 +1,16 @@
 import type { TemplateSchema } from "@/lib/schema";
 
-// common: true  → GreetingSection/CalendarSection/LocationSection/ContactSection/RSVPSection가 씀 (9개 템플릿 공유)
-// common 없음   → garden 전용 컴포넌트(Hero/RSVPIntroModal/InfoSection/BgmPlayer)만 씀
+// common: true  → "기본 정보" 탭, 9개 템플릿 공유 (excludeTemplates로 특정 템플릿만 제외 가능 —
+//                 예: 봉투 이미지는 8개 템플릿엔 공용이지만 garden엔 봉투 UI가 없어서 제외)
+// common 없음   → "garden 전용 옵션" 탭, garden에서만 편집 가능
 export const gardenSchema: TemplateSchema = {
   name: "garden",
   sections: [
     {
       title: "히어로 문구",
       fields: [
-        { key: "mainTitle", type: "textarea", label: "메인 타이틀 (큰 글씨, 줄바꿈 가능)", placeholder: "We're getting married" },
-        { key: "subInfo", type: "array", label: "보조 정보 (작은 글씨, 줄바꿈 = 새 줄)" },
+        { key: "mainTitle", type: "textarea", label: "메인 타이틀 (큰 글씨, 줄바꿈 가능)", common: true, placeholder: "We're getting married" },
+        { key: "subInfo", type: "array", label: "보조 정보 (작은 글씨, 줄바꿈 = 새 줄)", common: true },
       ],
     },
     {
@@ -79,11 +80,12 @@ export const gardenSchema: TemplateSchema = {
     {
       title: "참석여부 팝업 문구",
       fields: [
-        { key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구" },
+        { key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구", common: true },
         {
           key: "rsvpPopupDelaySec",
           type: "text",
           label: "팝업 뜨는 시간 (초)",
+          common: true,
           placeholder: "비워두면 자동 계산 (예: 3.5)",
           pattern: "^$|^[0-9]+(\\.[0-9]+)?$",
           errorMessage: "숫자만 입력하세요 (예: 3.5)",
@@ -104,6 +106,7 @@ export const gardenSchema: TemplateSchema = {
           key: "info",
           type: "array-object",
           label: "안내사항",
+          common: true,
           helpText: "Location-Contact 사이, 한 장씩 스와이프로 표시",
           itemFields: [
             { key: "title", type: "text", label: "제목", placeholder: "예: 주차 안내" },
@@ -114,7 +117,7 @@ export const gardenSchema: TemplateSchema = {
     },
     {
       title: "화환 안내",
-      fields: [{ key: "flowerNotice", type: "textarea", label: "화환 안내 문구" }],
+      fields: [{ key: "flowerNotice", type: "textarea", label: "화환 안내 문구", common: true }],
     },
     {
       title: "서울에서 오시는 길",
@@ -123,6 +126,7 @@ export const gardenSchema: TemplateSchema = {
           key: "directionsFromSeoul",
           type: "array-object",
           label: "경로별 안내",
+          common: true,
           itemFields: [
             { key: "route", type: "text", label: "경로명", placeholder: "예: 청량리역 경로" },
             { key: "steps", type: "array", label: "단계별 안내 (줄바꿈 = 새 단계)" },
@@ -133,16 +137,16 @@ export const gardenSchema: TemplateSchema = {
     {
       title: "배경음악",
       fields: [
-        { key: "bgm.title", type: "text", label: "제목" },
-        { key: "bgm.src", type: "file", label: "파일 (mp3)", placeholder: "/audio/bgm.mp3" },
+        { key: "bgm.title", type: "text", label: "제목", common: true },
+        { key: "bgm.src", type: "file", label: "파일 (mp3)", common: true, placeholder: "/audio/bgm.mp3" },
       ],
     },
     {
       title: "이미지 경로",
       fields: [
         { key: "introBg", type: "image", label: "인트로 배경", common: true },
-        { key: "envelopeClosed", type: "image", label: "봉투 (닫힘)", common: true },
-        { key: "envelopeOpen", type: "image", label: "봉투 (열림)", common: true },
+        { key: "envelopeClosed", type: "image", label: "봉투 (닫힘)", common: true, excludeTemplates: ["garden"] },
+        { key: "envelopeOpen", type: "image", label: "봉투 (열림)", common: true, excludeTemplates: ["garden"] },
         {
           key: "gallery",
           type: "array-object",

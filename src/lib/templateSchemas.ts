@@ -9,6 +9,17 @@ const REGISTRY: Record<string, TemplateSchema> = {
 
 const COMMON_FALLBACK = commonFieldsOnly(gardenSchema);
 
+// common:true여도 특정 템플릿에서는 의미 없는 필드(예: 봉투 이미지 — garden엔 봉투 UI 자체가 없음)를 숨김
+function excludeForTemplate(schema: TemplateSchema, name: string): TemplateSchema {
+  return {
+    ...schema,
+    sections: schema.sections
+      .map((s) => ({ ...s, fields: s.fields.filter((f) => !f.excludeTemplates?.includes(name)) }))
+      .filter((s) => s.fields.length > 0),
+  };
+}
+
 export function getSchemaForTemplate(name: string): TemplateSchema {
-  return REGISTRY[name] ?? { ...COMMON_FALLBACK, name };
+  const schema = REGISTRY[name] ?? { ...COMMON_FALLBACK, name };
+  return excludeForTemplate(schema, name);
 }
