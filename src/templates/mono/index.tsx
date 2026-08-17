@@ -79,7 +79,7 @@ function RSVPIntroModal() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div className="absolute inset-0" style={{ background: "#000000" }}
             onClick={close} />
-          <motion.div className="relative bg-white rounded-3xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-8 text-center shadow-xl"
+          <motion.div className="relative bg-white rounded-3xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-8 text-center"
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.4, ease: "easeOut" }}>
 
@@ -572,7 +572,7 @@ function BgmPlayer() {
       <button
         onClick={toggle}
         aria-label={playing ? "배경음악 정지" : "배경음악 재생"}
-        className="fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center shadow-lg text-white"
+        className="fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center text-white"
         style={{ background: "#111111" }}
       >
         {playing ? (
