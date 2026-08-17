@@ -1,16 +1,45 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
 import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
+
+const KAKAO_MAP_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
+
+declare global {
+  interface Window {
+    kakao: any; // eslint-disable-line @typescript-eslint/no-explicit-any -- 카카오맵 SDK, 공식 타입 패키지 없음
+  }
+}
 
 export default function LocationSection() {
   const wedding = useWedding();
   const [copied, setCopied] = useState(false);
+  const [sdkLoaded, setSdkLoaded] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
+  const [mapFailed, setMapFailed] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
   const { venue, shuttleTimetable } = wedding;
   const hasShuttle = shuttleTimetable.from.length > 0 || shuttleTimetable.to.length > 0;
-  const hasKakaoUrl = !!venue.kakaoMapUrl;
+
+  // 주소를 좌표로 지오코딩해서 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 —
+  // 위도/경도를 직접 입력받지 않아도 이미 입력받는 주소만으로 동작
+  useEffect(() => {
+    if (!sdkLoaded || !mapVisible || !mapRef.current || !venue.address) return;
+    window.kakao.maps.load(() => {
+      const geocoder = new window.kakao.maps.services.Geocoder();
+      geocoder.addressSearch(venue.address, (result: { x: string; y: string }[], status: string) => {
+        if (status !== window.kakao.maps.services.Status.OK || !result[0]) {
+          setMapFailed(true);
+          return;
+        }
+        const coords = new window.kakao.maps.LatLng(Number(result[0].y), Number(result[0].x));
+        const map = new window.kakao.maps.Map(mapRef.current, { center: coords, level: 4 });
+        new window.kakao.maps.Marker({ position: coords, map });
+      });
+    });
+  }, [sdkLoaded, mapVisible, venue.address]);
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(venue.address);
@@ -34,8 +63,16 @@ export default function LocationSection() {
         <p className="text-sm text-[var(--color-text-light)] mt-2">{venue.address}</p>
       </motion.div>
 
+      {KAKAO_MAP_KEY && (
+        <Script
+          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&libraries=services&autoload=false`}
+          strategy="afterInteractive"
+          onLoad={() => setSdkLoaded(true)}
+        />
+      )}
+
       <motion.div
-        className="mt-6 mx-4 rounded-2xl overflow-hidden shadow-md"
+        className="relative mt-6 mx-4 rounded-2xl overflow-hidden shadow-md"
         style={{ height: 260, background: "var(--color-accent)" }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -43,18 +80,10 @@ export default function LocationSection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        {mapVisible && hasKakaoUrl && (
-          <iframe
-            src={venue.kakaoMapUrl}
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            title="웨딩홀 위치"
-          />
-        )}
-        {mapVisible && !hasKakaoUrl && (
-          <div className="w-full h-full flex items-center justify-center">
-            <p className="text-xs text-[var(--color-text-light)]">카카오맵 URL이 설정되지 않았습니다</p>
+        <div ref={mapRef} className="absolute inset-0" />
+        {mapVisible && (!KAKAO_MAP_KEY || mapFailed) && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <p className="text-xs text-[var(--color-text-light)]">지도를 표시할 수 없습니다</p>
           </div>
         )}
       </motion.div>
