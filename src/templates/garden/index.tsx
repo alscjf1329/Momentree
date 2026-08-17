@@ -275,18 +275,17 @@ function TypedText({
 function Hero() {
   const w = useWedding();
   return (
-    <section className="relative overflow-hidden" style={{ height: "100dvh" }}>
-      <motion.div
-        className="absolute inset-0"
-        initial={{ scale: 1 }}
-        animate={{ scale: 1.09 }}
-        transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
-      >
-        <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
-      </motion.div>
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(180deg,rgba(10,12,8,0.35) 0%,rgba(10,12,8,0.4) 55%,rgba(10,12,8,0.65) 100%)"
-      }} />
+    <section className="relative overflow-hidden bg-white" style={{ height: "100dvh" }}>
+      {w.introBg && (
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1 }}
+          animate={{ scale: 1.09 }}
+          transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+        >
+          <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
+        </motion.div>
+      )}
 
       <div className="absolute inset-0 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center">
         <div className="self-start pl-2 sm:pl-4">

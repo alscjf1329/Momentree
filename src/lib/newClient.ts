@@ -30,7 +30,7 @@ export const DEFAULT_WEDDING_DATA: WeddingData = {
     { src: "/images/gallery-4.jpg", alt: "" },
     { src: "/images/gallery-5.jpg", alt: "" },
   ],
-  introBg: "/images/intro-bg.jpg",
+  introBg: "",
   envelopeClosed: "/images/envelope-closed.jpg",
   envelopeOpen: "/images/envelope-open.jpg",
 };

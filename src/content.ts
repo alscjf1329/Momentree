@@ -86,8 +86,8 @@ export const WEDDING: WeddingData = {
     { src: "/images/gallery-4.jpg", alt: "두 사람의 네 번째 사진" },
     { src: "/images/gallery-5.jpg", alt: "두 사람의 다섯 번째 사진" },
   ],
-  // 인트로 배경 이미지
-  introBg: "/images/intro-bg.jpg",
+  // 인트로 배경 이미지 (없으면 흰 배경)
+  introBg: "",
   // 봉투 이미지 (스크롤 오프닝용)
   envelopeClosed: "/images/envelope-closed.jpg",
   envelopeOpen: "/images/envelope-open.jpg",
