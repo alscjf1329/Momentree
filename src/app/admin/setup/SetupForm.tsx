@@ -8,6 +8,7 @@ import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DEFAULT_WEDDING_DATA, generateFilename, namesToSlug } from "@/lib/newClient";
 import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
+import ShareLinkCard from "@/components/admin/ShareLinkCard";
 
 const DEFAULT_DATA = DEFAULT_WEDDING_DATA;
 const TEMPLATES = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden", "mono"] as const;
@@ -176,6 +177,9 @@ export default function SetupForm() {
             </div>
           )}
 
+          {/* 내 청첩장 QR / 공유 */}
+          {filename && <ShareLinkCard template={data.template} filename={filename} />}
+
           {/* 공유 링크 */}
           {filename && (
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
@@ -233,6 +237,13 @@ export default function SetupForm() {
           )}
 
           <AdminForm schema={schema} data={data} onChange={handleChange} errors={errors} />
+
+          {/* 모바일 전용: QR / 공유 */}
+          {filename && (
+            <div className="lg:hidden">
+              <ShareLinkCard template={data.template} filename={filename} />
+            </div>
+          )}
 
           {/* 모바일 전용: 공유 링크 */}
           {filename && (

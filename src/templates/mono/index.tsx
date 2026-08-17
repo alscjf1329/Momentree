@@ -228,108 +228,51 @@ function heroAnimationDuration(mainTitle: string, subInfoCount: number): number 
   return Math.max(titleFinish, subInfoFinish);
 }
 
-function TypedText({
-  text,
-  delay = 0,
-  className,
-  style,
-}: {
-  text: string;
-  delay?: number;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const letters = Array.from(text);
-  return (
-    <motion.span
-      className={className}
-      style={style}
-      initial="hidden"
-      animate="visible"
-      variants={{ visible: { transition: { staggerChildren: HERO_TITLE_STAGGER, delayChildren: delay } } }}
-    >
-      {letters.map((char, i) => (
-        <motion.span
-          key={i}
-          style={{ display: "inline-block", whiteSpace: char === " " ? "pre" : "normal" }}
-          variants={{
-            hidden: { opacity: 0, y: 10 },
-            visible: { opacity: 1, y: 0, transition: { duration: HERO_TITLE_CHAR_DURATION, ease: "easeOut" } },
-          }}
-        >
-          {char}
-        </motion.span>
-      ))}
-    </motion.span>
-  );
-}
-
 function Hero() {
   const w = useWedding();
   return (
     <section className="relative overflow-hidden bg-white" style={{ height: "100dvh" }}>
       {w.introBg && (
-        <>
-          <motion.div
-            className="absolute inset-0"
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.09 }}
-            transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
-          >
-            <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
-          </motion.div>
-          <div className="absolute inset-0" style={{
-            background: "linear-gradient(180deg,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.15) 45%,rgba(0,0,0,0.6) 100%)"
-          }} />
-        </>
+        <div className="absolute inset-0">
+          <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
+        </div>
       )}
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-        {(() => {
-          const lines = w.mainTitle.split("\n");
-          let charsBefore = 0;
-          return lines.map((line, i) => {
-            const delay = HERO_TITLE_DELAY + charsBefore * HERO_TITLE_STAGGER;
-            charsBefore += Array.from(line).length;
-            return (
-              <TypedText
-                key={i}
-                text={line}
-                delay={delay}
-                className={w.introBg ? "block text-white" : "block text-black"}
-                style={{
-                  fontFamily: "'Noto Serif KR', serif",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                  fontSize: "clamp(24px,7vw,40px)",
-                  lineHeight: 1.4,
-                  overflowWrap: "break-word",
-                  textShadow: w.introBg ? "0 2px 16px rgba(0,0,0,0.5)" : "none",
-                }}
-              />
-            );
-          });
-        })()}
+        {w.mainTitle.split("\n").map((line, i) => (
+          <span
+            key={i}
+            className={`block ${w.introBg ? "text-white" : "text-black"}`}
+            style={{
+              fontFamily: "'Noto Serif KR', serif",
+              fontWeight: 500,
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              fontSize: "clamp(24px,7vw,40px)",
+              lineHeight: 1.4,
+              overflowWrap: "break-word",
+              textShadow: w.introBg ? "0 2px 16px rgba(0,0,0,0.5)" : "none",
+            }}
+          >
+            {line}
+          </span>
+        ))}
 
         {w.subInfo.map((line, i) => (
-          <motion.p key={i}
+          <p key={i}
             className={`text-xs tracking-[0.3em] mt-3 ${w.introBg ? "text-white/80" : "text-black/60"}`}
-            style={{ textShadow: w.introBg ? "0 1px 8px rgba(0,0,0,0.5)" : "none" }}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ delay: HERO_SUBINFO_START + i * HERO_SUBINFO_STAGGER, duration: HERO_SUBINFO_DURATION }}>
+            style={{ textShadow: w.introBg ? "0 1px 8px rgba(0,0,0,0.5)" : "none" }}>
             {line}
-          </motion.p>
+          </p>
         ))}
       </div>
 
-      <motion.div className={`absolute bottom-8 left-0 right-0 flex justify-center ${w.introBg ? "text-white/70" : "text-black/50"}`}
-        animate={{ y: [0, 8, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}>
+      <div className={`absolute bottom-8 left-0 right-0 flex justify-center ${w.introBg ? "text-white/70" : "text-black/50"}`}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" strokeWidth="1.5"
             strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-      </motion.div>
+      </div>
     </section>
   );
 }
