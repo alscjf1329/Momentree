@@ -10,7 +10,7 @@ export default function LocationSection() {
   const [mapVisible, setMapVisible] = useState(false);
   const { venue, shuttleTimetable } = wedding;
   const hasShuttle = shuttleTimetable.from.length > 0 || shuttleTimetable.to.length > 0;
-  const hasCoords = venue.lat !== 0 || venue.lng !== 0;
+  const hasKakaoUrl = !!venue.kakaoMapUrl;
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(venue.address);
@@ -43,18 +43,18 @@ export default function LocationSection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        {mapVisible && hasCoords && (
+        {mapVisible && hasKakaoUrl && (
           <iframe
-            src={`https://map.kakao.com/link/map/${venue.name},${venue.lat},${venue.lng}`}
+            src={venue.kakaoMapUrl}
             width="100%"
             height="260"
             style={{ border: 0 }}
             title="웨딩홀 위치"
           />
         )}
-        {mapVisible && !hasCoords && (
+        {mapVisible && !hasKakaoUrl && (
           <div className="w-full h-full flex items-center justify-center">
-            <p className="text-xs text-[var(--color-text-light)]">지도 좌표가 설정되지 않았습니다</p>
+            <p className="text-xs text-[var(--color-text-light)]">카카오맵 URL이 설정되지 않았습니다</p>
           </div>
         )}
       </motion.div>
