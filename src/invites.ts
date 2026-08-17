@@ -17,6 +17,7 @@ export const INVITES: Record<string, WeddingData> = {
   "demo-modern":    { ...WEDDING, slug: "demo-modern",    template: "modern",    theme: "classic-cream" },
   "demo-luxury":    { ...WEDDING, slug: "demo-luxury",    template: "luxury",    theme: "classic-cream" },
   "demo-garden":    { ...WEDDING, slug: "demo-garden",    template: "garden",    theme: "classic-cream" },
+  "demo-mono":      { ...WEDDING, slug: "demo-mono",      template: "mono",      theme: "classic-cream" },
 
   // ── 테마 데모 (같은 레이아웃, 다른 컬러) ───────────────────────────────
   "demo-minimal-white":   { ...WEDDING, slug: "demo-minimal-white",   template: "classic", theme: "minimal-white" },

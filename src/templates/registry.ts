@@ -7,6 +7,7 @@ import BlossomTemplate from "@/templates/blossom";
 import ModernTemplate from "@/templates/modern";
 import LuxuryTemplate from "@/templates/luxury";
 import GardenTemplate from "@/templates/garden";
+import MonoTemplate from "@/templates/mono";
 
 export const TEMPLATE_MAP: Record<string, React.ComponentType> = {
   classic: ClassicTemplate,
@@ -18,4 +19,5 @@ export const TEMPLATE_MAP: Record<string, React.ComponentType> = {
   modern: ModernTemplate,
   luxury: LuxuryTemplate,
   garden: GardenTemplate,
+  mono: MonoTemplate,
 };

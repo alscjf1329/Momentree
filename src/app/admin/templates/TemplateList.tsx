@@ -70,6 +70,13 @@ const TEMPLATES = [
     desc: "풀숲 풀블리드 히어로 + 캘리그래피 + 화이트 그리드 갤러리",
     bg: "linear-gradient(160deg,#eaf0e4 0%,#d6e2cc 100%)",
   },
+  {
+    id: "mono",
+    name: "모노",
+    mood: "블랙 + 화이트",
+    desc: "흑백 그레이스케일 풀블리드 히어로 + 미니멀 타이포그래피",
+    bg: "linear-gradient(160deg,#ffffff 0%,#d9d9d9 100%)",
+  },
 ];
 
 function TemplatePreview({ id }: { id: string }) {
@@ -191,8 +198,7 @@ function TemplatePreview({ id }: { id: string }) {
       <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "rgba(201,169,110,0.35)" }}>2025.10.18</p>
     </div>
   );
-  // garden
-  return (
+  if (id === "garden") return (
     <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: "linear-gradient(160deg,#eaf0e4,#d6e2cc)" }}>
       <svg viewBox="0 0 160 40" width="70" style={{ opacity: 0.5, marginBottom: 8 }} fill="none">
@@ -202,6 +208,17 @@ function TemplatePreview({ id }: { id: string }) {
       </svg>
       <p style={{ fontFamily: "'Sacramento',cursive", fontSize: 26, color: "#8a7a3a" }}>married</p>
       <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "rgba(44,50,38,0.4)", marginTop: 8 }}>2025.10.18</p>
+    </div>
+  );
+  // mono
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: "#fff" }}>
+      <div style={{ width: 28, height: 1, background: "#111", marginBottom: 12 }} />
+      <p className="font-serif font-medium tracking-[0.15em] text-black" style={{ fontSize: "clamp(13px,2.2vw,18px)" }}>KIM</p>
+      <p style={{ fontSize: 9, letterSpacing: "0.3em", color: "#999", margin: "4px 0" }}>&amp;</p>
+      <p className="font-serif font-medium tracking-[0.15em] text-black" style={{ fontSize: "clamp(13px,2.2vw,18px)" }}>LEE</p>
+      <div style={{ width: 28, height: 1, background: "#111", marginTop: 12, marginBottom: 8 }} />
+      <p style={{ fontSize: 7, letterSpacing: "0.3em", color: "#999" }}>2025.10.18</p>
     </div>
   );
 }

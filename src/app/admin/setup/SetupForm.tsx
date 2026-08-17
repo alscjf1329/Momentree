@@ -10,7 +10,7 @@ import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
 
 const DEFAULT_DATA = DEFAULT_WEDDING_DATA;
-const TEMPLATES = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden"] as const;
+const TEMPLATES = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden", "mono"] as const;
 const LS_KEY = "momentree_last_file";
 
 export default function SetupForm() {
