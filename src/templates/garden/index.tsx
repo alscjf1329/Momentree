@@ -306,7 +306,6 @@ function Hero() {
                       fontSize: "clamp(28px,8vw,48px)",
                       lineHeight: 1.1,
                       overflowWrap: "break-word",
-                      textShadow: "0 2px 16px rgba(0,0,0,0.5)",
                     }}
                   />
                 </div>
@@ -317,7 +316,6 @@ function Hero() {
 
         {w.subInfo.map((line, i) => (
           <motion.p key={i} className="text-xs tracking-[0.15em] text-white/80 mt-2"
-            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ delay: HERO_SUBINFO_START + i * HERO_SUBINFO_STAGGER, duration: HERO_SUBINFO_DURATION }}>
             {line}
