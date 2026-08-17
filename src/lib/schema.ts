@@ -108,12 +108,3 @@ export function validateBySchema(schema: TemplateSchema, data: unknown): Record<
   }
   return errors;
 }
-
-export function commonFieldsOnly(schema: TemplateSchema): TemplateSchema {
-  return {
-    name: schema.name,
-    sections: schema.sections
-      .map((s) => ({ ...s, fields: s.fields.filter((f) => f.common) }))
-      .filter((s) => s.fields.length > 0),
-  };
-}
