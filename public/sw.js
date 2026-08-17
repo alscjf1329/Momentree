@@ -1,4 +1,4 @@
-const CACHE = "momentree-v1";
+const CACHE = "momentree-v2";
 
 // 앱 셸 — 오프라인에서도 뜨게 할 URL 목록
 const PRECACHE = ["/", "/admin", "/offline"];
@@ -37,18 +37,18 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // _next/static 에셋 — content hash 있으므로 cache-first
+  // _next/static 에셋 — network-first. cache-first였을 때 배포 후에도
+  // 예전 캐시("momentree-v1"은 배포마다 안 바뀜)가 새 코드를 계속 가려서
+  // 몇 시간 동안 변경사항이 반영 안 되는 문제가 있었음
   if (url.pathname.startsWith("/_next/static/")) {
     e.respondWith(
-      caches.match(request).then(
-        (cached) =>
-          cached ||
-          fetch(request).then((res) => {
-            const clone = res.clone();
-            caches.open(CACHE).then((c) => c.put(request, clone));
-            return res;
-          })
-      )
+      fetch(request)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, clone));
+          return res;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
