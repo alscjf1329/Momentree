@@ -8,6 +8,7 @@ import CalendarSection from "@/components/sections/CalendarSection";
 import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
+import GuestbookSection from "@/components/sections/GuestbookSection";
 
 const VARS = {
   "--color-primary": "#b8758a",
@@ -135,6 +136,7 @@ export default function RomanticTemplate() {
       <LocationSection />
       <ContactSection />
       <RSVPSection />
+      <GuestbookSection />
     </div>
   );
 }

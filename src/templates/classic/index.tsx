@@ -12,6 +12,7 @@ import GallerySection from "@/components/sections/GallerySection";
 import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
+import GuestbookSection from "@/components/sections/GuestbookSection";
 
 export default function ClassicTemplate() {
   return (
@@ -24,6 +25,7 @@ export default function ClassicTemplate() {
       <LocationSection />
       <ContactSection />
       <RSVPSection />
+      <GuestbookSection />
     </main>
   );
 }

@@ -8,6 +8,7 @@ import CalendarSection from "@/components/sections/CalendarSection";
 import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
+import GuestbookSection from "@/components/sections/GuestbookSection";
 
 const VARS = {
   "--color-primary": "#c9a96e",
@@ -164,6 +165,7 @@ export default function LuxuryTemplate() {
       <LocationSection />
       <ContactSection />
       <RSVPSection />
+      <GuestbookSection />
     </div>
   );
 }

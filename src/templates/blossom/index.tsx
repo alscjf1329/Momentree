@@ -9,6 +9,7 @@ import GallerySection from "@/components/sections/GallerySection";
 import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
+import GuestbookSection from "@/components/sections/GuestbookSection";
 
 const VARS = {
   "--color-primary": "#c4758a",
@@ -140,6 +141,7 @@ export default function BlossomTemplate() {
       <LocationSection />
       <ContactSection />
       <RSVPSection />
+      <GuestbookSection />
     </div>
   );
 }
