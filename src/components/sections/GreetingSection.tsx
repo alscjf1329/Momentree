@@ -42,7 +42,6 @@ export default function GreetingSection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <div className="section-divider mb-8" />
         <p className="text-sm text-[var(--color-text-light)] font-light tracking-wider">
           {wedding.groom.fatherName} · {wedding.groom.motherName}의 아들{" "}
           <span className="text-[var(--color-primary)] font-medium">{wedding.groom.name}</span>
