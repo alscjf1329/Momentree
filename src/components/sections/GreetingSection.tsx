@@ -39,17 +39,17 @@ export default function GreetingSection() {
       </div>
 
       <motion.div
-        className="mt-12 max-w-[260px] mx-auto"
+        className="mt-12"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <div className="flex items-baseline justify-between text-sm text-[var(--color-text-light)] font-light tracking-wider">
+        <div className="flex items-baseline justify-center gap-2 text-sm text-[var(--color-text-light)] font-light tracking-wider">
           <span>{wedding.groom.fatherName} · {wedding.groom.motherName}의 아들</span>
           <span className="text-[var(--color-primary)] font-medium">{givenName(wedding.groom.name)}</span>
         </div>
-        <div className="flex items-baseline justify-between text-sm text-[var(--color-text-light)] font-light tracking-wider mt-2">
+        <div className="flex items-baseline justify-center gap-2 text-sm text-[var(--color-text-light)] font-light tracking-wider mt-2">
           <span>{wedding.bride.fatherName} · {wedding.bride.motherName}의 딸</span>
           <span className="text-[var(--color-primary)] font-medium">{givenName(wedding.bride.name)}</span>
         </div>
