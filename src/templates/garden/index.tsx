@@ -406,11 +406,11 @@ function GardenGallery() {
             className="relative flex-none overflow-hidden"
             style={{
               width: "100%",
-              aspectRatio: "4/3",
+              aspectRatio: "3/4",
               scrollSnapAlign: "center",
               background: "var(--color-cream)",
             }}>
-            {/* 가로/세로 사진 모두 대응 — 잘리지 않게 contain, 세로 사진은 좌우 여백 생김 */}
+            {/* 세로 사진 기준 박스 — 가로 사진은 상하 여백 생김 */}
             <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} unoptimized={isGif(img.src)} />
           </div>
         ))}
