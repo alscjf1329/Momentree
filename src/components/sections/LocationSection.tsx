@@ -51,10 +51,14 @@ export default function LocationSection() {
   // ref 안에서 바로 처리 — sdkLoaded/address가 바뀌면 콜백 자체가 새로 만들어져
   // React가 알아서 재호출해줌
   const mapCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    console.log("[kakao-debug] callback ref fired, node=", !!node, "sdkLoaded=", sdkLoaded, "address=", venue.address);
     if (!node || !sdkLoaded || !venue.address) return;
+    console.log("[kakao-debug] calling kakao.maps.load");
     window.kakao.maps.load(() => {
+      console.log("[kakao-debug] kakao.maps.load callback fired");
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoder.addressSearch(venue.address, (result: { x: string; y: string }[], status: string) => {
+        console.log("[kakao-debug] addressSearch result, status=", status, "result=", JSON.stringify(result));
         if (status !== window.kakao.maps.services.Status.OK || !result[0]) {
           setMapFailed(true);
           return;
