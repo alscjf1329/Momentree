@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
 
+// 청첩장 관례상 부모님 성함 옆엔 자녀 이름을 성 없이 이름만 적음 (예: 김태연 → 태연)
+const givenName = (fullName: string) => fullName.slice(1) || fullName;
+
 export default function GreetingSection() {
   const wedding = useWedding();
   const lines = wedding.greeting.filter((l) => l !== "");
@@ -36,7 +39,7 @@ export default function GreetingSection() {
       </div>
 
       <motion.div
-        className="mt-12 max-w-[280px] mx-auto"
+        className="mt-12 max-w-[260px] mx-auto"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }}
@@ -44,11 +47,11 @@ export default function GreetingSection() {
       >
         <div className="flex items-baseline justify-between text-sm text-[var(--color-text-light)] font-light tracking-wider">
           <span>{wedding.groom.fatherName} · {wedding.groom.motherName}의 아들</span>
-          <span className="text-[var(--color-primary)] font-medium">{wedding.groom.name}</span>
+          <span className="text-[var(--color-primary)] font-medium">{givenName(wedding.groom.name)}</span>
         </div>
         <div className="flex items-baseline justify-between text-sm text-[var(--color-text-light)] font-light tracking-wider mt-2">
           <span>{wedding.bride.fatherName} · {wedding.bride.motherName}의 딸</span>
-          <span className="text-[var(--color-primary)] font-medium">{wedding.bride.name}</span>
+          <span className="text-[var(--color-primary)] font-medium">{givenName(wedding.bride.name)}</span>
         </div>
       </motion.div>
     </section>

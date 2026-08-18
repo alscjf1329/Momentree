@@ -43,7 +43,6 @@ export default function RSVPSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-3">RSVP</p>
         <h2 className="font-serif text-xl text-[var(--color-text)]">참석 의사 전달</h2>
         {wedding.rsvpNotice && (
           <p className="text-sm text-[var(--color-text-light)] mt-3 leading-relaxed whitespace-pre-wrap">
