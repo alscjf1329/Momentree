@@ -95,7 +95,7 @@ function RSVPIntroModal() {
                 </p>
                 <div className="h-px bg-[var(--color-accent)] my-6" />
                 <p className="text-sm text-[var(--color-text)]">
-                  신랑 {w.groom.name}님 <span className="text-[var(--color-primary)]">♥</span> 신부 {w.bride.name}님
+                  신랑 {w.groom.name} <span className="text-[var(--color-primary)]">♥</span> 신부 {w.bride.name}
                 </p>
                 <p className="font-serif text-2xl text-[var(--color-text)] mt-3">
                   {w.date.month}/{w.date.day}
