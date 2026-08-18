@@ -131,7 +131,7 @@ function LuxuryGallery() {
       </div>
       <div className="px-6 space-y-2">
         {/* Alternating sizes */}
-        {w.gallery.slice(0, 4).map((img, i) => (
+        {w.gallery.map((img, i) => (
           <motion.div key={i} className="relative overflow-hidden"
             style={{ height: i % 2 === 0 ? 210 : 140 }}
             initial={{ opacity: 0 }}

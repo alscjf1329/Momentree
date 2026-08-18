@@ -8,6 +8,7 @@ const RSVP_DIR = path.join(DATA_DIR, "rsvp");
 
 export interface RsvpEntry {
   name: string;
+  side?: "groom" | "bride" | "";
   attendance: "attending" | "not_attending";
   guests: string;
   companionName?: string;

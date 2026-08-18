@@ -134,6 +134,13 @@ export default function AdminPage() {
                       <input value={draft.name ?? ""} onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
                         placeholder="이름" className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs" />
                       <div className="flex gap-2">
+                        <select value={draft.side ?? ""}
+                          onChange={e => setDraft(d => ({ ...d, side: e.target.value as RsvpEntry["side"] }))}
+                          className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs">
+                          <option value="">신랑측/신부측</option>
+                          <option value="groom">신랑측</option>
+                          <option value="bride">신부측</option>
+                        </select>
                         <select value={draft.attendance ?? "attending"}
                           onChange={e => setDraft(d => ({ ...d, attendance: e.target.value as RsvpEntry["attendance"] }))}
                           className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs">
@@ -155,7 +162,14 @@ export default function AdminPage() {
                   ) : (
                     <>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-gray-800">{r.name}</span>
+                        <span className="font-medium text-gray-800">
+                          {r.name}
+                          {r.side && (
+                            <span className="ml-1.5 text-[10px] font-normal text-gray-400">
+                              ({r.side === "groom" ? "신랑측" : "신부측"})
+                            </span>
+                          )}
+                        </span>
                         {r.attendance === "attending"
                           ? <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">✓ 참석 {r.guests}명</span>
                           : <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">불참</span>

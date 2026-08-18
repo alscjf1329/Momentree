@@ -25,6 +25,7 @@ const VARS = {
 
 type Step = "intro" | "form" | "done";
 type Attendance = "attending" | "not_attending" | "";
+type Side = "groom" | "bride" | "";
 
 // GIF는 next/image 최적화를 거치면 애니메이션이 정지 프레임으로 굳어버려서 원본 그대로 서빙해야 함
 const isGif = (src: string) => src.toLowerCase().endsWith(".gif");
@@ -34,6 +35,7 @@ function RSVPIntroModal() {
   const [show, setShow] = useState(false);
   const [step, setStep] = useState<Step>("intro");
   const [name, setName] = useState("");
+  const [side, setSide] = useState<Side>("");
   const [attendance, setAttendance] = useState<Attendance>("");
   const [guests, setGuests] = useState("1");
   const [companionName, setCompanionName] = useState("");
@@ -63,7 +65,7 @@ function RSVPIntroModal() {
     setLoading(true);
     setError(false);
     try {
-      await submitRSVP({ name, attendance, guests, companionName, message, slug: w.slug });
+      await submitRSVP({ name, side, attendance, guests, companionName, message, slug: w.slug });
       setStep("done");
     } catch {
       setError(true);
@@ -130,6 +132,23 @@ function RSVPIntroModal() {
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)}
                   placeholder="성함을 입력해주세요" required
                   className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors mb-4" />
+
+                <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">신랑측 · 신부측</label>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {[
+                    { value: "groom", label: "신랑측 손님" },
+                    { value: "bride", label: "신부측 손님" },
+                  ].map(({ value, label }) => (
+                    <button key={value} type="button" onClick={() => setSide(value as Side)}
+                      className={`py-3 rounded-xl text-sm border transition-colors ${
+                        side === value
+                          ? "bg-[var(--color-text)] border-[var(--color-text)] text-white"
+                          : "border-[var(--color-accent)] text-[var(--color-text-light)]"
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
 
                 <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">참석 여부</label>
                 <div className="grid grid-cols-2 gap-2 mb-4">

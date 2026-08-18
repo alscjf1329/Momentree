@@ -117,9 +117,9 @@ function MoodyGallery() {
         <div className="w-5 h-px mx-auto mt-2" style={{ background: "rgba(139,158,196,0.15)" }} />
       </div>
       <div className="grid grid-cols-2 gap-[3px] px-4">
-        {w.gallery.slice(0, 4).map((img, i) => (
+        {w.gallery.map((img, i) => (
           <motion.div key={i} className="relative overflow-hidden"
-            style={{ height: i === 0 || i === 3 ? 230 : 160 }}
+            style={{ height: i % 4 === 0 || i % 4 === 3 ? 230 : 160 }}
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}

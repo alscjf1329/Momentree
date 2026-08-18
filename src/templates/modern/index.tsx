@@ -81,7 +81,7 @@ function InstagramGallery() {
         <p className="text-[8px] tracking-[0.55em]" style={{ color: "rgba(160,136,120,0.55)" }}>GALLERY</p>
       </div>
       <div className="grid grid-cols-3 gap-[2px]">
-        {w.gallery.slice(0, 6).map((img, i) => (
+        {w.gallery.map((img, i) => (
           <motion.div key={i} className="relative overflow-hidden" style={{ paddingBottom: "100%" }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -93,17 +93,6 @@ function InstagramGallery() {
           </motion.div>
         ))}
       </div>
-      {/* Wide featured photo */}
-      {w.gallery[5] && (
-        <motion.div className="relative overflow-hidden mt-[2px]" style={{ height: 200 }}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}>
-          <Image src={w.gallery[0].src} alt={w.gallery[0].alt} fill className="object-cover" sizes="480px" />
-          <div className="absolute inset-0" style={{ background: "rgba(45,30,18,0.15)" }} />
-        </motion.div>
-      )}
     </section>
   );
 }

@@ -1,5 +1,6 @@
 export type RSVPPayload = {
   name: string;
+  side: "groom" | "bride" | "";
   attendance: "attending" | "not_attending" | "";
   guests: string;
   companionName?: string;

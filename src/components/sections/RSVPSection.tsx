@@ -6,10 +6,12 @@ import { useWedding } from "@/context/WeddingContext";
 import { submitRSVP } from "@/lib/rsvp";
 
 type Attendance = "attending" | "not_attending" | "";
+type Side = "groom" | "bride" | "";
 
 export default function RSVPSection() {
   const wedding = useWedding();
   const [name, setName] = useState("");
+  const [side, setSide] = useState<Side>("");
   const [attendance, setAttendance] = useState<Attendance>("");
   const [guests, setGuests] = useState("1");
   const [companionName, setCompanionName] = useState("");
@@ -24,7 +26,7 @@ export default function RSVPSection() {
     setLoading(true);
     setError(false);
     try {
-      await submitRSVP({ name, attendance, guests, companionName, message, slug: wedding.slug });
+      await submitRSVP({ name, side, attendance, guests, companionName, message, slug: wedding.slug });
       setSubmitted(true);
     } catch {
       setError(true);
@@ -86,6 +88,31 @@ export default function RSVPSection() {
               required
               className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors"
             />
+          </div>
+
+          <div>
+            <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">
+              신랑측 · 신부측
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: "groom", label: "신랑측 손님" },
+                { value: "bride", label: "신부측 손님" },
+              ].map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setSide(value as Side)}
+                  className={`py-3 rounded-xl text-sm border transition-colors ${
+                    side === value
+                      ? "bg-[var(--color-text)] border-[var(--color-text)] text-white"
+                      : "border-[var(--color-accent)] text-[var(--color-text-light)]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
