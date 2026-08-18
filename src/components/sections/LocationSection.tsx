@@ -24,18 +24,24 @@ export default function LocationSection() {
   // next/script의 onLoad가 안정적으로 안 불릴 때가 있어서(이미 로드된 스크립트
   // 재사용 시 등) window.kakao 존재 여부를 직접 폴링 — sdkLoaded는 그 결과만 반영
   useEffect(() => {
+    console.log("[kakao-debug] poll-effect mount, sdkLoaded=", sdkLoaded, "hasMaps=", !!window.kakao?.maps);
     if (sdkLoaded) return;
     if (window.kakao?.maps) {
+      console.log("[kakao-debug] immediate hasMaps, setting true");
       setSdkLoaded(true);
       return;
     }
     const id = setInterval(() => {
+      console.log("[kakao-debug] tick, hasMaps=", !!window.kakao?.maps);
       if (window.kakao?.maps) {
         setSdkLoaded(true);
         clearInterval(id);
       }
     }, 200);
-    return () => clearInterval(id);
+    return () => {
+      console.log("[kakao-debug] poll-effect cleanup");
+      clearInterval(id);
+    };
   }, [sdkLoaded]);
 
   // 주소를 좌표로 지오코딩해서 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 —
