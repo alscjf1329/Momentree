@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
+import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
 const TEMPLATES = [
   { id: "classic",   name: "클래식",     mood: "다크 로맨틱",    desc: "봉투 오프닝 + 골드 포인트",    bg: "linear-gradient(150deg,#1a1208,#2d1f0f)", accent: "#c9a96e", text: "#fff" },
@@ -18,7 +20,11 @@ const STEPS = [
   { n: "03", title: "링크 공유",     desc: "생성된 URL을 카카오톡, 문자로 바로 공유합니다." },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
+  const session = secret ? await verifySessionToken(token, secret) : null;
+
   return (
     <div style={{ background: "#faf6f1", minHeight: "100dvh", fontFamily: "var(--font-sans)" }}>
 
@@ -36,11 +42,19 @@ export default function Home() {
               style={{ borderColor: "rgba(0,0,0,0.12)", color: "#777" }}>
               예시 보기
             </Link>
-            <Link href="/admin/login"
-              className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90"
-              style={{ background: "var(--color-primary-dark)" }}>
-              로그인
-            </Link>
+            {session ? (
+              <Link href={session.role === "admin" ? "/admin" : "/admin/setup"}
+                className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90 max-w-[160px] truncate"
+                style={{ background: "var(--color-primary-dark)" }}>
+                {session.role === "admin" ? "관리자" : session.file} 님
+              </Link>
+            ) : (
+              <Link href="/admin/login"
+                className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90"
+                style={{ background: "var(--color-primary-dark)" }}>
+                로그인
+              </Link>
+            )}
           </div>
         </div>
       </header>
