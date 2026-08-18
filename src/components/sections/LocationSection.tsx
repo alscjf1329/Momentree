@@ -38,17 +38,18 @@ export default function LocationSection() {
     return () => clearInterval(id);
   }, [sdkLoaded]);
 
-  // 주소를 좌표로 지오코딩해서 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 —
-  // 위도/경도를 직접 입력받지 않아도 이미 입력받는 주소만으로 동작.
+  // 주소가 있으면 주소로, 없으면 업체명(venue.name)으로 카카오 장소검색해서
+  // 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 — 위도/경도를 직접
+  // 입력받지 않아도 이미 입력받는 주소 또는 웨딩홀명만으로 동작.
   // useRef+useEffect 조합은 ref가 붙는 시점과 effect 실행 시점이 어긋나는
   // 경우가 있어서(콜백 ref는 DOM 노드가 실제로 붙을 때만 확실히 호출됨) 콜백
   // ref 안에서 바로 처리 — sdkLoaded/address가 바뀌면 콜백 자체가 새로 만들어져
   // React가 알아서 재호출해줌
   const mapCallbackRef = useCallback((node: HTMLDivElement | null) => {
-    if (!node || !sdkLoaded || !venue.address) return;
+    const query = venue.address || venue.name;
+    if (!node || !sdkLoaded || !query) return;
     window.kakao.maps.load(() => {
-      const geocoder = new window.kakao.maps.services.Geocoder();
-      geocoder.addressSearch(venue.address, (result: { x: string; y: string }[], status: string) => {
+      const onResult = (result: { x: string; y: string }[], status: string) => {
         if (status !== window.kakao.maps.services.Status.OK || !result[0]) {
           setMapFailed(true);
           return;
@@ -56,9 +57,14 @@ export default function LocationSection() {
         const coords = new window.kakao.maps.LatLng(Number(result[0].y), Number(result[0].x));
         const map = new window.kakao.maps.Map(node, { center: coords, level: 4 });
         new window.kakao.maps.Marker({ position: coords, map });
-      });
+      };
+      if (venue.address) {
+        new window.kakao.maps.services.Geocoder().addressSearch(venue.address, onResult);
+      } else {
+        new window.kakao.maps.services.Places().keywordSearch(query, onResult);
+      }
     });
-  }, [sdkLoaded, venue.address]);
+  }, [sdkLoaded, venue.address, venue.name]);
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(venue.address);
@@ -99,12 +105,12 @@ export default function LocationSection() {
         transition={{ duration: 0.8, delay: 0.1 }}
       >
         <div ref={mapCallbackRef} className="absolute inset-0" />
-        {!venue.address && (
+        {!venue.address && !venue.name && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-xs text-[var(--color-text-light)]">주소가 입력되지 않았습니다</p>
+            <p className="text-xs text-[var(--color-text-light)]">웨딩홀명 또는 주소가 입력되지 않았습니다</p>
           </div>
         )}
-        {venue.address && (!KAKAO_MAP_KEY || mapFailed) && (
+        {(venue.address || venue.name) && (!KAKAO_MAP_KEY || mapFailed) && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <p className="text-xs text-[var(--color-text-light)]">지도를 표시할 수 없습니다</p>
           </div>
