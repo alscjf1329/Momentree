@@ -401,11 +401,7 @@ function InfoSection() {
     mainRef.current?.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
   };
 
-  const hasInfo = w.info.length > 0;
-  const hasFlower = !!w.flowerNotice;
-  const hasDirections = w.directionsFromSeoul.length > 0;
-
-  if (!hasInfo && !hasFlower && !hasDirections) return null;
+  if (w.info.length === 0) return null;
 
   return (
     <section className="py-16 bg-white">
@@ -415,76 +411,35 @@ function InfoSection() {
         <p className="text-xs tracking-[0.3em] text-black font-medium">INFORMATION</p>
       </motion.div>
 
-      {hasInfo && (
-        <>
-          {/* 안내사항 — 한 장씩 스와이프 */}
-          <div ref={mainRef} onScroll={handleScroll}
-            className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
-            style={{ scrollSnapType: "x mandatory" }}>
-            {w.info.map((item, i) => (
-              <div key={i}
-                className="flex-none border border-[var(--color-accent)] p-6"
-                style={{ width: "100%", scrollSnapAlign: "center" }}>
-                <p className="font-serif text-lg text-[var(--color-text)] mb-3">{item.title}</p>
-                <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
-                  {item.content}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* 점 인디케이터 */}
-          {w.info.length > 1 && (
-            <div className="flex justify-center gap-1.5 mt-5">
-              {w.info.map((_, i) => (
-                <button key={i} onClick={() => goTo(i)} aria-label={`${i + 1}번째 안내사항 보기`}
-                  className="rounded-full transition-all"
-                  style={{
-                    width: active === i ? 16 : 6,
-                    height: 6,
-                    background: active === i ? "#111" : "var(--color-accent)",
-                  }} />
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
-      {hasFlower && (
-        <>
-          {hasInfo && <div className="h-px bg-[var(--color-accent)] mx-6 my-8" />}
-          <div className="px-6 text-center">
-            <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] mb-2">화환 안내</p>
+      {/* 안내사항 — 한 장씩 스와이프 */}
+      <div ref={mainRef} onScroll={handleScroll}
+        className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
+        style={{ scrollSnapType: "x mandatory" }}>
+        {w.info.map((item, i) => (
+          <div key={i}
+            className="flex-none border border-[var(--color-accent)] p-6"
+            style={{ width: "100%", scrollSnapAlign: "center" }}>
+            <p className="font-serif text-lg text-[var(--color-text)] mb-3">{item.title}</p>
             <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
-              {w.flowerNotice}
+              {item.content}
             </p>
           </div>
-        </>
-      )}
+        ))}
+      </div>
 
-      {hasDirections && (
-        <>
-          {(hasInfo || hasFlower) && <div className="h-px bg-[var(--color-accent)] mx-6 my-8" />}
-          <div className="px-6">
-            <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] mb-4 text-center">
-              서울에서 오시는 길
-            </p>
-            <div className="space-y-4 max-w-sm mx-auto">
-              {w.directionsFromSeoul.map((d, i) => (
-                <div key={i} className="border border-[var(--color-accent)] p-5">
-                  <p className="font-serif text-[var(--color-text)] mb-2">{d.route}</p>
-                  <ol className="space-y-1">
-                    {d.steps.map((step, j) => (
-                      <li key={j} className="text-sm text-[var(--color-text-light)] leading-relaxed">
-                        {j + 1}. {step}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
+      {/* 점 인디케이터 */}
+      {w.info.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-5">
+          {w.info.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)} aria-label={`${i + 1}번째 안내사항 보기`}
+              className="rounded-full transition-all"
+              style={{
+                width: active === i ? 16 : 6,
+                height: 6,
+                background: active === i ? "#111" : "var(--color-accent)",
+              }} />
+          ))}
+        </div>
       )}
     </section>
   );

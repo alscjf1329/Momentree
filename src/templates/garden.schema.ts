@@ -120,25 +120,6 @@ export const gardenSchema: TemplateSchema = {
       ],
     },
     {
-      title: "화환 안내",
-      fields: [{ key: "flowerNotice", type: "textarea", label: "화환 안내 문구", common: true }],
-    },
-    {
-      title: "서울에서 오시는 길",
-      fields: [
-        {
-          key: "directionsFromSeoul",
-          type: "array-object",
-          label: "경로별 안내",
-          common: true,
-          itemFields: [
-            { key: "route", type: "text", label: "경로명", placeholder: "예: 청량리역 경로" },
-            { key: "steps", type: "array", label: "단계별 안내 (줄바꿈 = 새 단계)" },
-          ],
-        },
-      ],
-    },
-    {
       title: "배경음악",
       fields: [
         { key: "bgm.title", type: "text", label: "제목", common: true },
