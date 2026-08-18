@@ -90,13 +90,10 @@ export default function RSVPSection() {
           </div>
 
           <div>
-            <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">
-              신랑측 · 신부측
-            </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { value: "groom", label: "신랑측 손님" },
-                { value: "bride", label: "신부측 손님" },
+                { value: "groom", label: "신랑측" },
+                { value: "bride", label: "신부측" },
               ].map(({ value, label }) => (
                 <button
                   key={value}
