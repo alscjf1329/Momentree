@@ -27,6 +27,8 @@ export interface FieldSchema {
   helpText?: string;
   /** array-object 전용: 각 항목의 필드 구조 */
   itemFields?: FieldSchema[];
+  /** array-object + itemFields가 {src: image, alt: text} 형태인 갤러리류 전용: 여러 장 한번에 업로드하는 버튼 표시 */
+  bulkImageUpload?: boolean;
 }
 
 export interface SectionSchema {

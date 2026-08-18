@@ -156,6 +156,7 @@ export const monoSchema: TemplateSchema = {
           type: "array-object",
           label: "갤러리",
           common: true,
+          bulkImageUpload: true,
           itemFields: [
             { key: "src", type: "image", label: "경로" },
             { key: "alt", type: "text", label: "설명" },
