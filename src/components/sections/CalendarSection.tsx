@@ -45,8 +45,7 @@ export default function CalendarSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">DATE</p>
-        <div className="section-divider mb-8" />
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-8">DATE</p>
 
         <p className="font-serif text-2xl text-[var(--color-text)] tracking-widest mb-1">
           {year}.{String(month).padStart(2, "0")}.{String(day).padStart(2, "0")}

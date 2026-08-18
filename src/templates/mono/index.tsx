@@ -334,7 +334,6 @@ function MonoGallery() {
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <p className="text-xs tracking-[0.3em] text-black font-medium">GALLERY</p>
-        <div className="section-divider mt-3" style={{ margin: 0 }} />
       </motion.div>
 
       {/* 메인 뷰어 — 한 장씩 스와이프 */}
@@ -413,8 +412,7 @@ function InfoSection() {
       <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <p className="text-xs tracking-[0.3em] text-black font-medium mb-2">INFORMATION</p>
-        <div className="section-divider" />
+        <p className="text-xs tracking-[0.3em] text-black font-medium">INFORMATION</p>
       </motion.div>
 
       {hasInfo && (

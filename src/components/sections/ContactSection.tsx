@@ -31,8 +31,7 @@ export default function ContactSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-2">CONTACT</p>
-        <div className="section-divider mb-8" />
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-8">CONTACT</p>
 
         <div className="flex rounded-full border border-[var(--color-primary-light)] overflow-hidden mx-8">
           {(["groom", "bride"] as Side[]).map((side) => (
