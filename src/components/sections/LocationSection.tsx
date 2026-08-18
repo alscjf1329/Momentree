@@ -24,24 +24,18 @@ export default function LocationSection() {
   // next/script의 onLoad가 안정적으로 안 불릴 때가 있어서(이미 로드된 스크립트
   // 재사용 시 등) window.kakao 존재 여부를 직접 폴링 — sdkLoaded는 그 결과만 반영
   useEffect(() => {
-    console.log("[kakao-debug] poll-effect mount, sdkLoaded=", sdkLoaded, "hasMaps=", !!window.kakao?.maps);
     if (sdkLoaded) return;
     if (window.kakao?.maps) {
-      console.log("[kakao-debug] immediate hasMaps, setting true");
       setSdkLoaded(true);
       return;
     }
     const id = setInterval(() => {
-      console.log("[kakao-debug] tick, hasMaps=", !!window.kakao?.maps);
       if (window.kakao?.maps) {
         setSdkLoaded(true);
         clearInterval(id);
       }
     }, 200);
-    return () => {
-      console.log("[kakao-debug] poll-effect cleanup");
-      clearInterval(id);
-    };
+    return () => clearInterval(id);
   }, [sdkLoaded]);
 
   // 주소를 좌표로 지오코딩해서 검색창/사이드바 없는 깔끔한 마커 지도를 직접 그림 —
@@ -51,14 +45,10 @@ export default function LocationSection() {
   // ref 안에서 바로 처리 — sdkLoaded/address가 바뀌면 콜백 자체가 새로 만들어져
   // React가 알아서 재호출해줌
   const mapCallbackRef = useCallback((node: HTMLDivElement | null) => {
-    console.log("[kakao-debug] callback ref fired, node=", !!node, "sdkLoaded=", sdkLoaded, "address=", venue.address);
     if (!node || !sdkLoaded || !venue.address) return;
-    console.log("[kakao-debug] calling kakao.maps.load");
     window.kakao.maps.load(() => {
-      console.log("[kakao-debug] kakao.maps.load callback fired");
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoder.addressSearch(venue.address, (result: { x: string; y: string }[], status: string) => {
-        console.log("[kakao-debug] addressSearch result, status=", status, "result=", JSON.stringify(result));
         if (status !== window.kakao.maps.services.Status.OK || !result[0]) {
           setMapFailed(true);
           return;
@@ -109,7 +99,12 @@ export default function LocationSection() {
         transition={{ duration: 0.8, delay: 0.1 }}
       >
         <div ref={mapCallbackRef} className="absolute inset-0" />
-        {(!KAKAO_MAP_KEY || mapFailed) && (
+        {!venue.address && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <p className="text-xs text-[var(--color-text-light)]">주소가 입력되지 않았습니다</p>
+          </div>
+        )}
+        {venue.address && (!KAKAO_MAP_KEY || mapFailed) && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <p className="text-xs text-[var(--color-text-light)]">지도를 표시할 수 없습니다</p>
           </div>
