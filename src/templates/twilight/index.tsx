@@ -110,6 +110,7 @@ function Hero() {
 
 function MoodyGallery() {
   const w = useWedding();
+  if (w.gallery.length === 0) return null;
   return (
     <section className="py-14" style={{ background: "#080a14" }}>
       <div className="text-center mb-8">

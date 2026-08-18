@@ -7,6 +7,8 @@ import { useWedding } from "@/context/WeddingContext";
 export default function GallerySection() {
   const { gallery } = useWedding();
 
+  if (gallery.length === 0) return null;
+
   return (
     <section style={{ background: "var(--color-text)" }}>
       <div className="py-10 text-center">

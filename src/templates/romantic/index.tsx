@@ -89,6 +89,7 @@ const ROTATIONS = [-3, 2, -2, 4, -1];
 
 function PolaroidGallery() {
   const w = useWedding();
+  if (w.gallery.length === 0) return null;
   return (
     <section className="py-16 bg-[#fdf5f6]">
       <motion.div className="text-center mb-10"

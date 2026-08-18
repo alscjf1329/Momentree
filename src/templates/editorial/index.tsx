@@ -73,6 +73,7 @@ function Hero() {
 
 function FilmstripGallery() {
   const w = useWedding();
+  if (w.gallery.length === 0) return null;
   return (
     <section className="py-14 bg-[#0d0d0d]">
       <motion.div className="px-8 mb-7 flex items-center gap-4"

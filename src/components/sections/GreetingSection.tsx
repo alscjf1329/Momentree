@@ -7,6 +7,8 @@ export default function GreetingSection() {
   const wedding = useWedding();
   const lines = wedding.greeting.filter((l) => l !== "");
 
+  if (lines.length === 0) return null;
+
   return (
     <section className="py-24 px-8 text-center bg-[var(--color-cream)]">
       <motion.div
@@ -15,8 +17,7 @@ export default function GreetingSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-6">INVITATION</p>
-        <div className="section-divider mb-10" />
+        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-12">INVITATION</p>
       </motion.div>
 
       <div className="space-y-3">

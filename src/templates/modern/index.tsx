@@ -74,6 +74,7 @@ function Hero() {
 
 function InstagramGallery() {
   const w = useWedding();
+  if (w.gallery.length === 0) return null;
   // 3-col square grid (Instagram style)
   return (
     <section className="py-12" style={{ background: "#f5efe7" }}>

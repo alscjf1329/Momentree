@@ -385,6 +385,8 @@ function GardenGallery() {
     strip.scrollTo({ left: target, behavior: "smooth" });
   }, [active]);
 
+  if (w.gallery.length === 0) return null;
+
   return (
     <section className="py-16 bg-[var(--color-cream)]">
       <motion.div className="px-6 mb-6"

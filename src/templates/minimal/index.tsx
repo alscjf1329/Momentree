@@ -63,6 +63,7 @@ function Hero() {
 
 function GridGallery() {
   const w = useWedding();
+  if (w.gallery.length === 0) return null;
   return (
     <section className="py-16 bg-white">
       <motion.div className="px-8 mb-8 text-center"

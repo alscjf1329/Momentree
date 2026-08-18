@@ -123,6 +123,7 @@ function Hero() {
 
 function LuxuryGallery() {
   const w = useWedding();
+  if (w.gallery.length === 0) return null;
   return (
     <section className="py-14" style={{ background: "#0c1422" }}>
       <div className="text-center mb-8">
