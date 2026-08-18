@@ -399,11 +399,11 @@ function GardenGallery() {
 
       {/* 메인 뷰어 — 한 장씩 스와이프 */}
       <div ref={mainRef} onScroll={handleScroll}
-        className="no-scrollbar flex overflow-x-auto px-6"
+        className="no-scrollbar flex overflow-x-auto"
         style={{ scrollSnapType: "x mandatory" }}>
         {w.gallery.map((img, i) => (
           <div key={i}
-            className="relative flex-none overflow-hidden rounded-2xl"
+            className="relative flex-none overflow-hidden"
             style={{
               width: "100%",
               aspectRatio: "4/3",

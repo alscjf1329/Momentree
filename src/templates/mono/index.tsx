@@ -339,7 +339,7 @@ function MonoGallery() {
 
       {/* 메인 뷰어 — 한 장씩 스와이프 */}
       <div ref={mainRef} onScroll={handleScroll}
-        className="no-scrollbar flex overflow-x-auto px-6"
+        className="no-scrollbar flex overflow-x-auto"
         style={{ scrollSnapType: "x mandatory" }}>
         {w.gallery.map((img, i) => (
           <div key={i}
@@ -348,7 +348,7 @@ function MonoGallery() {
               width: "100%",
               aspectRatio: "4/3",
               scrollSnapAlign: "center",
-              background: "#fff",
+              background: "var(--color-accent)",
             }}>
             {/* 가로/세로 사진 모두 대응 — 잘리지 않게 contain, 세로 사진은 좌우 여백 생김 */}
             <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} unoptimized={isGif(img.src)} />
