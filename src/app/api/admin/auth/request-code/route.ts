@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { generateOtpCode, type SessionRole } from "@/lib/adminAuth";
 import { isOnCooldown, issueOtp, OTP_TTL_MS } from "@/lib/adminOtp";
 import { isValidLoginEmail } from "@/lib/newClient";
+import { isAdmin } from "@/lib/admins";
 
 export async function POST(req: NextRequest) {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -22,8 +23,9 @@ export async function POST(req: NextRequest) {
   let role: SessionRole;
   let file: string | undefined;
 
-  if (email === adminEmail) {
+  if (await isAdmin(email)) {
     role = "admin";
+    file = email;
   } else {
     // 관리자가 미리 만들어주지 않아도 이메일 인증만으로 고객 계정이 생성된다 (최초 로그인 시 자동 생성)
     if (!isValidLoginEmail(email)) {

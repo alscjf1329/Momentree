@@ -14,6 +14,7 @@ interface Me {
   role: "admin" | "customer";
   file: string | null;
   email: string | null;
+  superAdmin: boolean;
 }
 
 function NavInner() {
@@ -28,6 +29,7 @@ function NavInner() {
   }, []);
 
   const isCustomer = me?.role === "customer";
+  const nav = me?.superAdmin ? [...NAV, { href: "/admin/admins", label: "관리자 관리" }] : NAV;
 
   const logout = async () => {
     await fetch("/api/admin/auth/logout", { method: "POST" });
@@ -54,7 +56,7 @@ function NavInner() {
       {/* 탭 */}
       <nav className="flex items-center gap-0.5 flex-1 overflow-x-auto"
         style={{ scrollbarWidth: "none" }}>
-        {NAV.map(({ href: base, label }) => (
+        {nav.map(({ href: base, label }) => (
           <Link key={base} href={href(base)}
             className="px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0"
             style={active(base)
