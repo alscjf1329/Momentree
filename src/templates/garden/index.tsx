@@ -408,7 +408,7 @@ function GardenGallery() {
               width: "100%",
               aspectRatio: "4/3",
               scrollSnapAlign: "center",
-              background: "var(--color-accent)",
+              background: "var(--color-cream)",
             }}>
             {/* 가로/세로 사진 모두 대응 — 잘리지 않게 contain, 세로 사진은 좌우 여백 생김 */}
             <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} unoptimized={isGif(img.src)} />
