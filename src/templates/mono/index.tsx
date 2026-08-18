@@ -39,7 +39,6 @@ function RSVPIntroModal() {
   const [attendance, setAttendance] = useState<Attendance>("");
   const [guests, setGuests] = useState("1");
   const [companionName, setCompanionName] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -65,7 +64,7 @@ function RSVPIntroModal() {
     setLoading(true);
     setError(false);
     try {
-      await submitRSVP({ name, side, attendance, guests, companionName, message, slug: w.slug });
+      await submitRSVP({ name, side, attendance, guests, companionName, slug: w.slug });
       setStep("done");
     } catch {
       setError(true);
@@ -187,11 +186,6 @@ function RSVPIntroModal() {
                 <input type="text" value={companionName} onChange={(e) => setCompanionName(e.target.value)}
                   placeholder="함께 오시는 분의 성함"
                   className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors mb-4" />
-
-                <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">축하 메시지 (선택)</label>
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)}
-                  placeholder="두 분께 전하고 싶은 말을 남겨주세요" rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors resize-none mb-2" />
 
                 {error && <p className="text-xs text-red-500 text-center mb-2">전송에 실패했습니다. 다시 시도해주세요.</p>}
 
