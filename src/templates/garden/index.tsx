@@ -13,15 +13,15 @@ import RSVPSection from "@/components/sections/RSVPSection";
 import GuestbookSection from "@/components/sections/GuestbookSection";
 
 const VARS = {
-  "--color-primary": "#7c9670",
-  "--color-primary-light": "#b3c8a8",
-  "--color-primary-dark": "#4f6544",
-  "--color-accent": "#f2f4ee",
-  "--color-gold": "#c2b686",
-  "--color-cream": "#faf7f0",
-  "--color-warm-gray": "#a5ac9c",
-  "--color-text": "#31352c",
-  "--color-text-light": "#767d6d",
+  "--color-primary": "#5f7a52",
+  "--color-primary-light": "#a3b696",
+  "--color-primary-dark": "#3d5233",
+  "--color-accent": "#eef0e6",
+  "--color-gold": "#b89a5c",
+  "--color-cream": "#f7f2e7",
+  "--color-warm-gray": "#9aa08c",
+  "--color-text": "#2a2e24",
+  "--color-text-light": "#6b7061",
 } as React.CSSProperties;
 
 type Step = "intro" | "form" | "done";
