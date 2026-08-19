@@ -56,6 +56,8 @@ export default function LocationSection() {
         }
         const coords = new window.kakao.maps.LatLng(Number(result[0].y), Number(result[0].x));
         const map = new window.kakao.maps.Map(node, { center: coords, level: 4 });
+        map.setDraggable(false);
+        map.setZoomable(false);
         new window.kakao.maps.Marker({ position: coords, map });
       };
       if (venue.address) {
