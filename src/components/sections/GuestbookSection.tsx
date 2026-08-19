@@ -36,7 +36,7 @@ export default function GuestbookSection() {
   };
 
   return (
-    <section className="py-20 px-6 bg-[var(--color-cream)]">
+    <section className="py-14 px-6 bg-[var(--color-cream)]">
       {!showForm ? (
         <motion.div
           className="text-center"
@@ -61,6 +61,7 @@ export default function GuestbookSection() {
         animate={{ opacity: 1, height: "auto" }}
         transition={{ duration: 0.35 }}
       >
+        <h2 className="font-serif text-xl text-[var(--color-text)] text-center mb-5">축하 메시지</h2>
         <input
           type="text"
           value={name}
