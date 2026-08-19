@@ -330,7 +330,7 @@ function MonoGallery() {
 
   return (
     <section className="py-16 bg-white">
-      <motion.div className="px-6 mb-6"
+      <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <p className="text-xs tracking-[0.3em] text-black font-medium">GALLERY</p>

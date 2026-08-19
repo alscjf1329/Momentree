@@ -68,9 +68,8 @@ export default function ContactSection() {
                 </div>
                 <div className="px-5 pb-5 flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm text-[var(--color-text-light)]">{acc.bank}</p>
-                    <p className="font-serif text-[var(--color-text)] tracking-widest mt-0.5">
-                      {acc.number}
+                    <p className="font-serif text-[var(--color-text)] tracking-widest">
+                      {acc.bank} {acc.number}
                     </p>
                     <p className="text-xs text-[var(--color-text-light)] mt-0.5">{acc.holder}</p>
                   </div>
