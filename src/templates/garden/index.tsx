@@ -448,25 +448,17 @@ function InfoSection() {
   const mainRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
+  const slideWidth = () =>
+    (mainRef.current?.firstElementChild as HTMLElement | null)?.offsetWidth || mainRef.current?.clientWidth || 1;
+
   const handleScroll = () => {
     const el = mainRef.current;
     if (!el) return;
-    const center = el.scrollLeft + el.clientWidth / 2;
-    let closest = 0;
-    let min = Infinity;
-    Array.from(el.children).forEach((child, i) => {
-      const c = (child as HTMLElement).offsetLeft + (child as HTMLElement).offsetWidth / 2;
-      const d = Math.abs(c - center);
-      if (d < min) { min = d; closest = i; }
-    });
-    setActive(closest);
+    setActive(Math.round(el.scrollLeft / slideWidth()));
   };
 
   const goTo = (i: number) => {
-    const el = mainRef.current;
-    const target = el?.children[i] as HTMLElement | undefined;
-    if (!el || !target) return;
-    el.scrollTo({ left: target.offsetLeft - (el.clientWidth - target.offsetWidth) / 2, behavior: "smooth" });
+    mainRef.current?.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
   };
 
   if (w.info.length === 0) return null;
@@ -479,20 +471,18 @@ function InfoSection() {
         <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold">INFORMATION</p>
       </motion.div>
 
-      {/* 안내사항 — 카드 사이 여백을 두고 다음/이전 카드가 살짝 흐리게 보이는 peek 캐러셀 */}
+      {/* 안내사항 — 한 장씩 스와이프 */}
       <div ref={mainRef} onScroll={handleScroll}
-        className="no-scrollbar flex gap-3 overflow-x-auto px-6 items-stretch"
+        className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
         style={{ scrollSnapType: "x mandatory" }}>
         {w.info.map((item, i) => (
           <div key={i}
-            className="flex-none rounded-lg p-8 transition-all duration-300"
+            className="flex-none rounded-lg p-8"
             style={{
-              width: "85%",
+              width: "100%",
               scrollSnapAlign: "center",
               background: "#fff",
               boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
-              opacity: active === i ? 1 : 0.4,
-              transform: active === i ? "scale(1)" : "scale(0.94)",
             }}>
             <p className="font-serif text-lg text-[var(--color-text)] tracking-wide">{item.title}</p>
             <div className="w-6 h-px my-4" style={{ background: "var(--color-primary-light)" }} />
