@@ -417,10 +417,16 @@ function InfoSection() {
         style={{ scrollSnapType: "x mandatory" }}>
         {w.info.map((item, i) => (
           <div key={i}
-            className="flex-none border border-[var(--color-accent)] p-6"
-            style={{ width: "100%", scrollSnapAlign: "center" }}>
-            <p className="font-serif text-lg text-[var(--color-text)] mb-3">{item.title}</p>
-            <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
+            className="flex-none rounded-lg p-8"
+            style={{
+              width: "100%",
+              scrollSnapAlign: "center",
+              background: "#fafafa",
+              boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
+            }}>
+            <p className="font-serif text-lg text-black tracking-wide">{item.title}</p>
+            <div className="w-6 h-px bg-black/20 my-4" />
+            <p className="text-sm text-black/55 leading-loose whitespace-pre-wrap">
               {item.content}
             </p>
           </div>
