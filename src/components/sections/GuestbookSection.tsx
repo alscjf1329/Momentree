@@ -37,19 +37,9 @@ export default function GuestbookSection() {
 
   return (
     <section className="py-20 px-6 bg-[var(--color-cream)]">
-      <motion.div
-        className="text-center"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.7 }}
-      >
-        <h2 className="font-serif text-xl text-[var(--color-text)]">축하 메시지</h2>
-      </motion.div>
-
       {!showForm ? (
         <motion.div
-          className="mt-8 text-center"
+          className="text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-60px" }}
@@ -66,7 +56,7 @@ export default function GuestbookSection() {
       ) : (
       <motion.form
         onSubmit={handleSubmit}
-        className="mt-8 space-y-3"
+        className="space-y-3"
         initial={{ opacity: 0, height: 0 }}
         animate={{ opacity: 1, height: "auto" }}
         transition={{ duration: 0.35 }}
