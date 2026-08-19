@@ -10,6 +10,7 @@ type Side = "groom" | "bride" | "";
 
 export default function RSVPSection() {
   const wedding = useWedding();
+  const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [side, setSide] = useState<Side>("");
   const [attendance, setAttendance] = useState<Attendance>("");
@@ -64,14 +65,29 @@ export default function RSVPSection() {
           <p className="font-serif text-[var(--color-primary)] text-lg">감사합니다</p>
           <p className="text-sm text-[var(--color-text-light)] mt-2">소중한 마음 잘 전달받았습니다.</p>
         </motion.div>
-      ) : (
-        <motion.form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-4"
+      ) : !showForm ? (
+        <motion.div
+          className="mt-8 text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, delay: 0.1 }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="w-full py-4 rounded-xl bg-[var(--color-primary)] text-white text-sm tracking-widest font-medium active:opacity-80"
+          >
+            참석여부 전달하기
+          </button>
+        </motion.div>
+      ) : (
+        <motion.form
+          onSubmit={handleSubmit}
+          className="mt-8 space-y-4"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 0.35 }}
         >
           <div>
             <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">

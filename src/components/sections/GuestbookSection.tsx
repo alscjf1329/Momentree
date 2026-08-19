@@ -7,6 +7,7 @@ import { submitGuestbook, fetchGuestbook, type GuestbookEntry } from "@/lib/gues
 
 export default function GuestbookSection() {
   const wedding = useWedding();
+  const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
@@ -46,13 +47,29 @@ export default function GuestbookSection() {
         <h2 className="font-serif text-xl text-[var(--color-text)]">축하 메시지</h2>
       </motion.div>
 
+      {!showForm ? (
+        <motion.div
+          className="mt-8 text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="w-full py-4 rounded-xl bg-[var(--color-primary)] text-white text-sm tracking-widest font-medium active:opacity-80"
+          >
+            메시지 남기기
+          </button>
+        </motion.div>
+      ) : (
       <motion.form
         onSubmit={handleSubmit}
         className="mt-8 space-y-3"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.7, delay: 0.1 }}
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        transition={{ duration: 0.35 }}
       >
         <input
           type="text"
@@ -85,6 +102,7 @@ export default function GuestbookSection() {
           {loading ? "전송 중..." : "메시지 남기기"}
         </button>
       </motion.form>
+      )}
 
       {entries.length > 0 && (
         <motion.div
