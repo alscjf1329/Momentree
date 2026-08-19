@@ -36,7 +36,7 @@ export default function RSVPSection() {
   };
 
   return (
-    <section id="rsvp" className="py-14 px-6 bg-[var(--color-cream)]">
+    <section id="rsvp" className="pt-14 pb-4 px-6 bg-[var(--color-cream)]">
       <motion.div
         className="text-center"
         initial={{ opacity: 0 }}

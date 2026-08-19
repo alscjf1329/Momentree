@@ -36,7 +36,7 @@ export default function GuestbookSection() {
   };
 
   return (
-    <section className="py-14 px-6 bg-[var(--color-cream)]">
+    <section className="pt-4 pb-14 px-6 bg-[var(--color-cream)]">
       {!showForm ? (
         <motion.div
           className="text-center"
