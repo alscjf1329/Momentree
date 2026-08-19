@@ -289,7 +289,7 @@ function TypedText({
 function Hero() {
   const w = useWedding();
   return (
-    <section className="relative overflow-hidden bg-white" style={{ height: "100dvh" }}>
+    <section className="relative overflow-hidden bg-white" style={{ height: "100svh" }}>
       {w.introBg && (
         <motion.div
           className="absolute inset-0"

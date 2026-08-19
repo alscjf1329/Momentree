@@ -244,7 +244,7 @@ function heroAnimationDuration(mainTitle: string, subInfoCount: number): number 
 function Hero() {
   const w = useWedding();
   return (
-    <section className="relative overflow-hidden bg-white" style={{ height: "100dvh" }}>
+    <section className="relative overflow-hidden bg-white" style={{ height: "100svh" }}>
       {w.introBg && (
         <div className="absolute inset-0">
           <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
