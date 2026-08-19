@@ -18,7 +18,7 @@ const VARS = {
   "--color-primary-dark": "#0a0a09",
   "--color-accent": "#ece9e3",
   "--color-gold": "#b3a082",
-  "--color-cream": "#fafaf7",
+  "--color-cream": "#ffffff",
   "--color-warm-gray": "#9c988f",
   "--color-text": "#1c1c1a",
   "--color-text-light": "#6e6b64",
@@ -421,7 +421,7 @@ function InfoSection() {
             style={{
               width: "100%",
               scrollSnapAlign: "center",
-              background: "#fff",
+              background: "var(--color-accent)",
               boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
             }}>
             <p className="font-serif text-lg text-black tracking-wide">{item.title}</p>
