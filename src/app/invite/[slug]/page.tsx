@@ -19,7 +19,14 @@ async function readClientFile(filename: string): Promise<WeddingData | null> {
       "utf-8"
     );
     // 필드 추가 이전에 저장된 레거시 클라이언트 파일 대비 기본값과 병합
-    const data = { ...WEDDING, ...JSON.parse(raw) } as WeddingData;
+    // (얕은 병합이라 groom/bride 안에 새로 추가된 필드는 별도로 다시 병합해야 함)
+    const parsed = JSON.parse(raw);
+    const data = {
+      ...WEDDING,
+      ...parsed,
+      groom: { ...WEDDING.groom, ...parsed.groom },
+      bride: { ...WEDDING.bride, ...parsed.bride },
+    } as WeddingData;
     const schema = getSchemaForTemplate(data.template);
     return applyToEncryptedFields(data, schema, decrypt);
   } catch {
