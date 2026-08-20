@@ -22,7 +22,7 @@ export default function EnvelopeScrollSection() {
 
   return (
     <div ref={sectionRef} style={{ height: "300vh" }}>
-      <div className="sticky top-0 overflow-hidden" style={{ height: "100dvh", background: "#1a1208" }}>
+      <div className="sticky top-0 overflow-hidden" style={{ height: "100svh", background: "#1a1208" }}>
         <motion.div className="absolute inset-0" style={{ opacity: closedOpacity }}>
           <Image
             src={wedding.envelopeClosed}

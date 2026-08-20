@@ -17,7 +17,7 @@ export default function IntroSection() {
   }, []);
 
   return (
-    <section className="relative flex flex-col items-center justify-center overflow-hidden" style={{ height: "100dvh" }}>
+    <section className="relative flex flex-col items-center justify-center overflow-hidden" style={{ height: "100svh" }}>
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           className="absolute inset-[-8%]"

@@ -388,17 +388,25 @@ function InfoSection() {
   const mainRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
-  const slideWidth = () =>
-    (mainRef.current?.firstElementChild as HTMLElement | null)?.offsetWidth || mainRef.current?.clientWidth || 1;
-
   const handleScroll = () => {
     const el = mainRef.current;
     if (!el) return;
-    setActive(Math.round(el.scrollLeft / slideWidth()));
+    const center = el.scrollLeft + el.clientWidth / 2;
+    let closest = 0;
+    let min = Infinity;
+    Array.from(el.children).forEach((child, i) => {
+      const c = (child as HTMLElement).offsetLeft + (child as HTMLElement).offsetWidth / 2;
+      const d = Math.abs(c - center);
+      if (d < min) { min = d; closest = i; }
+    });
+    setActive(closest);
   };
 
   const goTo = (i: number) => {
-    mainRef.current?.scrollTo({ left: i * slideWidth(), behavior: "smooth" });
+    const el = mainRef.current;
+    const target = el?.children[i] as HTMLElement | undefined;
+    if (!el || !target) return;
+    el.scrollTo({ left: target.offsetLeft - (el.clientWidth - target.offsetWidth) / 2, behavior: "smooth" });
   };
 
   if (w.info.length === 0) return null;
@@ -411,15 +419,15 @@ function InfoSection() {
         <p className="text-xs tracking-[0.3em] text-black font-medium">INFORMATION</p>
       </motion.div>
 
-      {/* 안내사항 — 한 장씩 스와이프 */}
+      {/* 안내사항 — 카드 사이 흰 여백을 두고 한 장씩 스와이프 */}
       <div ref={mainRef} onScroll={handleScroll}
-        className="no-scrollbar flex overflow-x-auto px-6 items-stretch"
+        className="no-scrollbar flex gap-3 overflow-x-auto px-6 items-stretch"
         style={{ scrollSnapType: "x mandatory" }}>
         {w.info.map((item, i) => (
           <div key={i}
             className="flex-none rounded-lg p-8"
             style={{
-              width: "100%",
+              width: "88%",
               scrollSnapAlign: "center",
               background: "var(--color-accent)",
               boxShadow: "0 2px 24px rgba(0,0,0,0.06)",

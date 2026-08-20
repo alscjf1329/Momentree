@@ -159,21 +159,21 @@ export default function LocationSection() {
         >
           <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] mb-3">셔틀버스 시간표</p>
           <div className="grid grid-cols-2 gap-4">
-            {shuttleTimetable.from.length > 0 && (
-              <div>
-                <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">가는 편</p>
-                <ul className="space-y-1">
-                  {shuttleTimetable.from.map((line, i) => (
-                    <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
             {shuttleTimetable.to.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">오는 편</p>
                 <ul className="space-y-1">
                   {shuttleTimetable.to.map((line, i) => (
+                    <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {shuttleTimetable.from.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">가는 편</p>
+                <ul className="space-y-1">
+                  {shuttleTimetable.from.map((line, i) => (
                     <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
                   ))}
                 </ul>

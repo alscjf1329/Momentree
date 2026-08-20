@@ -20,7 +20,7 @@ export default function InviteLayout({ children }: { children: React.ReactNode }
         style={{
           maxWidth: 480,
           background: "#fff",
-          minHeight: "100dvh",
+          minHeight: "100svh",
           overflowAnchor: "none",
         }}
       >

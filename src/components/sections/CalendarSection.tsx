@@ -37,7 +37,7 @@ export default function CalendarSection() {
   }, [wedding.date.iso]);
 
   return (
-    <section className="py-20 px-6 bg-[var(--color-cream)]">
+    <section className="py-20 px-6 bg-[var(--color-accent)]">
       <motion.div
         className="text-center"
         initial={{ opacity: 0 }}
