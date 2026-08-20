@@ -11,6 +11,7 @@ export const WEDDING: WeddingData = {
     nameFull: "김 민 준",
     fatherName: "김철수",
     motherName: "이영희",
+    relation: "장남",
     accounts: [
       { name: "신랑 김민준", bank: "카카오뱅크", number: "3333-01-1234567", holder: "김민준" },
     ],
@@ -20,6 +21,7 @@ export const WEDDING: WeddingData = {
     nameFull: "이 서 연",
     fatherName: "이대호",
     motherName: "박민정",
+    relation: "장녀",
     accounts: [
       { name: "신부 이서연", bank: "신한은행", number: "110-123-456789", holder: "이서연" },
     ],

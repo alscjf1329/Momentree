@@ -10,6 +10,8 @@ export interface PersonInfo {
   nameFull: string;
   fatherName: string;
   motherName: string;
+  // 부모님 성함 옆에 붙는 관계 (예: 장남/차남/막내아들, 장녀/차녀/막내딸)
+  relation: string;
   accounts: AccountEntry[];
 }
 

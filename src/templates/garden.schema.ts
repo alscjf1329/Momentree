@@ -20,6 +20,7 @@ export const gardenSchema: TemplateSchema = {
         { key: "groom.nameFull", type: "text", label: "전체이름", common: true, placeholder: "홍 길 동" },
         { key: "groom.fatherName", type: "text", label: "부친", common: true },
         { key: "groom.motherName", type: "text", label: "모친", common: true },
+        { key: "groom.relation", type: "text", label: "관계 (예: 장남/차남/막내아들)", common: true, placeholder: "장남" },
         {
           key: "groom.accounts",
           type: "array-object",
@@ -41,6 +42,7 @@ export const gardenSchema: TemplateSchema = {
         { key: "bride.nameFull", type: "text", label: "전체이름", common: true, placeholder: "김 지 수" },
         { key: "bride.fatherName", type: "text", label: "부친", common: true },
         { key: "bride.motherName", type: "text", label: "모친", common: true },
+        { key: "bride.relation", type: "text", label: "관계 (예: 장녀/차녀/막내딸)", common: true, placeholder: "장녀" },
         {
           key: "bride.accounts",
           type: "array-object",
