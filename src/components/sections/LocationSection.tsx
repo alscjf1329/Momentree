@@ -157,10 +157,10 @@ export default function LocationSection() {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <div className="mb-3">
+          <div className="flex items-baseline justify-between gap-2 mb-3">
             <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)]">셔틀버스 시간표</p>
             {wedding.shuttleInfo && (
-              <p className="text-xs text-[var(--color-text-light)] tracking-normal font-normal mt-1">{wedding.shuttleInfo}</p>
+              <p className="text-xs text-[var(--color-text-light)] tracking-normal font-normal text-right">{wedding.shuttleInfo}</p>
             )}
           </div>
           <div className="grid grid-cols-2 gap-4">
