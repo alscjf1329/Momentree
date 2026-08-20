@@ -22,6 +22,7 @@ export default function InviteLayout({ children }: { children: React.ReactNode }
           background: "#fff",
           minHeight: "100svh",
           overflowAnchor: "none",
+          paddingTop: "env(safe-area-inset-top)",
         }}
       >
         {children}

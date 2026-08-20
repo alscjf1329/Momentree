@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="theme-color" content="#5c4035" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,7 +30,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body style={{ minHeight: "100dvh" }} suppressHydrationWarning>
+      <body style={{ minHeight: "100svh" }} suppressHydrationWarning>
         {children}
         <RegisterSW />
       </body>
