@@ -157,10 +157,10 @@ export default function LocationSection() {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <div className="flex items-baseline justify-between gap-2 mb-3">
+          <div className="flex items-baseline gap-2 mb-3">
             <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)]">셔틀버스 시간표</p>
             {wedding.shuttleInfo && (
-              <p className="text-xs text-[var(--color-text-light)] tracking-normal font-normal text-right">{wedding.shuttleInfo}</p>
+              <p className="text-xs text-[var(--color-text-light)] tracking-normal font-normal">{wedding.shuttleInfo}</p>
             )}
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -168,9 +168,13 @@ export default function LocationSection() {
               <div>
                 <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">오는 편</p>
                 <ul className="space-y-1">
-                  {shuttleTimetable.to.map((line, i) => (
-                    <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
-                  ))}
+                  {shuttleTimetable.to.map((line, i) =>
+                    line === "" ? (
+                      <li key={i} aria-hidden className="h-2" />
+                    ) : (
+                      <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
+                    )
+                  )}
                 </ul>
               </div>
             )}
@@ -178,9 +182,13 @@ export default function LocationSection() {
               <div>
                 <p className="text-xs font-medium text-[var(--color-text)] mb-1.5">가는 편</p>
                 <ul className="space-y-1">
-                  {shuttleTimetable.from.map((line, i) => (
-                    <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
-                  ))}
+                  {shuttleTimetable.from.map((line, i) =>
+                    line === "" ? (
+                      <li key={i} aria-hidden className="h-2" />
+                    ) : (
+                      <li key={i} className="text-xs text-[var(--color-text-light)]">{line}</li>
+                    )
+                  )}
                 </ul>
               </div>
             )}
