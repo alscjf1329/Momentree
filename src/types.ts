@@ -49,6 +49,8 @@ export interface WeddingData {
   rsvpNotice: string;
   // RSVP 폼 하단 마감 안내 문구
   rsvpDeadlineText: string;
+  // 마음 전하실 곳(계좌번호) 안내 문구
+  contactNotice: string;
   info: { title: string; content: string }[];
   // 화환 안내 문구
   flowerNotice: string;

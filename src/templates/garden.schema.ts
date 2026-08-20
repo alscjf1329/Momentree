@@ -104,6 +104,12 @@ export const gardenSchema: TemplateSchema = {
       ],
     },
     {
+      title: "마음 전하실 곳 (계좌번호) 문구",
+      fields: [
+        { key: "contactNotice", type: "textarea", label: "안내 문구", common: true },
+      ],
+    },
+    {
       title: "안내사항 (Information)",
       fields: [
         {

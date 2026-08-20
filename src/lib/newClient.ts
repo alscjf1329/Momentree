@@ -18,6 +18,7 @@ export const DEFAULT_WEDDING_DATA: WeddingData = {
   rsvpMessage: ["참석에 부담 가지지 말아주시고,", "편하게 알려주세요.", "저희의 정성을 다하는 준비에 도움이 될 것 같아", "참석 여부를 알려주시면 감사하겠습니다."],
   rsvpNotice: "",
   rsvpDeadlineText: "",
+  contactNotice: "",
   info: [{ title: "", content: "" }],
   flowerNotice: "",
   shuttleTimetable: { from: [""], to: [""] },

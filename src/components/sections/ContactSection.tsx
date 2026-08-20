@@ -30,11 +30,11 @@ export default function ContactSection() {
         transition={{ duration: 0.7 }}
       >
         <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-4">마음 전하실 곳</p>
-        <p className="text-sm text-[var(--color-text-light)] leading-relaxed">
-          멀리서도 축하의 마음을 전하고 싶으신 분들을 위해 계좌번호를 안내드립니다.
-          <br />
-          소중한 축하를 보내주셔서 감사드리며, 따뜻한 마음에 깊이 감사드립니다.
-        </p>
+        {wedding.contactNotice && (
+          <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
+            {wedding.contactNotice}
+          </p>
+        )}
 
       </motion.div>
 
