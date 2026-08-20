@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
 
 type Side = "groom" | "bride";
@@ -9,8 +9,7 @@ type CopiedKey = string | null;
 
 export default function ContactSection() {
   const wedding = useWedding();
-  const [showAccounts, setShowAccounts] = useState(false);
-  const [tab, setTab] = useState<Side>("groom");
+  const [openSide, setOpenSide] = useState<Side | null>(null);
   const [copied, setCopied] = useState<CopiedKey>(null);
 
   const copyText = async (text: string, key: string) => {
@@ -18,8 +17,6 @@ export default function ContactSection() {
     setCopied(key);
     setTimeout(() => setCopied(null), 2000);
   };
-
-  const current = tab === "groom" ? wedding.groom : wedding.bride;
 
   if (wedding.groom.accounts.length === 0 && wedding.bride.accounts.length === 0) return null;
 
@@ -39,70 +36,66 @@ export default function ContactSection() {
           소중한 축하를 보내주셔서 감사드리며, 따뜻한 마음에 깊이 감사드립니다.
         </p>
 
-        {!showAccounts ? (
-          <button
-            type="button"
-            onClick={() => setShowAccounts(true)}
-            className="w-full mt-8 py-4 rounded-xl bg-[var(--color-primary)] text-white text-sm tracking-widest font-medium active:opacity-80"
-          >
-            계좌번호 보기
-          </button>
-        ) : (
-          <div className="flex rounded-full border border-[var(--color-primary-light)] overflow-hidden mx-8 mt-8">
-            {(["groom", "bride"] as Side[]).map((side) => (
-              <button
-                key={side}
-                onClick={() => setTab(side)}
-                className={`flex-1 py-2.5 text-sm tracking-widest transition-colors ${
-                  tab === side
-                    ? "bg-[var(--color-primary)] text-white"
-                    : "text-[var(--color-primary)]"
-                }`}
-              >
-                {side === "groom" ? "신랑측" : "신부측"}
-              </button>
-            ))}
-          </div>
-        )}
       </motion.div>
 
-      {showAccounts && (
-        <motion.div
-          key={tab}
-          className="mt-8 px-6 space-y-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.35 }}
-        >
-          <div className="space-y-2">
-            <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)] px-1">계좌번호</p>
-            {current.accounts.map((acc, i) => {
-              const key = `${tab}-account-${i}`;
-              return (
-                <div key={i} className="rounded-2xl border border-[var(--color-accent)] overflow-hidden">
-                  <div className="px-5 py-4">
-                    <span className="text-sm text-[var(--color-text)]">{acc.name || current.name}</span>
-                  </div>
-                  <div className="px-5 pb-5 flex items-center justify-between gap-3">
-                    <div>
-                      <p className="font-serif text-[var(--color-text)] tracking-widest">
-                        {acc.bank} {acc.number}
-                      </p>
-                      <p className="text-xs text-[var(--color-text-light)] mt-0.5">{acc.holder}</p>
+      <div className="mt-8 px-6 space-y-3">
+        {(["groom", "bride"] as Side[]).map((side) => {
+          const person = side === "groom" ? wedding.groom : wedding.bride;
+          if (person.accounts.length === 0) return null;
+          const isOpen = openSide === side;
+          return (
+            <div key={side} className="rounded-2xl border border-[var(--color-accent)] overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setOpenSide(isOpen ? null : side)}
+                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)]"
+              >
+                <span>{side === "groom" ? "신랑측" : "신부측"}</span>
+                <span
+                  className="text-[var(--color-text-light)] transition-transform"
+                  style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                >
+                  ⌄
+                </span>
+              </button>
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <div className="px-5 pb-5 space-y-3 border-t border-[var(--color-accent)] pt-4">
+                      {person.accounts.map((acc, i) => {
+                        const key = `${side}-account-${i}`;
+                        return (
+                          <div key={i} className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-xs text-[var(--color-text-light)] mb-0.5">{acc.name || person.name}</p>
+                              <p className="font-serif text-[var(--color-text)] tracking-widest">
+                                {acc.bank} {acc.number}
+                              </p>
+                              <p className="text-xs text-[var(--color-text-light)] mt-0.5">{acc.holder}</p>
+                            </div>
+                            <button
+                              onClick={() => copyText(acc.number, key)}
+                              className="px-4 py-2 rounded-full border border-[var(--color-primary-light)] text-[var(--color-primary)] text-xs tracking-wide shrink-0"
+                            >
+                              {copied === key ? "복사됨 ✓" : "복사"}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <button
-                      onClick={() => copyText(acc.number, key)}
-                      className="px-4 py-2 rounded-full border border-[var(--color-primary-light)] text-[var(--color-primary)] text-xs tracking-wide shrink-0"
-                    >
-                      {copied === key ? "복사됨 ✓" : "복사"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
