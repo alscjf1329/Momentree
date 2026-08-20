@@ -288,8 +288,15 @@ function TypedText({
 
 function Hero() {
   const w = useWedding();
+  // svh는 스펙상 정적이어야 하지만 브라우저별 구현 편차로 여전히 주소창에
+  // 반응해 흔들리는 경우가 있어 — 최초 1회 측정한 픽셀값을 고정해 완전히
+  // 정적으로 만듦 (리사이즈 리스너 없음 = 이후 변동 무시)
+  const [heroHeight, setHeroHeight] = useState<number | null>(null);
+  useEffect(() => {
+    setHeroHeight(window.visualViewport?.height ?? window.innerHeight);
+  }, []);
   return (
-    <section className="relative overflow-hidden bg-white" style={{ height: "100svh" }}>
+    <section className="relative overflow-hidden bg-white" style={{ height: heroHeight ? `${heroHeight}px` : "100svh" }}>
       {w.introBg && (
         <motion.div
           className="absolute inset-0"
