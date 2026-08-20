@@ -8,9 +8,9 @@ const givenName = (fullName: string) => fullName.slice(1) || fullName;
 
 export default function GreetingSection() {
   const wedding = useWedding();
-  const lines = wedding.greeting.filter((l) => l !== "");
+  const lines = wedding.greeting;
 
-  if (lines.length === 0) return null;
+  if (!lines.some((l) => l !== "")) return null;
 
   return (
     <section className="py-24 px-8 text-center bg-[var(--color-cream)]">
@@ -24,18 +24,22 @@ export default function GreetingSection() {
       </motion.div>
 
       <div className="space-y-3">
-        {lines.map((line, i) => (
-          <motion.p
-            key={i}
-            className="font-serif text-[var(--color-text)] text-[15px] leading-loose tracking-wide"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.6, delay: i * 0.15 }}
-          >
-            {line}
-          </motion.p>
-        ))}
+        {lines.map((line, i) =>
+          line === "" ? (
+            <div key={i} className="h-3" />
+          ) : (
+            <motion.p
+              key={i}
+              className="font-serif text-[var(--color-text)] text-[15px] leading-loose tracking-wide"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, delay: i * 0.15 }}
+            >
+              {line}
+            </motion.p>
+          )
+        )}
       </div>
 
       <motion.div
