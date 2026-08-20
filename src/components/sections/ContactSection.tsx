@@ -75,9 +75,8 @@ export default function ContactSection() {
                             <div>
                               <p className="text-xs text-[var(--color-text-light)] mb-0.5">{acc.name || person.name}</p>
                               <p className="font-serif text-[var(--color-text)] tracking-widest">
-                                {acc.bank} {acc.number}
+                                {acc.holder} {acc.number} {acc.bank}
                               </p>
-                              <p className="text-xs text-[var(--color-text-light)] mt-0.5">{acc.holder}</p>
                             </div>
                             <button
                               onClick={() => copyText(acc.number, key)}
