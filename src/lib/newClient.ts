@@ -22,6 +22,7 @@ export const DEFAULT_WEDDING_DATA: WeddingData = {
   info: [{ title: "", content: "" }],
   flowerNotice: "",
   shuttleTimetable: { from: [""], to: [""] },
+  shuttleInfo: "",
   directionsFromSeoul: [{ route: "", steps: [""] }],
   bgm: { title: "", src: "" },
   gallery: [],

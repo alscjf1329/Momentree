@@ -80,6 +80,7 @@ export const WEDDING: WeddingData = {
   flowerNotice: "화환은 정중히 사양하고 있습니다. 마음만 감사히 받겠습니다.",
   // 셔틀버스 시간표
   shuttleTimetable: { from: [], to: [] },
+  shuttleInfo: "탑승 장소: 정문 앞 / 문의: 010-0000-0000",
   // 서울에서 오시는 길
   directionsFromSeoul: [],
   // 갤러리 이미지 (public/images/ 에 넣어주세요)

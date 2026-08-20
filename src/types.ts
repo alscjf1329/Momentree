@@ -58,6 +58,8 @@ export interface WeddingData {
   flowerNotice: string;
   // 셔틀버스 시간표
   shuttleTimetable: { from: string[]; to: string[] };
+  // 셔틀버스 시간표 라벨 옆에 붙는 안내 문구 (탑승 장소, 문의처 등)
+  shuttleInfo: string;
   // 서울에서 오시는 길 (경로별 안내)
   directionsFromSeoul: { route: string; steps: string[] }[];
   gallery: { src: string; alt: string }[];

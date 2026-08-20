@@ -75,6 +75,7 @@ export const monoSchema: TemplateSchema = {
           helpText: "카카오맵 앱/웹에서 장소 검색 → 공유 → 링크 복사해서 붙여넣으면 지도 미리보기에도 그대로 반영돼요",
         },
         { key: "venue.naverMapUrl", type: "text", label: "네이버맵 URL", common: true },
+        { key: "shuttleInfo", type: "text", label: "셔틀버스 정보 (시간표 옆에 표시)", common: true, placeholder: "탑승 장소: 정문 앞 / 문의: 010-0000-0000" },
         { key: "shuttleTimetable.from", type: "array", label: "셔틀 시간표 — 가는 편", common: true },
         { key: "shuttleTimetable.to", type: "array", label: "셔틀 시간표 — 오는 편", common: true },
       ],
