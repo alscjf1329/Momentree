@@ -472,11 +472,11 @@ function InfoSection() {
   if (w.info.length === 0) return null;
 
   return (
-    <section className="py-16 bg-[var(--color-cream)]">
+    <section className="py-16 bg-[#EBEBEB]">
       <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold">INFORMATION</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold">INFORMATION</p>
       </motion.div>
 
       {/* 안내사항 — 카드 사이 흰 여백을 두고 한 장씩 스와이프 */}
@@ -489,7 +489,7 @@ function InfoSection() {
             style={{
               width: "88%",
               scrollSnapAlign: "center",
-              background: "var(--color-accent)",
+              background: "#fff",
               boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
             }}>
             <p className="font-serif text-lg text-[var(--color-text)] tracking-wide">{item.title}</p>

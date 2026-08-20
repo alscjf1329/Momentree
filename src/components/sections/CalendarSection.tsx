@@ -37,7 +37,7 @@ export default function CalendarSection() {
   }, [wedding.date.iso]);
 
   return (
-    <section className="py-20 px-6 bg-[var(--color-accent)]">
+    <section className="py-20 px-6 bg-[#EBEBEB]">
       <motion.div
         className="text-center"
         initial={{ opacity: 0 }}
@@ -45,7 +45,7 @@ export default function CalendarSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-8">DATE</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-8">DATE</p>
 
         <p className="font-serif text-2xl text-[var(--color-text)] tracking-widest mb-1">
           {year}.{String(month).padStart(2, "0")}.{String(day).padStart(2, "0")}
@@ -61,7 +61,8 @@ export default function CalendarSection() {
       </motion.div>
 
       <motion.div
-        className="mt-10 max-w-xs mx-auto"
+        className="mt-10 max-w-xs mx-auto rounded-2xl bg-white p-5"
+        style={{ boxShadow: "0 2px 24px rgba(0,0,0,0.06)" }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }}

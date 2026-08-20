@@ -29,7 +29,7 @@ export default function ContactSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-4">마음 전하실 곳</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-4">마음 전하실 곳</p>
         <p className="text-sm text-[var(--color-text-light)] leading-relaxed">
           멀리서도 축하의 마음을 전하고 싶으신 분들을 위해 계좌번호를 안내드립니다.
           <br />

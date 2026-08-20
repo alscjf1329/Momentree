@@ -20,7 +20,7 @@ export default function GreetingSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-xs tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-12">INVITATION</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-12">INVITATION</p>
       </motion.div>
 
       <div className="space-y-3">
