@@ -61,16 +61,12 @@ export default function CalendarSection() {
       </motion.div>
 
       <motion.div
-        className="mt-10 max-w-xs mx-auto rounded-2xl bg-white p-5"
-        style={{ boxShadow: "0 2px 24px rgba(0,0,0,0.06)" }}
+        className="mt-10 max-w-xs mx-auto"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.7, delay: 0.15 }}
       >
-        <p className="text-center text-sm tracking-widest text-[var(--color-text-light)] mb-4 font-serif">
-          {year}년 {month}월
-        </p>
         <div className="grid grid-cols-7 gap-y-2">
           {DAY_LABELS.map((l, i) => (
             <div
