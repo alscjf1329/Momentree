@@ -29,7 +29,7 @@ export default function ContactSection() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-4">마음 전하실 곳</p>
+        <h2 className="font-serif text-xl text-[var(--color-text)]">마음 전하실 곳</h2>
         {wedding.contactNotice && (
           <p className="text-sm text-[var(--color-text-light)] leading-relaxed whitespace-pre-wrap">
             {wedding.contactNotice}
