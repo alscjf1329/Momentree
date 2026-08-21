@@ -158,7 +158,7 @@ export default function LocationSection() {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <div className="flex items-baseline gap-2 mb-3">
-            <p className="text-xs tracking-[0.25em] text-[var(--color-warm-gray)]">셔틀버스 시간표</p>
+            <p className="text-xs tracking-[0.25em] font-bold text-[var(--color-text)]">셔틀버스 시간표</p>
             {wedding.shuttleInfo && (
               <p className="text-xs text-[var(--color-text-light)] tracking-normal font-normal">{wedding.shuttleInfo}</p>
             )}
