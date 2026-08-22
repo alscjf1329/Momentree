@@ -67,14 +67,14 @@ export default function ContactSection() {
                     transition={{ duration: 0.3 }}
                     style={{ overflow: "hidden" }}
                   >
-                    <div className="px-5 pb-5 space-y-3 border-t border-[var(--color-accent)] pt-4">
+                    <div className="px-5 pb-5 divide-y divide-[var(--color-accent)] border-t border-[var(--color-accent)] pt-1">
                       {person.accounts.map((acc, i) => {
                         const key = `${side}-account-${i}`;
                         return (
-                          <div key={i} className="flex items-center justify-between gap-3">
+                          <div key={i} className="flex items-center justify-between gap-3 py-3">
                             <div>
                               <p className="text-xs text-[var(--color-text-light)] mb-0.5">{acc.name || person.name}</p>
-                              <p className="text-sm font-serif text-[var(--color-text)] tracking-widest">
+                              <p className="text-sm font-bold text-[var(--color-text)] tracking-widest">
                                 {acc.holder} {acc.number} {acc.bank}
                               </p>
                             </div>
