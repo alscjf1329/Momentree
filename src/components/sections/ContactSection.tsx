@@ -74,7 +74,7 @@ export default function ContactSection() {
                           <div key={i} className="flex items-center justify-between gap-3 py-3">
                             <div>
                               <p className="text-xs text-[var(--color-text-light)] mb-0.5">{acc.name || person.name}</p>
-                              <p className="text-sm font-medium text-[var(--color-text)] tracking-widest">
+                              <p className="text-sm font-normal text-[var(--color-text)] tracking-widest">
                                 {acc.holder} {acc.number} {acc.bank}
                               </p>
                             </div>
