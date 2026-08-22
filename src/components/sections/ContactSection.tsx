@@ -21,7 +21,7 @@ export default function ContactSection() {
   if (wedding.groom.accounts.length === 0 && wedding.bride.accounts.length === 0) return null;
 
   return (
-    <section className="py-20 bg-[var(--color-cream)]">
+    <section className="py-14 bg-[var(--color-cream)]">
       <motion.div
         className="text-center px-6"
         initial={{ opacity: 0 }}
@@ -35,10 +35,9 @@ export default function ContactSection() {
             {wedding.contactNotice}
           </p>
         )}
-
       </motion.div>
 
-      <div className="mt-8 px-6 space-y-3">
+      <div className="mt-6 px-6 space-y-3">
         {(["groom", "bride"] as Side[]).map((side) => {
           const person = side === "groom" ? wedding.groom : wedding.bride;
           if (person.accounts.length === 0) return null;
@@ -48,7 +47,7 @@ export default function ContactSection() {
               <button
                 type="button"
                 onClick={() => setOpenSide(isOpen ? null : side)}
-                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)]"
+                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)] bg-[#EBEBEB]"
               >
                 <span>{side === "groom" ? "신랑측" : "신부측"}</span>
                 <span
@@ -67,7 +66,7 @@ export default function ContactSection() {
                     transition={{ duration: 0.3 }}
                     style={{ overflow: "hidden" }}
                   >
-                    <div className="px-5 pb-5 divide-y divide-[var(--color-accent)] border-t border-[var(--color-accent)] pt-1">
+                    <div className="px-5 pb-4 divide-y divide-[var(--color-accent)] border-t border-[var(--color-accent)]">
                       {person.accounts.map((acc, i) => {
                         const key = `${side}-account-${i}`;
                         return (
