@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { DATA_DIR } from "@/lib/paths";
 import { withFileLock } from "@/lib/fileLock";
+import { getSession } from "@/lib/session";
 
 const GUESTBOOK_DIR = path.join(DATA_DIR, "guestbook");
 
@@ -45,5 +46,34 @@ export async function POST(req: NextRequest) {
       "utf-8"
     );
   });
+  return NextResponse.json({ ok: true });
+}
+
+// DELETE /api/guestbook?file=slug&index=n  → 항목 삭제 (본인 파일 또는 관리자만)
+export async function DELETE(req: NextRequest) {
+  const slug = req.nextUrl.searchParams.get("file");
+  const indexParam = req.nextUrl.searchParams.get("index");
+  const index = indexParam !== null ? Number(indexParam) : NaN;
+  if (!slug || Number.isNaN(index)) {
+    return NextResponse.json({ error: "file, index required" }, { status: 400 });
+  }
+
+  const session = await getSession(req);
+  if (!session || (session.role !== "admin" && session.file !== slug)) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const found = await withFileLock(`guestbook:${slug}`, async () => {
+    const entries = await readFile(slug);
+    if (index < 0 || index >= entries.length) return false;
+    entries.splice(index, 1);
+    await fs.writeFile(
+      path.join(GUESTBOOK_DIR, `${slug}.json`),
+      JSON.stringify(entries, null, 2),
+      "utf-8"
+    );
+    return true;
+  });
+  if (!found) return NextResponse.json({ error: "not found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }
