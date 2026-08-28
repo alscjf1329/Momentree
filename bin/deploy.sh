@@ -1,12 +1,10 @@
 cd /app/Momentree
 git pull origin main
-npm install
-rm -rf .next/
-npm run build
 
-# standalone 모드는 static/public을 자동으로 안 넣어줘서 수동으로 복사해야 함
-# (안 하면 서버는 뜨지만 /_next/static/chunks/*.js가 전부 404남)
-cp -r public .next/standalone/public
-cp -r .next/static .next/standalone/.next/static
+# Next.js standalone 멀티스테이지 빌드라 static/public 복사가 이미지 안에서
+# 자동으로 처리됨 (pm2 시절엔 수동 복사가 필요했음)
+docker compose build
+docker compose up -d
 
-pm2 startOrReload ecosystem.config.js --update-env
+# 이전 이미지/캐시 레이어 정리 (디스크 누적 방지)
+docker image prune -f

@@ -1,12 +1,16 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_KAKAO_MAP_KEY: ${NEXT_PUBLIC_KAKAO_MAP_KEY}
+    container_name: momentree
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
-      - ./data:/app/data
+      - /data/momentree:/data/momentree
     environment:
       - NODE_ENV=production
     env_file:
-      - .env.local
+      - .env
     restart: unless-stopped
