@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { getSession } from "@/lib/session";
 import { DATA_DIR } from "@/lib/paths";
+import { withFileLock } from "@/lib/fileLock";
 
 const RSVP_DIR = path.join(DATA_DIR, "rsvp");
 
@@ -53,14 +54,15 @@ export async function POST(req: NextRequest) {
 
   if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
 
-  const entries = await readFile(slug);
-  entries.push({ ...rest, submittedAt: new Date().toISOString() } as RsvpEntry);
-
-  await fs.writeFile(
-    path.join(RSVP_DIR, `${slug}.json`),
-    JSON.stringify(entries, null, 2),
-    "utf-8"
-  );
+  await withFileLock(`rsvp:${slug}`, async () => {
+    const entries = await readFile(slug);
+    entries.push({ ...rest, submittedAt: new Date().toISOString() } as RsvpEntry);
+    await fs.writeFile(
+      path.join(RSVP_DIR, `${slug}.json`),
+      JSON.stringify(entries, null, 2),
+      "utf-8"
+    );
+  });
   return NextResponse.json({ ok: true });
 }
 
@@ -81,17 +83,18 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const entries = await readFile(slug);
-  if (index < 0 || index >= entries.length) {
-    return NextResponse.json({ error: "not found" }, { status: 404 });
-  }
-  entries[index] = { ...entries[index], ...updates };
-
-  await fs.writeFile(
-    path.join(RSVP_DIR, `${slug}.json`),
-    JSON.stringify(entries, null, 2),
-    "utf-8"
-  );
+  const found = await withFileLock(`rsvp:${slug}`, async () => {
+    const entries = await readFile(slug);
+    if (index < 0 || index >= entries.length) return false;
+    entries[index] = { ...entries[index], ...updates };
+    await fs.writeFile(
+      path.join(RSVP_DIR, `${slug}.json`),
+      JSON.stringify(entries, null, 2),
+      "utf-8"
+    );
+    return true;
+  });
+  if (!found) return NextResponse.json({ error: "not found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }
 
@@ -108,16 +111,17 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const entries = await readFile(slug);
-  if (index < 0 || index >= entries.length) {
-    return NextResponse.json({ error: "not found" }, { status: 404 });
-  }
-  entries.splice(index, 1);
-
-  await fs.writeFile(
-    path.join(RSVP_DIR, `${slug}.json`),
-    JSON.stringify(entries, null, 2),
-    "utf-8"
-  );
+  const found = await withFileLock(`rsvp:${slug}`, async () => {
+    const entries = await readFile(slug);
+    if (index < 0 || index >= entries.length) return false;
+    entries.splice(index, 1);
+    await fs.writeFile(
+      path.join(RSVP_DIR, `${slug}.json`),
+      JSON.stringify(entries, null, 2),
+      "utf-8"
+    );
+    return true;
+  });
+  if (!found) return NextResponse.json({ error: "not found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 import { DATA_DIR } from "@/lib/paths";
+import { withFileLock } from "@/lib/fileLock";
 
 const GUESTBOOK_DIR = path.join(DATA_DIR, "guestbook");
 
@@ -35,13 +36,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "slug, name, message required" }, { status: 400 });
   }
 
-  const entries = await readFile(slug);
-  entries.push({ name, message, submittedAt: new Date().toISOString() });
-
-  await fs.writeFile(
-    path.join(GUESTBOOK_DIR, `${slug}.json`),
-    JSON.stringify(entries, null, 2),
-    "utf-8"
-  );
+  await withFileLock(`guestbook:${slug}`, async () => {
+    const entries = await readFile(slug);
+    entries.push({ name, message, submittedAt: new Date().toISOString() });
+    await fs.writeFile(
+      path.join(GUESTBOOK_DIR, `${slug}.json`),
+      JSON.stringify(entries, null, 2),
+      "utf-8"
+    );
+  });
   return NextResponse.json({ ok: true });
 }
