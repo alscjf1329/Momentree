@@ -6,6 +6,7 @@ import TextField from "./fields/TextField";
 import TextAreaField from "./fields/TextAreaField";
 import ArrayField from "./fields/ArrayField";
 import ArrayObjectField from "./fields/ArrayObjectField";
+import GalleryField from "./fields/GalleryField";
 import BooleanField from "./fields/BooleanField";
 import EncryptedField from "./fields/EncryptedField";
 import ImageField from "./fields/ImageField";
@@ -26,6 +27,9 @@ export function renderField({ field, data, basePath, onChange, errors }: RenderF
     case "array":
       return <ArrayField key={path} {...common} />;
     case "array-object":
+      if (field.bulkImageUpload) {
+        return <GalleryField key={path} {...common} />;
+      }
       return (
         <ArrayObjectField
           key={path}
