@@ -49,13 +49,13 @@ export default function GreetingSection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <div className="flex items-baseline justify-between text-base text-[var(--color-text-light)] font-light tracking-wider">
+        <div className="grid grid-cols-[1fr_2.5rem] items-baseline text-base text-[var(--color-text-light)] font-light tracking-wider">
           <span>{wedding.groom.fatherName} · {wedding.groom.motherName}의 {wedding.groom.relation}</span>
-          <span className="text-[var(--color-primary)] font-medium">{givenName(wedding.groom.name)}</span>
+          <span className="text-center text-[var(--color-primary)] font-medium">{givenName(wedding.groom.name)}</span>
         </div>
-        <div className="flex items-baseline justify-between text-base text-[var(--color-text-light)] font-light tracking-wider mt-2">
+        <div className="grid grid-cols-[1fr_2.5rem] items-baseline text-base text-[var(--color-text-light)] font-light tracking-wider mt-2">
           <span>{wedding.bride.fatherName} · {wedding.bride.motherName}의 {wedding.bride.relation}</span>
-          <span className="text-[var(--color-primary)] font-medium">{givenName(wedding.bride.name)}</span>
+          <span className="text-center text-[var(--color-primary)] font-medium">{givenName(wedding.bride.name)}</span>
         </div>
       </motion.div>
     </section>
