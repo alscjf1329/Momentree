@@ -258,7 +258,7 @@ function Hero() {
         </div>
       )}
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center @container">
         {w.mainTitle.split("\n").map((line, i) => (
           <span
             key={i}
@@ -268,7 +268,9 @@ function Hero() {
               fontWeight: 500,
               textTransform: "uppercase",
               letterSpacing: "0.12em",
-              fontSize: "clamp(24px,7vw,40px)",
+              // vw(뷰포트 기준) 대신 cqw(이 박스 실제 폭 기준)를 써서 기기별 주소창/노치 등으로
+              // 뷰포트와 박스 폭이 어긋나는 경우에도 폰트 크기가 항상 같은 비율로 렌더링됨
+              fontSize: "clamp(24px,7cqw,40px)",
               lineHeight: 1.4,
               overflowWrap: "break-word",
             }}

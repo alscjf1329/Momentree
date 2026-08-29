@@ -34,6 +34,10 @@
 html {
   scroll-behavior: smooth;
   /* overflow-x: hidden 을 html에 쓰면 iOS에서 position:fixed 버그 발생 */
+  /* 모바일 브라우저가 자체 판단으로 글자 크기를 키우는 것(폰트 부스팅)을 막음 —
+     기기마다 같은 CSS로도 실제 렌더링 크기가 달라져 줄바꿈 위치가 어긋나는 원인 중 하나 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {

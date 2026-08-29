@@ -308,7 +308,7 @@ function Hero() {
         </motion.div>
       )}
 
-      <div className="absolute inset-0 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center @container">
         <div className="self-start pl-2 sm:pl-4">
           {(() => {
             const lines = w.mainTitle.split("\n");
@@ -324,7 +324,8 @@ function Hero() {
                     className="block text-white text-left"
                     style={{
                       fontFamily: "'Mrs Saint Delafield', 'Noto Serif KR', serif",
-                      fontSize: "clamp(28px,8vw,48px)",
+                      // vw 대신 cqw — 위 @container 박스의 실제 폭 기준으로 고정
+                      fontSize: "clamp(28px,8cqw,48px)",
                       lineHeight: 1.1,
                       overflowWrap: "break-word",
                     }}
