@@ -11,7 +11,6 @@ import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
 import GuestbookSection from "@/components/sections/GuestbookSection";
-import FitLine from "@/components/FitLine";
 
 const VARS = {
   "--color-primary": "#5f7a52",
@@ -293,7 +292,6 @@ function Hero() {
   // 반응해 흔들리는 경우가 있어 — 최초 1회 측정한 픽셀값을 고정해 완전히
   // 정적으로 만듦 (리사이즈 리스너 없음 = 이후 변동 무시)
   const [heroHeight, setHeroHeight] = useState<number | null>(null);
-  const titleBoxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setHeroHeight(window.visualViewport?.height ?? window.innerHeight);
   }, []);
@@ -310,7 +308,7 @@ function Hero() {
         </motion.div>
       )}
 
-      <div ref={titleBoxRef} className="absolute inset-0 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center @container">
+      <div className="absolute inset-0 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center @container">
         <div className="self-start pl-2 sm:pl-4">
           {(() => {
             const lines = w.mainTitle.split("\n");
@@ -320,20 +318,18 @@ function Hero() {
               charsBefore += Array.from(line).length;
               return (
                 <div key={i} style={{ marginLeft: `${i * 9}%`, marginTop: i === 0 ? 0 : "-0.12em" }}>
-                  <FitLine boundRef={titleBoxRef} align="left">
-                    <TypedText
-                      text={line}
-                      delay={delay}
-                      className="block text-white text-left"
-                      style={{
-                        fontFamily: "'Mrs Saint Delafield', 'Noto Serif KR', serif",
-                        // vw 대신 cqw — 위 @container 박스의 실제 폭 기준으로 고정.
-                        // 그래도 남는 오차는 FitLine이 실측해서 축소 — 절대 자동 줄바꿈되지 않음
-                        fontSize: "clamp(28px,8cqw,48px)",
-                        lineHeight: 1.1,
-                      }}
-                    />
-                  </FitLine>
+                  <TypedText
+                    text={line}
+                    delay={delay}
+                    className="block text-white text-left"
+                    style={{
+                      fontFamily: "'Mrs Saint Delafield', 'Noto Serif KR', serif",
+                      // vw 대신 cqw — 위 @container 박스의 실제 폭 기준으로 고정
+                      fontSize: "clamp(28px,8cqw,48px)",
+                      lineHeight: 1.1,
+                      overflowWrap: "break-word",
+                    }}
+                  />
                 </div>
               );
             });

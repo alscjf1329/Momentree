@@ -11,7 +11,6 @@ import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
 import GuestbookSection from "@/components/sections/GuestbookSection";
-import FitLine from "@/components/FitLine";
 
 const VARS = {
   "--color-primary": "#1c1c1a",
@@ -248,7 +247,6 @@ function Hero() {
   // 반응해 흔들리는 경우가 있어 — 최초 1회 측정한 픽셀값을 고정해 완전히
   // 정적으로 만듦 (리사이즈 리스너 없음 = 이후 변동 무시)
   const [heroHeight, setHeroHeight] = useState<number | null>(null);
-  const titleBoxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setHeroHeight(window.visualViewport?.height ?? window.innerHeight);
   }, []);
@@ -260,27 +258,25 @@ function Hero() {
         </div>
       )}
 
-      <div ref={titleBoxRef} className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center @container">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center @container">
         {w.mainTitle.split("\n").map((line, i) => (
-          <FitLine
+          <span
             key={i}
-            boundRef={titleBoxRef}
-            align="center"
-            className={w.introBg ? "text-white" : "text-black"}
+            className={`block ${w.introBg ? "text-white" : "text-black"}`}
             style={{
               fontFamily: "'Noto Serif KR', serif",
               fontWeight: 500,
               textTransform: "uppercase",
               letterSpacing: "0.12em",
               // vw(뷰포트 기준) 대신 cqw(이 박스 실제 폭 기준)를 써서 기기별 주소창/노치 등으로
-              // 뷰포트와 박스 폭이 어긋나는 경우에도 폰트 크기가 항상 같은 비율로 렌더링됨.
-              // 그래도 남는 오차는 FitLine이 실측해서 축소 — 절대 자동 줄바꿈되지 않음
+              // 뷰포트와 박스 폭이 어긋나는 경우에도 폰트 크기가 항상 같은 비율로 렌더링됨
               fontSize: "clamp(24px,7cqw,40px)",
               lineHeight: 1.4,
+              overflowWrap: "break-word",
             }}
           >
             {line}
-          </FitLine>
+          </span>
         ))}
 
         {w.subInfo.map((line, i) => (
