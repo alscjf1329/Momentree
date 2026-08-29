@@ -58,7 +58,7 @@ export default function IntroSection() {
               transition={{ duration: 0.9, ease: "easeOut" }}
               className="font-serif"
             >
-              <p className="text-sm tracking-[0.3em] text-white/70 mb-3">WEDDING INVITATION</p>
+              <p className="text-sm tracking-[0.3em] text-white/70 font-semibold mb-3">WEDDING INVITATION</p>
               <h1 className="text-4xl font-light tracking-widest leading-loose">
                 {wedding.groom.nameFull}
                 <span className="block text-2xl text-white/50 my-2 font-light">♥</span>

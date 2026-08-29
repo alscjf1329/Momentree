@@ -12,7 +12,7 @@ export default function GallerySection() {
   return (
     <section style={{ background: "var(--color-text)" }}>
       <div className="py-10 text-center">
-        <p className="text-sm tracking-[0.3em] text-white/50">GALLERY</p>
+        <p className="text-sm tracking-[0.3em] text-white/50 font-semibold">GALLERY</p>
         <div className="w-8 h-px bg-white/20 mx-auto mt-2" />
       </div>
       <div className="space-y-[2px]">

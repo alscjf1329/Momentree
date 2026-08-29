@@ -340,7 +340,7 @@ function MonoGallery() {
       <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <p className="text-sm tracking-[0.3em] text-black font-medium">GALLERY</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold">GALLERY</p>
       </motion.div>
 
       {/* 메인 뷰어 — 한 장씩 스와이프 */}
@@ -423,7 +423,7 @@ function InfoSection() {
       <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <p className="text-sm tracking-[0.3em] text-black font-medium">INFORMATION</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold">INFORMATION</p>
       </motion.div>
 
       {/* 안내사항 — 카드 사이 흰 여백을 두고 한 장씩 스와이프 */}
@@ -488,7 +488,7 @@ function MessageWall() {
       <motion.div className="text-center mb-8"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6 }}>
-        <p className="text-sm tracking-[0.3em] text-black font-medium mb-3">MESSAGES</p>
+        <p className="text-sm tracking-[0.3em] text-[var(--color-primary-dark)] font-semibold mb-3">MESSAGES</p>
         <LineDivider />
       </motion.div>
       <div className="space-y-3 max-w-sm mx-auto">
