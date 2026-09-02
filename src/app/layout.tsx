@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import RegisterSW from "@/components/RegisterSW";
+import PreventPinchZoom from "@/components/PreventPinchZoom";
 
 export const metadata: Metadata = {
   title: "Momentree",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body style={{ minHeight: "100svh" }} suppressHydrationWarning>
         {children}
         <RegisterSW />
+        <PreventPinchZoom />
       </body>
     </html>
   );
