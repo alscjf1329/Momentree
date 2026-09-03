@@ -51,6 +51,15 @@ body {
   font-family: var(--font-serif);
 }
 
+/* iOS Safari는 포커스된 입력창의 font-size가 16px보다 작으면 자동으로 확대함 —
+   Tailwind text-sm/text-xs 등 클래스가 이미 더 높은 specificity로 크기를 지정하고
+   있어 !important로 덮어써야 실제로 적용됨 */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
 /* Section divider */
 .section-divider {
   width: 40px;
