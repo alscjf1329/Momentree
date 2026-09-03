@@ -56,9 +56,14 @@ export async function generateMetadata({
     data = getInvite(slug);
   }
   if (!data) return {};
+  const title = `${data.groom.name} ♥ ${data.bride.name} 결혼합니다`;
+  const description = `${data.date.year}년 ${data.date.month}월 ${data.date.day}일 ${data.date.dayOfWeek} ${data.date.time}`;
   return {
-    title: `${data.groom.name} ♥ ${data.bride.name} 결혼합니다`,
-    description: `${data.date.year}년 ${data.date.month}월 ${data.date.day}일 ${data.date.dayOfWeek} ${data.date.time}`,
+    title,
+    description,
+    // 카카오톡 등 링크 공유 미리보기는 og:description을 읽으므로
+    // 위 description과 별개로 openGraph에도 명시해야 반영됨
+    openGraph: { title, description },
   };
 }
 
