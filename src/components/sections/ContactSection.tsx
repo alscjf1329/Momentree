@@ -47,13 +47,9 @@ export default function ContactSection() {
               <button
                 type="button"
                 onClick={() => setOpenSide(isOpen ? null : side)}
-                className={`w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest transition-colors duration-300 active:opacity-90 ${
-                  isOpen
-                    ? "bg-[var(--color-primary)] text-white"
-                    : "bg-[#EBEBEB] text-[var(--color-text)]"
-                }`}
+                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)] bg-[#EBEBEB] transition-colors duration-300 active:opacity-90"
               >
-                <span className="font-medium">{side === "groom" ? "신랑측" : "신부측"} 계좌번호</span>
+                <span className="font-medium">{side === "groom" ? "신랑측" : "신부측"}</span>
                 <svg
                   width="16"
                   height="16"
