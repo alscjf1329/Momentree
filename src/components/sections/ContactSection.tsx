@@ -47,15 +47,29 @@ export default function ContactSection() {
               <button
                 type="button"
                 onClick={() => setOpenSide(isOpen ? null : side)}
-                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)] bg-[#EBEBEB]"
+                className={`w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest transition-colors duration-300 active:opacity-90 ${
+                  isOpen
+                    ? "bg-[var(--color-primary)] text-white"
+                    : "bg-[#EBEBEB] text-[var(--color-text)]"
+                }`}
               >
-                <span>{side === "groom" ? "신랑측" : "신부측"}</span>
-                <span
-                  className="text-[var(--color-text-light)] transition-transform"
+                <span className="font-medium">{side === "groom" ? "신랑측" : "신부측"} 계좌번호</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="transition-transform duration-300 shrink-0"
                   style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                 >
-                  ⌄
-                </span>
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
               <AnimatePresence initial={false}>
                 {isOpen && (
