@@ -5,17 +5,26 @@ import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
 import { submitGuestbook, fetchGuestbook, type GuestbookEntry } from "@/lib/guestbook";
 
+const PAGE_SIZE = 5;
+
 export default function GuestbookSection() {
   const wedding = useWedding();
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     fetchGuestbook(wedding.slug).then(setEntries);
   }, [wedding.slug]);
+
+  const sorted = [...entries].sort(
+    (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+  );
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const pageEntries = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +34,7 @@ export default function GuestbookSection() {
     try {
       await submitGuestbook({ name, message, slug: wedding.slug });
       setEntries((prev) => [{ name, message, submittedAt: new Date().toISOString() }, ...prev]);
+      setPage(1);
       setName("");
       setMessage("");
     } catch {
@@ -86,7 +96,7 @@ export default function GuestbookSection() {
         </button>
       </motion.form>
 
-      {entries.length > 0 && (
+      {sorted.length > 0 && (
         <motion.div
           className="mt-10 space-y-3"
           initial={{ opacity: 0 }}
@@ -94,7 +104,7 @@ export default function GuestbookSection() {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          {entries.map((e, i) => (
+          {pageEntries.map((e, i) => (
             <div key={i} className="rounded-xl border border-[var(--color-accent)] bg-white px-4 py-3">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-sm font-medium text-[var(--color-text)]">{e.name}</span>
@@ -107,6 +117,30 @@ export default function GuestbookSection() {
               </p>
             </div>
           ))}
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="text-xs tracking-widest text-[var(--color-text-light)] disabled:opacity-30"
+              >
+                이전
+              </button>
+              <span className="text-xs text-[var(--color-warm-gray)]">
+                {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="text-xs tracking-widest text-[var(--color-text-light)] disabled:opacity-30"
+              >
+                다음
+              </button>
+            </div>
+          )}
         </motion.div>
       )}
     </section>
