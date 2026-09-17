@@ -160,13 +160,13 @@ export default function RSVPSection() {
 
           <div>
             <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">
-              동반인 이름 (선택)
+              동반인 이름
             </label>
             <input
               type="text"
               value={companionName}
               onChange={(e) => setCompanionName(e.target.value)}
-              placeholder="함께 오시는 분의 성함"
+              placeholder="함께 오시는 분의 성함도 작성해주세요"
               className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors"
             />
           </div>
