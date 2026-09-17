@@ -183,9 +183,9 @@ function RSVPIntroModal() {
                   )}
                 </AnimatePresence>
 
-                <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">동반인 이름 (선택)</label>
+                <label className="text-xs tracking-widest text-[var(--color-warm-gray)] block mb-1.5">동반인 이름</label>
                 <input type="text" value={companionName} onChange={(e) => setCompanionName(e.target.value)}
-                  placeholder="함께 오시는 분의 성함"
+                  placeholder="함께 오시는 분의 성함도 작성해주세요"
                   className="w-full px-4 py-3 rounded-xl border border-[var(--color-accent)] bg-white text-gray-800 text-sm outline-none focus:border-[var(--color-primary)] transition-colors mb-4" />
 
                 {error && <p className="text-xs text-red-500 text-center mb-2">전송에 실패했습니다. 다시 시도해주세요.</p>}
