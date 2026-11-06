@@ -57,7 +57,7 @@ docker compose up --build
 | `mono` | 모노 | 흑백 모노크롬, 슬라이드 갤러리 |
 
 각 템플릿은 `src/templates/<id>/`에 구현되어 있고 `src/templates/registry.ts`에서 매핑됩니다.
-청첩장 공유 URL 형식: `/invite/<template-id>?file=<고객파일명>`
+청첩장 공유 URL 형식: `/invite/<template-id>?id=<공유 ID>` (기존 `?file=<고객파일명>` 링크도 계속 동작)
 
 ---
 
@@ -170,7 +170,8 @@ data/
 | `/api/admin/auth/me` | GET | 현재 세션의 role/file 조회 |
 | `/api/admin/auth/logout` | POST | 세션 종료 |
 | `/api/clients` | GET/POST/DELETE | 청첩장 데이터 조회/저장/삭제 (customer는 자기 파일만) |
-| `/api/rsvp` | GET/POST | 하객 RSVP 조회(공개)/제출(공개) |
+| `/api/rsvp` | GET/POST | 하객 RSVP 조회/제출 — 비로그인은 공유 ID로만 접근 (파일명=이메일 노출 방지), 전체 목록은 관리자 전용 |
+| `/api/share` | GET | 청첩장 공유용 공개 ID 발급/조회 (로그인 필요, `data/share-index.json`에 저장) |
 | `/api/rsvp` | PATCH/DELETE | RSVP 항목 수정/삭제 (본인 또는 관리자만) |
 | `/api/upload` | POST | 이미지/오디오 파일 업로드 |
 

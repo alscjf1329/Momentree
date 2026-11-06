@@ -9,6 +9,7 @@ import { DEFAULT_WEDDING_DATA, generateFilename, namesToSlug } from "@/lib/newCl
 import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
 import ShareLinkCard from "@/components/admin/ShareLinkCard";
+import { useInviteQuery } from "@/lib/useShareId";
 
 const DEFAULT_DATA = DEFAULT_WEDDING_DATA;
 const TEMPLATES = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden", "mono"] as const;
@@ -21,6 +22,7 @@ export default function SetupForm() {
 
   // 서버/클라이언트 동일한 초기값 — Date.now() 는 useEffect 에서만 호출
   const [filename, setFilename] = useState(fileParam);
+  const inviteQuery = useInviteQuery(filename);
   const [data, setData] = useState<WeddingData>(DEFAULT_DATA);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -188,7 +190,7 @@ export default function SetupForm() {
               </div>
               <div className="p-3 space-y-1">
                 {TEMPLATES.map(t => (
-                  <a key={t} href={`/invite/${t}?file=${filename}`} target="_blank"
+                  <a key={t} href={`/invite/${t}?${inviteQuery}`} target="_blank"
                     className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 group">
                     <span className="text-[11px] text-gray-500 capitalize">{t}</span>
                     <span className="text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
@@ -255,9 +257,9 @@ export default function SetupForm() {
                 {TEMPLATES.map(t => (
                   <div key={t} className="flex items-center justify-between text-xs">
                     <span className="text-gray-500 capitalize">{t}</span>
-                    <a href={`/invite/${t}?file=${filename}`} target="_blank"
+                    <a href={`/invite/${t}?${inviteQuery}`} target="_blank"
                       className="text-blue-500 hover:underline font-mono text-[11px]">
-                      /invite/{t}?file={filename}
+                      /invite/{t}?{inviteQuery}
                     </a>
                   </div>
                 ))}

@@ -3,6 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useInviteQuery } from "@/lib/useShareId";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY } from "@/lib/newClient";
 
@@ -228,6 +229,7 @@ export default function TemplateList() {
   const router = useRouter();
   const fileParam = searchParams.get("file") ?? "";
   const [selectedFile, setSelectedFile] = useState(fileParam);
+  const inviteQuery = useInviteQuery(selectedFile);
   const [clientList, setClientList] = useState<string[]>([]);
   const [selecting, setSelecting] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -351,7 +353,7 @@ export default function TemplateList() {
               </div>
               <div className="p-3 space-y-1">
                 {TEMPLATES.map(t => (
-                  <a key={t.id} href={`/invite/${t.id}?file=${selectedFile}`} target="_blank"
+                  <a key={t.id} href={`/invite/${t.id}?${inviteQuery}`} target="_blank"
                     className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 group">
                     <span className="text-[11px] text-gray-500">{t.name}</span>
                     <span className="text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
@@ -424,7 +426,7 @@ export default function TemplateList() {
                   <TemplatePreview id={t.id} />
                   {/* 호버 오버레이 */}
                   {active && (
-                    <a href={`/invite/${t.id}?file=${selectedFile}`} target="_blank"
+                    <a href={`/invite/${t.id}?${inviteQuery}`} target="_blank"
                       className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       style={{ background: "rgba(0,0,0,0.45)" }}>
                       <span className="text-white text-xs tracking-widest border border-white/40 px-4 py-1.5 rounded-full">
@@ -463,9 +465,9 @@ export default function TemplateList() {
                 {TEMPLATES.map(t => (
                   <div key={t.id} className="flex items-center justify-between text-xs">
                     <span className="text-gray-500">{t.name}</span>
-                    <a href={`/invite/${t.id}?file=${selectedFile}`} target="_blank"
+                    <a href={`/invite/${t.id}?${inviteQuery}`} target="_blank"
                       className="text-blue-500 hover:underline font-mono text-[10px]">
-                      /invite/{t.id}?file={selectedFile}
+                      /invite/{t.id}?{inviteQuery}
                     </a>
                   </div>
                 ))}

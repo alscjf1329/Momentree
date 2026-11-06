@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { useInviteQuery } from "@/lib/useShareId";
 
 export default function ShareLinkCard({ template, filename }: { template: string; filename: string }) {
   const [url, setUrl] = useState("");
   const [qr, setQr] = useState("");
   const [copied, setCopied] = useState(false);
+  const query = useInviteQuery(filename);
 
   useEffect(() => {
     if (!filename) return;
-    const u = `${window.location.origin}/invite/${template}?file=${filename}`;
+    const u = `${window.location.origin}/invite/${template}?${query}`;
     setUrl(u);
     QRCode.toDataURL(u, { width: 200, margin: 1 }).then(setQr).catch(() => {});
-  }, [template, filename]);
+  }, [template, filename, query]);
 
   const share = async () => {
     if (navigator.share) {
