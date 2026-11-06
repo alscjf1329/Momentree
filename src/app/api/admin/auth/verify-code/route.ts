@@ -7,6 +7,7 @@ import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
 import { applyToEncryptedFields, encrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DATA_DIR } from "@/lib/paths";
+import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
 const CLIENTS_DIR = path.join(DATA_DIR, "clients");
 
@@ -21,6 +22,11 @@ export async function POST(req: NextRequest) {
   const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret) {
     return NextResponse.json({ error: "관리자 인증이 설정되지 않았습니다" }, { status: 500 });
+  }
+
+  // 이메일별 5회 제한은 코드를 재발급하면 초기화되므로, IP 단위로도 시도 횟수를 제한
+  if (isRateLimited(`verify-code:${clientIp(req)}`, 20, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "시도 횟수를 초과했습니다. 잠시 후 다시 시도해주세요" }, { status: 429 });
   }
 
   const { email, code } = await req.json().catch(() => ({ email: undefined, code: undefined }));

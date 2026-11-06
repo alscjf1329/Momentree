@@ -4,6 +4,7 @@ import { generateOtpCode, type SessionRole } from "@/lib/adminAuth";
 import { isOnCooldown, issueOtp, OTP_TTL_MS } from "@/lib/adminOtp";
 import { isValidLoginEmail } from "@/lib/newClient";
 import { isAdmin } from "@/lib/admins";
+import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -13,6 +14,11 @@ export async function POST(req: NextRequest) {
 
   if (!adminEmail || !secret || !gmailUser || !gmailAppPassword) {
     return NextResponse.json({ error: "관리자 인증이 설정되지 않았습니다" }, { status: 500 });
+  }
+
+  // 서로 다른 이메일로 메일 폭탄/발송 한도 소진을 노리는 요청 차단 (이메일별 쿨다운은 isOnCooldown이 담당)
+  if (isRateLimited(`request-code:${clientIp(req)}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요" }, { status: 429 });
   }
 
   const { email } = await req.json().catch(() => ({ email: undefined }));
