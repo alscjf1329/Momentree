@@ -9,6 +9,7 @@ import { applyToEncryptedFields, decrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DATA_DIR } from "@/lib/paths";
 import { isValidClientFilename } from "@/lib/newClient";
+import { splitMeta } from "@/lib/clientMeta";
 import { getOrCreateShareId, resolveShareId } from "@/lib/shareId";
 import { WeddingProvider } from "@/context/WeddingContext";
 import { TEMPLATE_MAP } from "@/templates/registry";
@@ -24,7 +25,7 @@ async function readClientFile(filename: string): Promise<WeddingData | null> {
     );
     // 필드 추가 이전에 저장된 레거시 클라이언트 파일 대비 기본값과 병합
     // (얕은 병합이라 groom/bride 안에 새로 추가된 필드는 별도로 다시 병합해야 함)
-    const parsed = JSON.parse(raw);
+    const parsed = splitMeta(JSON.parse(raw)).data; // _meta(소유자 이메일 등)는 공개 페이지로 내려보내지 않음
     const data = {
       ...WEDDING,
       ...parsed,

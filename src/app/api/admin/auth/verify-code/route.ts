@@ -8,6 +8,7 @@ import { applyToEncryptedFields, encrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DATA_DIR } from "@/lib/paths";
 import { clientIp, isRateLimited } from "@/lib/rateLimit";
+import { buildMeta } from "@/lib/clientMeta";
 
 const CLIENTS_DIR = path.join(DATA_DIR, "clients");
 
@@ -49,7 +50,9 @@ export async function POST(req: NextRequest) {
       const data = { ...DEFAULT_WEDDING_DATA, slug: result.file };
       const schema = getSchemaForTemplate(data.template);
       const toSave = applyToEncryptedFields(data, schema, encrypt);
-      await fs.writeFile(filePath, JSON.stringify(toSave, null, 2), "utf-8");
+      // 신규 고객도 기본값으로 메타데이터(소유자=가입 이메일)를 채워서 만든다
+      const meta = buildMeta(data, undefined, result.file);
+      await fs.writeFile(filePath, JSON.stringify({ ...toSave, _meta: meta }, null, 2), "utf-8");
     }
   }
 
