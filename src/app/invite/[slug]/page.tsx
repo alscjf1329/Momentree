@@ -9,6 +9,7 @@ import { applyToEncryptedFields, decrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DATA_DIR } from "@/lib/paths";
 import { isValidClientFilename } from "@/lib/newClient";
+import { getOrCreateShareId, resolveShareId } from "@/lib/shareId";
 import { WeddingProvider } from "@/context/WeddingContext";
 import { TEMPLATE_MAP } from "@/templates/registry";
 import ClassicTemplate from "@/templates/classic";
@@ -42,15 +43,21 @@ async function readClientFile(filename: string): Promise<WeddingData | null> {
 // 동시 요청 레이스로 인한 hydration mismatch를 원천 차단
 export const dynamic = "force-dynamic";
 
+// ?id=<공유 ID> 또는 레거시 ?file=<파일명>(이미 공유된 링크) → 고객 파일명
+async function resolveFileParam(q: { file?: string; id?: string }): Promise<string | undefined> {
+  if (q.id) return (await resolveShareId(q.id)) ?? undefined;
+  return q.file;
+}
+
 export async function generateMetadata({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ file?: string }>;
+  searchParams: Promise<{ file?: string; id?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const { file } = await searchParams;
+  const file = await resolveFileParam(await searchParams);
 
   let data: WeddingData | null = null;
   if (file && slug in TEMPLATE_MAP) {
@@ -75,18 +82,20 @@ export default async function InvitePage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ file?: string }>;
+  searchParams: Promise<{ file?: string; id?: string }>;
 }) {
   const { slug } = await params;
-  const { file } = await searchParams;
+  const query = await searchParams;
+  const file = await resolveFileParam(query);
 
   let data: WeddingData;
 
-  if (file && slug in TEMPLATE_MAP) {
-    // 파일 기반 동적 렌더링: /invite/editorial?file=kim-minjun
-    const clientData = await readClientFile(file);
-    if (!clientData) notFound();
-    data = { ...clientData, template: slug };
+  if ((query.file || query.id) && slug in TEMPLATE_MAP) {
+    // 파일 기반 동적 렌더링: /invite/editorial?id=<공유 ID> (레거시: ?file=kim-minjun)
+    const clientData = file ? await readClientFile(file) : null;
+    if (!file || !clientData) notFound();
+    // 클라이언트로 내려가는 slug(RSVP·방명록 API 키)는 파일명(이메일) 대신 공유 ID를 쓴다
+    data = { ...clientData, template: slug, slug: await getOrCreateShareId(file) };
   } else {
     // 기존 정적 slug 조회: /invite/demo-classic
     const invited = getInvite(slug);

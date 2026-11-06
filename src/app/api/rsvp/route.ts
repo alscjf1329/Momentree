@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { DATA_DIR } from "@/lib/paths";
 import { withFileLock } from "@/lib/fileLock";
 import { isValidClientFilename } from "@/lib/newClient";
+import { resolvePublicFile } from "@/lib/shareId";
 
 const RSVP_DIR = path.join(DATA_DIR, "rsvp");
 
@@ -31,18 +32,20 @@ async function readFile(slug: string): Promise<RsvpEntry[]> {
   }
 }
 
-// GET /api/rsvp?file=kim-minjun  → 해당 클라이언트 RSVP
-// GET /api/rsvp                  → 전체 파일 목록
+// GET /api/rsvp?file=<공유 ID>   → 해당 청첩장 RSVP (비로그인은 공유 ID로만, 본인/관리자는 파일명도 가능)
+// GET /api/rsvp                  → 전체 파일 목록 (관리자 전용 — 파일명에 가입 이메일이 있음)
 export async function GET(req: NextRequest) {
   await ensureDir();
   const file = req.nextUrl.searchParams.get("file");
+  const session = await getSession(req);
 
   if (file) {
-    if (!isValidClientFilename(file)) return NextResponse.json({ error: "invalid file" }, { status: 400 });
-    return NextResponse.json(await readFile(file));
+    const resolved = await resolvePublicFile(file, session);
+    if (!resolved) return NextResponse.json({ error: "not found" }, { status: 404 });
+    return NextResponse.json(await readFile(resolved));
   }
 
-  // 파일 목록만 반환 (어드민 셀렉터용)
+  if (session?.role !== "admin") return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const files = await fs.readdir(RSVP_DIR).catch(() => [] as string[]);
   const slugs = files.filter(f => f.endsWith(".json")).map(f => f.replace(".json", ""));
   return NextResponse.json(slugs);
@@ -52,11 +55,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   await ensureDir();
   const body = await req.json();
-  const { slug, ...rest } = body;
+  const { slug: idOrFile, ...rest } = body;
 
-  if (typeof slug !== "string" || !isValidClientFilename(slug)) {
-    return NextResponse.json({ error: "slug required" }, { status: 400 });
-  }
+  const slug = await resolvePublicFile(idOrFile, await getSession(req));
+  if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
 
   await withFileLock(`rsvp:${slug}`, async () => {
     const entries = await readFile(slug);

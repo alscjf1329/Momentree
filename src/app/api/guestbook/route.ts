@@ -4,6 +4,7 @@ import path from "path";
 import { DATA_DIR } from "@/lib/paths";
 import { withFileLock } from "@/lib/fileLock";
 import { isValidClientFilename } from "@/lib/newClient";
+import { resolvePublicFile } from "@/lib/shareId";
 import { getSession } from "@/lib/session";
 
 const GUESTBOOK_DIR = path.join(DATA_DIR, "guestbook");
@@ -25,16 +26,17 @@ async function readFile(slug: string): Promise<GuestbookEntry[]> {
 
 // GET /api/guestbook?file=kim-minjun  → 해당 클라이언트 방명록 (공개)
 export async function GET(req: NextRequest) {
-  const file = req.nextUrl.searchParams.get("file");
-  if (!file || !isValidClientFilename(file)) return NextResponse.json({ error: "file required" }, { status: 400 });
+  const file = await resolvePublicFile(req.nextUrl.searchParams.get("file"), await getSession(req));
+  if (!file) return NextResponse.json({ error: "file required" }, { status: 400 });
   return NextResponse.json(await readFile(file));
 }
 
 // POST /api/guestbook  body: { name, message, slug }
 export async function POST(req: NextRequest) {
   await fs.mkdir(GUESTBOOK_DIR, { recursive: true });
-  const { slug, name, message } = await req.json();
-  if (typeof slug !== "string" || !isValidClientFilename(slug) || !name || !message) {
+  const { slug: idOrFile, name, message } = await req.json();
+  const slug = await resolvePublicFile(idOrFile, await getSession(req));
+  if (!slug || !name || !message) {
     return NextResponse.json({ error: "slug, name, message required" }, { status: 400 });
   }
 
