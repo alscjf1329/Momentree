@@ -1,47 +1,31 @@
-import fs from "fs/promises";
-import path from "path";
 import { hmac, type SessionRole } from "@/lib/adminAuth";
-import { DATA_DIR } from "@/lib/paths";
+import { getDb } from "@/lib/db";
 
-const OTP_DIR = path.join(DATA_DIR, "otp");
 export const OTP_TTL_MS = 5 * 60 * 1000;
 const REQUEST_COOLDOWN_MS = 30 * 1000;
 const MAX_ATTEMPTS = 5;
 
-interface OtpRecord {
-  codeHash: string;
-  issuedAt: number;
+interface OtpRow {
+  code_hash: string;
+  issued_at: number;
   attempts: number;
   role: SessionRole;
-  file?: string;
+  file: string | null;
 }
 
-function otpPath(email: string) {
-  return path.join(OTP_DIR, `${encodeURIComponent(email)}.json`);
+function readOtp(email: string): OtpRow | undefined {
+  return getDb().prepare("select code_hash, issued_at, attempts, role, file from otp where email = ?").get(email) as OtpRow | undefined;
 }
 
-async function readOtp(email: string): Promise<OtpRecord | null> {
-  try {
-    return JSON.parse(await fs.readFile(otpPath(email), "utf-8"));
-  } catch {
-    return null;
-  }
-}
-
-async function writeOtp(email: string, record: OtpRecord) {
-  await fs.mkdir(OTP_DIR, { recursive: true });
-  await fs.writeFile(otpPath(email), JSON.stringify(record), "utf-8");
-}
-
-async function clearOtp(email: string) {
-  await fs.unlink(otpPath(email)).catch(() => {});
+function clearOtp(email: string) {
+  getDb().prepare("delete from otp where email = ?").run(email);
 }
 
 // 발급 직후 재요청 스팸 방지용 쿨다운 체크. 아직 유효하면 true를 반환한다.
 export async function isOnCooldown(email: string): Promise<boolean> {
-  const existing = await readOtp(email);
+  const existing = readOtp(email);
   if (!existing) return false;
-  return Date.now() - existing.issuedAt < REQUEST_COOLDOWN_MS;
+  return Date.now() - existing.issued_at < REQUEST_COOLDOWN_MS;
 }
 
 export async function issueOtp(
@@ -52,7 +36,14 @@ export async function issueOtp(
   file?: string
 ): Promise<void> {
   const codeHash = await hmac(code, secret);
-  await writeOtp(email, { codeHash, issuedAt: Date.now(), attempts: 0, role, file });
+  const db = getDb();
+  db.prepare(
+    `insert into otp (email, code_hash, issued_at, attempts, role, file) values (?, ?, ?, 0, ?, ?)
+     on conflict(email) do update set code_hash = excluded.code_hash, issued_at = excluded.issued_at,
+       attempts = 0, role = excluded.role, file = excluded.file`
+  ).run(email, codeHash, Date.now(), role, file ?? null);
+  // 만료된 코드 정리 (다른 사람이 요청하고 쓰지 않은 행이 쌓이지 않게)
+  db.prepare("delete from otp where issued_at < ?").run(Date.now() - OTP_TTL_MS);
 }
 
 export type VerifyResult =
@@ -60,25 +51,25 @@ export type VerifyResult =
   | { status: "expired" | "too_many_attempts" | "invalid" | "not_found" };
 
 export async function verifyOtp(email: string, code: string, secret: string): Promise<VerifyResult> {
-  const record = await readOtp(email);
+  const record = readOtp(email);
   if (!record) return { status: "not_found" };
 
-  if (Date.now() - record.issuedAt > OTP_TTL_MS) {
-    await clearOtp(email);
+  if (Date.now() - record.issued_at > OTP_TTL_MS) {
+    clearOtp(email);
     return { status: "expired" };
   }
 
   if (record.attempts >= MAX_ATTEMPTS) {
-    await clearOtp(email);
+    clearOtp(email);
     return { status: "too_many_attempts" };
   }
 
   const codeHash = await hmac(code, secret);
-  if (codeHash !== record.codeHash) {
-    await writeOtp(email, { ...record, attempts: record.attempts + 1 });
+  if (codeHash !== record.code_hash) {
+    getDb().prepare("update otp set attempts = attempts + 1 where email = ?").run(email);
     return { status: "invalid" };
   }
 
-  await clearOtp(email);
-  return { status: "ok", role: record.role, file: record.file };
+  clearOtp(email);
+  return { status: "ok", role: record.role, file: record.file ?? undefined };
 }
