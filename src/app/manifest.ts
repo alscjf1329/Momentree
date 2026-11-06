@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Momentree",
     short_name: "Momentree",
-    description: "웨딩 청첩장 플랫폼",
+    description: "두 분의 하루를 링크 하나로. 모바일 청첩장 서비스",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

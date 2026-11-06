@@ -12,11 +12,13 @@ const TEMPLATES = [
   { id: "blossom",   name: "블로섬",     mood: "봄 벚꽃",        desc: "떨어지는 꽃잎 + 플로럴",        bg: "linear-gradient(150deg,#fdf0f4,#f8e4ec)",  accent: "#c4758a", text: "#3a2030" },
   { id: "modern",    name: "모던",       mood: "인스타 감성",     desc: "웜톤 풀블리드 + IG 그리드",     bg: "linear-gradient(150deg,#f5efe7,#e8d8c8)",  accent: "#c47a5a", text: "#2d1e12" },
   { id: "luxury",    name: "럭셔리",     mood: "프리미엄 네이비", desc: "딥 네이비 + 골드 프레임",        bg: "linear-gradient(150deg,#070d1a,#0e1628)",  accent: "#c9a96e", text: "#f0ece4" },
+  { id: "garden",    name: "가든",       mood: "풀숲 가든",      desc: "풀숲 히어로 + 캘리그래피",      bg: "linear-gradient(150deg,#eaf1e3,#c6d9bb)",  accent: "#5f7f50", text: "#2d3e27" },
+  { id: "mono",      name: "모노",       mood: "흑백 모노크롬",   desc: "블랙&화이트 타이포 + 슬라이드 갤러리", bg: "linear-gradient(150deg,#f4f4f4,#d8d8d8)", accent: "#000000", text: "#000000" },
 ];
 
 const STEPS = [
-  { n: "01", title: "고객 정보 입력", desc: "신랑·신부 이름, 날짜, 장소 등을 어드민에서 입력합니다." },
-  { n: "02", title: "템플릿 선택",   desc: "4가지 레이아웃 중 원하는 분위기를 고릅니다." },
+  { n: "01", title: "정보 입력", desc: "신랑·신부 이름, 날짜, 장소를 입력합니다." },
+  { n: "02", title: "템플릿 선택",   desc: "10가지 템플릿 중 원하는 분위기를 고릅니다." },
   { n: "03", title: "링크 공유",     desc: "생성된 URL을 카카오톡, 문자로 바로 공유합니다." },
 ];
 
@@ -26,7 +28,7 @@ export default async function Home() {
   const session = secret ? await verifySessionToken(token, secret) : null;
 
   return (
-    <div style={{ background: "#faf6f1", minHeight: "100dvh", fontFamily: "var(--font-sans)" }}>
+    <div style={{ background: "var(--color-cream)", minHeight: "100dvh", fontFamily: "var(--font-sans)" }}>
 
       {/* 헤더 */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm"
@@ -71,8 +73,8 @@ export default async function Home() {
         </h1>
         <p className="text-sm sm:text-base mb-8 sm:mb-10 mx-auto max-w-sm sm:max-w-md"
           style={{ color: "var(--color-text-light)", lineHeight: 1.8 }}>
-          고객별 데이터 파일 하나로 청첩장 URL을 즉시 생성합니다.<br className="hidden sm:block" />
-          4가지 감성 템플릿 중 원하는 스타일을 선택하세요.
+          링크 하나로 청첩장을 전하고, 하객 응답까지 한곳에서 확인하세요.<br className="hidden sm:block" />
+          10가지 감성 템플릿 중 원하는 스타일을 골라보세요.
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
           <Link href="/invite/demo-classic" target="_blank"
@@ -85,7 +87,7 @@ export default async function Home() {
 
       {/* 템플릿 카드 그리드 */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-14 sm:pb-20">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
           {TEMPLATES.map(t => (
             <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank"
               className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"
