@@ -1,9 +1,11 @@
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci
+# better-sqlite3는 컴파일 없이 패키지에 포함된 prebuilt 바이너리(musl 포함)를 쓴다.
+# 스크립트를 막지 않으면 npm이 node-gyp 컴파일을 시도하다 python 없이 실패함
+RUN npm ci --ignore-scripts
 
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -12,7 +14,7 @@ ARG NEXT_PUBLIC_KAKAO_MAP_KEY
 ENV NEXT_PUBLIC_KAKAO_MAP_KEY=$NEXT_PUBLIC_KAKAO_MAP_KEY
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
