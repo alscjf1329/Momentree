@@ -4,6 +4,7 @@ import path from "path";
 import { getSession } from "@/lib/session";
 import { DATA_DIR } from "@/lib/paths";
 import { withFileLock } from "@/lib/fileLock";
+import { isValidClientFilename } from "@/lib/newClient";
 
 const RSVP_DIR = path.join(DATA_DIR, "rsvp");
 
@@ -37,6 +38,7 @@ export async function GET(req: NextRequest) {
   const file = req.nextUrl.searchParams.get("file");
 
   if (file) {
+    if (!isValidClientFilename(file)) return NextResponse.json({ error: "invalid file" }, { status: 400 });
     return NextResponse.json(await readFile(file));
   }
 
@@ -52,7 +54,9 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { slug, ...rest } = body;
 
-  if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
+  if (typeof slug !== "string" || !isValidClientFilename(slug)) {
+    return NextResponse.json({ error: "slug required" }, { status: 400 });
+  }
 
   await withFileLock(`rsvp:${slug}`, async () => {
     const entries = await readFile(slug);
@@ -76,7 +80,7 @@ async function canEdit(req: NextRequest, slug: string): Promise<boolean> {
 export async function PATCH(req: NextRequest) {
   await ensureDir();
   const { slug, index, ...updates } = await req.json();
-  if (!slug || typeof index !== "number") {
+  if (typeof slug !== "string" || !isValidClientFilename(slug) || typeof index !== "number") {
     return NextResponse.json({ error: "slug, index required" }, { status: 400 });
   }
   if (!(await canEdit(req, slug))) {
@@ -104,7 +108,7 @@ export async function DELETE(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get("file");
   const indexParam = req.nextUrl.searchParams.get("index");
   const index = indexParam !== null ? Number(indexParam) : NaN;
-  if (!slug || Number.isNaN(index)) {
+  if (!slug || !isValidClientFilename(slug) || Number.isNaN(index)) {
     return NextResponse.json({ error: "file, index required" }, { status: 400 });
   }
   if (!(await canEdit(req, slug))) {

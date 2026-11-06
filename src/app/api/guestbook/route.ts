@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { DATA_DIR } from "@/lib/paths";
 import { withFileLock } from "@/lib/fileLock";
+import { isValidClientFilename } from "@/lib/newClient";
 import { getSession } from "@/lib/session";
 
 const GUESTBOOK_DIR = path.join(DATA_DIR, "guestbook");
@@ -25,7 +26,7 @@ async function readFile(slug: string): Promise<GuestbookEntry[]> {
 // GET /api/guestbook?file=kim-minjun  → 해당 클라이언트 방명록 (공개)
 export async function GET(req: NextRequest) {
   const file = req.nextUrl.searchParams.get("file");
-  if (!file) return NextResponse.json({ error: "file required" }, { status: 400 });
+  if (!file || !isValidClientFilename(file)) return NextResponse.json({ error: "file required" }, { status: 400 });
   return NextResponse.json(await readFile(file));
 }
 
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   await fs.mkdir(GUESTBOOK_DIR, { recursive: true });
   const { slug, name, message } = await req.json();
-  if (!slug || !name || !message) {
+  if (typeof slug !== "string" || !isValidClientFilename(slug) || !name || !message) {
     return NextResponse.json({ error: "slug, name, message required" }, { status: 400 });
   }
 
@@ -54,7 +55,7 @@ export async function DELETE(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get("file");
   const indexParam = req.nextUrl.searchParams.get("index");
   const index = indexParam !== null ? Number(indexParam) : NaN;
-  if (!slug || Number.isNaN(index)) {
+  if (!slug || !isValidClientFilename(slug) || Number.isNaN(index)) {
     return NextResponse.json({ error: "file, index required" }, { status: 400 });
   }
 
