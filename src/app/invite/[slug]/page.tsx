@@ -8,11 +8,14 @@ import type { WeddingData } from "@/types";
 import { applyToEncryptedFields, decrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DATA_DIR } from "@/lib/paths";
+import { isValidClientFilename } from "@/lib/newClient";
 import { WeddingProvider } from "@/context/WeddingContext";
 import { TEMPLATE_MAP } from "@/templates/registry";
 import ClassicTemplate from "@/templates/classic";
 
 async function readClientFile(filename: string): Promise<WeddingData | null> {
+  // ?file= 값이 그대로 경로에 들어가므로 ../ 같은 경로 순회 차단
+  if (!isValidClientFilename(filename)) return null;
   try {
     const raw = await fs.readFile(
       path.join(DATA_DIR, "clients", `${filename}.json`),
