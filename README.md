@@ -125,6 +125,26 @@ ENCRYPTION_KEY=openssl rand -base64 32 로 생성
 DATA_DIR=/절대/경로/data
 ```
 
+### 백업 / 복구
+
+`bin/backup.sh`가 `DATA_DIR`(clients, rsvp, uploads)을 `momentree-YYYYMMDD-HHMMSS.tar.gz`로 묶어 `BACKUP_DIR`에 저장하고 최신 `KEEP`개(기본 14)만 남깁니다. 기본값은 `/data/momentree` → `/data/momentree-backups`. 로그인 코드(`otp/`)는 제외됩니다.
+
+```bash
+# 서버 crontab (매일 04:00)
+0 4 * * * /app/Momentree/bin/backup.sh >> /var/log/momentree-backup.log 2>&1
+
+# 복구 — 컨테이너를 멈춘 상태에서 압축 해제
+docker compose stop
+tar -xzf /data/momentree-backups/momentree-XXXX.tar.gz -C /data/momentree
+docker compose start
+```
+
+같은 서버 디스크에만 두면 디스크 장애 시 함께 사라지므로, 백업 디렉터리를 외부(S3, 다른 서버 등)로 주기적으로 복사하세요.
+
+### 테스트
+
+`npm test` — 세션 토큰, 계좌 암호화, rate limit, 파일 락, RSVP 권한(제출/수정/삭제)을 검증합니다 (Node 내장 test runner, 추가 의존성 없음).
+
 ---
 
 ## 데이터 저장 구조
@@ -161,7 +181,7 @@ data/
 
 고객 데이터 필드는 템플릿별 스키마(`src/templates/<id>.schema.ts`)로 정의되고, 어드민 폼(`src/components/admin/AdminForm.tsx`)이 이 스키마를 읽어 자동으로 입력 폼과 실시간 미리보기를 생성합니다. 새 필드를 추가하려면 스키마 파일에 필드를 선언하기만 하면 됩니다 — 폼 코드를 직접 수정할 필요가 없습니다.
 
-공통 스키마가 없는 템플릿(`garden` 제외 8종)은 `src/lib/templateSchemas.ts`의 공통 필드 폴백으로 렌더링됩니다.
+전용 스키마 파일이 없는 8종(classic·editorial·minimal·romantic·twilight·blossom·modern·luxury)은 `garden.schema.ts`를 폴백으로 쓰되, 각 템플릿이 실제로 렌더링하지 않는 필드(`excludeTemplates`)는 폼에서 숨깁니다.
 
 ---
 
