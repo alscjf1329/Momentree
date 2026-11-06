@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useInviteQuery } from "@/lib/useShareId";
+import { useClientDirectory } from "@/lib/useClientDirectory";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY } from "@/lib/newClient";
 
@@ -230,7 +231,7 @@ export default function TemplateList() {
   const fileParam = searchParams.get("file") ?? "";
   const [selectedFile, setSelectedFile] = useState(fileParam);
   const inviteQuery = useInviteQuery(selectedFile);
-  const [clientList, setClientList] = useState<string[]>([]);
+  const dir = useClientDirectory();
   const [selecting, setSelecting] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
@@ -249,7 +250,6 @@ export default function TemplateList() {
 
   useEffect(() => {
     if (role !== "admin") return; // role 확인 전이거나 customer면 관리자 전용 목록을 건드리지 않음
-    fetch("/api/clients").then(r => r.json()).then(setClientList).catch(() => {});
   }, [role]);
 
   const active = !!selectedFile;
@@ -329,14 +329,16 @@ export default function TemplateList() {
                 value={selectedFile}
                 onChange={e => setSelectedFile(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
               />
-              {clientList.length > 0 && (
+              {dir.total > 0 && (
                 <div className="space-y-0.5 max-h-48 overflow-y-auto">
-                  {clientList.map(f => (
-                    <button key={f} onClick={() => setSelectedFile(f)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-mono transition-colors ${
-                        selectedFile === f ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-50"
+                  <input className="w-full mb-1 px-3 py-1.5 text-[11px] border border-gray-200 rounded-lg"
+                    placeholder="이름·이메일·파일명 검색" value={dir.q} onChange={e => dir.setQ(e.target.value)} />
+                  {dir.clients.map(c => (
+                    <button key={c.file} onClick={() => setSelectedFile(c.file)} title={c.file}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${
+                        selectedFile === c.file ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-50"
                       }`}>
-                      {f}
+                      {dir.display(c)}
                     </button>
                   ))}
                 </div>
@@ -394,14 +396,14 @@ export default function TemplateList() {
                 </Link>
               )}
             </div>
-            {clientList.length > 0 && (
+            {dir.total > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {clientList.map(f => (
-                  <button key={f} onClick={() => setSelectedFile(f)}
-                    className={`px-2.5 py-1 text-[11px] font-mono rounded-full border transition-colors ${
-                      selectedFile === f ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600"
+                {dir.clients.map(c => (
+                  <button key={c.file} onClick={() => setSelectedFile(c.file)} title={c.file}
+                    className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
+                      selectedFile === c.file ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600"
                     }`}>
-                    {f}
+                    {dir.display(c)}
                   </button>
                 ))}
               </div>
