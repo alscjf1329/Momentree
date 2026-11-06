@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import { getSession } from "@/lib/session";
 import { isValidClientFilename } from "@/lib/newClient";
-import { getOrCreateShareId } from "@/lib/shareId";
-import { DATA_DIR } from "@/lib/paths";
+import { getShareId } from "@/lib/customers";
 
 // GET /api/share?file=x → 공유 링크용 공개 ID (customer는 자기 파일, admin은 지정한 파일)
 export async function GET(req: NextRequest) {
@@ -15,8 +12,6 @@ export async function GET(req: NextRequest) {
   if (!file || !isValidClientFilename(file)) {
     return NextResponse.json({ error: "file required" }, { status: 400 });
   }
-  const exists = await fs.access(path.join(DATA_DIR, "clients", `${file}.json`)).then(() => true, () => false);
-  if (!exists) return NextResponse.json({ error: "not found" }, { status: 404 });
-
-  return NextResponse.json({ id: await getOrCreateShareId(file) });
+  const id = getShareId(file);
+  return id ? NextResponse.json({ id }) : NextResponse.json({ error: "not found" }, { status: 404 });
 }

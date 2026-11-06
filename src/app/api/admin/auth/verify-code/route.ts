@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/adminAuth";
 import { verifyOtp } from "@/lib/adminOtp";
 import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
-import { applyToEncryptedFields, encrypt } from "@/lib/accountCrypto";
-import { getSchemaForTemplate } from "@/lib/templateSchemas";
-import { DATA_DIR } from "@/lib/paths";
+import { customerExists, saveCustomer } from "@/lib/customers";
 import { clientIp, isRateLimited } from "@/lib/rateLimit";
-import { buildMeta } from "@/lib/clientMeta";
-
-const CLIENTS_DIR = path.join(DATA_DIR, "clients");
 
 const ERROR_MESSAGES: Record<string, string> = {
   expired: "코드가 만료되었습니다. 다시 요청해주세요",
@@ -41,19 +34,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: ERROR_MESSAGES[result.status] }, { status });
   }
 
-  // 첫 로그인인 고객이면 계정(파일)이 아직 없으므로 기본 데이터로 자동 생성
-  if (result.role === "customer" && result.file) {
-    await fs.mkdir(CLIENTS_DIR, { recursive: true });
-    const filePath = path.join(CLIENTS_DIR, `${result.file}.json`);
-    const exists = await fs.access(filePath).then(() => true).catch(() => false);
-    if (!exists) {
-      const data = { ...DEFAULT_WEDDING_DATA, slug: result.file };
-      const schema = getSchemaForTemplate(data.template);
-      const toSave = applyToEncryptedFields(data, schema, encrypt);
-      // 신규 고객도 기본값으로 메타데이터(소유자=가입 이메일)를 채워서 만든다
-      const meta = buildMeta(data, undefined, result.file);
-      await fs.writeFile(filePath, JSON.stringify({ ...toSave, _meta: meta }, null, 2), "utf-8");
-    }
+  // 첫 로그인인 고객이면 계정이 아직 없으므로 기본 데이터로 자동 생성 (소유자 = 가입 이메일)
+  if (result.role === "customer" && result.file && !customerExists(result.file)) {
+    saveCustomer(result.file, { ...DEFAULT_WEDDING_DATA, slug: result.file }, result.file);
   }
 
   const token = await createSessionToken(secret, { role: result.role, file: result.file });

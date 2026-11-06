@@ -1,82 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
-import { DATA_DIR } from "@/lib/paths";
-import { withFileLock } from "@/lib/fileLock";
 import { isValidClientFilename } from "@/lib/newClient";
 import { resolvePublicFile } from "@/lib/shareId";
 import { getSession } from "@/lib/session";
+import { addGuestbook, deleteGuestbook, listGuestbook } from "@/lib/entries";
 
-const GUESTBOOK_DIR = path.join(DATA_DIR, "guestbook");
+export type { GuestbookEntry } from "@/lib/entries";
 
-export interface GuestbookEntry {
-  name: string;
-  message: string;
-  submittedAt: string;
-}
-
-async function readFile(slug: string): Promise<GuestbookEntry[]> {
-  try {
-    const raw = await fs.readFile(path.join(GUESTBOOK_DIR, `${slug}.json`), "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
-// GET /api/guestbook?file=kim-minjun  → 해당 클라이언트 방명록 (공개)
+// GET /api/guestbook?file=<공유 ID>  → 해당 청첩장 방명록 (공개)
 export async function GET(req: NextRequest) {
-  const file = await resolvePublicFile(req.nextUrl.searchParams.get("file"), await getSession(req));
+  const file = resolvePublicFile(req.nextUrl.searchParams.get("file"), await getSession(req));
   if (!file) return NextResponse.json({ error: "file required" }, { status: 400 });
-  return NextResponse.json(await readFile(file));
+  return NextResponse.json(listGuestbook(file));
 }
 
-// POST /api/guestbook  body: { name, message, slug }
+// POST /api/guestbook  body: { name, message, slug(공유 ID) }
 export async function POST(req: NextRequest) {
-  await fs.mkdir(GUESTBOOK_DIR, { recursive: true });
   const { slug: idOrFile, name, message } = await req.json();
-  const slug = await resolvePublicFile(idOrFile, await getSession(req));
+  const slug = resolvePublicFile(idOrFile, await getSession(req));
   if (!slug || !name || !message) {
     return NextResponse.json({ error: "slug, name, message required" }, { status: 400 });
   }
-
-  await withFileLock(`guestbook:${slug}`, async () => {
-    const entries = await readFile(slug);
-    entries.push({ name, message, submittedAt: new Date().toISOString() });
-    await fs.writeFile(
-      path.join(GUESTBOOK_DIR, `${slug}.json`),
-      JSON.stringify(entries, null, 2),
-      "utf-8"
-    );
-  });
+  addGuestbook(slug, String(name), String(message));
   return NextResponse.json({ ok: true });
 }
 
-// DELETE /api/guestbook?file=slug&index=n  → 항목 삭제 (본인 파일 또는 관리자만)
+// DELETE /api/guestbook?file=slug&id=n  → 항목 삭제 (본인 파일 또는 관리자만)
 export async function DELETE(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get("file");
-  const indexParam = req.nextUrl.searchParams.get("index");
-  const index = indexParam !== null ? Number(indexParam) : NaN;
-  if (!slug || !isValidClientFilename(slug) || Number.isNaN(index)) {
-    return NextResponse.json({ error: "file, index required" }, { status: 400 });
+  const id = Number(req.nextUrl.searchParams.get("id"));
+  if (!slug || !isValidClientFilename(slug) || !Number.isInteger(id)) {
+    return NextResponse.json({ error: "file, id required" }, { status: 400 });
   }
 
   const session = await getSession(req);
   if (!session || (session.role !== "admin" && session.file !== slug)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-
-  const found = await withFileLock(`guestbook:${slug}`, async () => {
-    const entries = await readFile(slug);
-    if (index < 0 || index >= entries.length) return false;
-    entries.splice(index, 1);
-    await fs.writeFile(
-      path.join(GUESTBOOK_DIR, `${slug}.json`),
-      JSON.stringify(entries, null, 2),
-      "utf-8"
-    );
-    return true;
-  });
-  if (!found) return NextResponse.json({ error: "not found" }, { status: 404 });
-  return NextResponse.json({ ok: true });
+  return deleteGuestbook(slug, id) ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "not found" }, { status: 404 });
 }

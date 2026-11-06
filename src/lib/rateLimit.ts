@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 
 const hits = new Map<string, number[]>();
 
-// ponytail: 프로세스 메모리 기반 — 인스턴스 1개 전제(fileLock과 동일), 재시작 시 초기화. 다중 인스턴스가 되면 Redis 등으로 교체.
+// ponytail: 프로세스 메모리 기반 — 인스턴스 1개 전제(SQLite 단일 파일 DB와 동일), 재시작 시 초기화. 다중 인스턴스가 되면 Redis 등으로 교체.
 // key별로 windowMs 안에 max회를 넘기면 true(차단). 호출 자체가 1회 시도로 집계된다.
 export function isRateLimited(key: string, max: number, windowMs: number, now = Date.now()): boolean {
   const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);

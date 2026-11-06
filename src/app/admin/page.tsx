@@ -59,8 +59,7 @@ export default function AdminPage() {
     loadMessages(f);
   };
 
-  const sortedMessages = messages
-    .map((m, i) => ({ ...m, _idx: i }))
+  const sortedMessages = [...messages]
     .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
   const messageTotalPages = Math.max(1, Math.ceil(sortedMessages.length / MESSAGES_PER_PAGE));
   const currentMessagePage = Math.min(messagePage, messageTotalPages);
@@ -86,7 +85,7 @@ export default function AdminPage() {
     await fetch("/api/rsvp", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: file, index: i, ...draft }),
+      body: JSON.stringify({ slug: file, ...draft, id: rsvps[i].id }),
     });
     setEditIndex(null);
     await loadRsvps(file);
@@ -94,13 +93,13 @@ export default function AdminPage() {
 
   const removeRsvp = async (i: number) => {
     if (!confirm("이 응답을 삭제할까요?")) return;
-    await fetch(`/api/rsvp?file=${file}&index=${i}`, { method: "DELETE" });
+    await fetch(`/api/rsvp?file=${file}&id=${rsvps[i].id}`, { method: "DELETE" });
     await loadRsvps(file);
   };
 
-  const removeMessage = async (i: number) => {
+  const removeMessage = async (id: number) => {
     if (!confirm("이 메시지를 삭제할까요?")) return;
-    await fetch(`/api/guestbook?file=${file}&index=${i}`, { method: "DELETE" });
+    await fetch(`/api/guestbook?file=${file}&id=${id}`, { method: "DELETE" });
     await loadMessages(file);
   };
 
@@ -258,7 +257,7 @@ export default function AdminPage() {
             ) : (
               <div className="space-y-3">
                 {pageMessages.map((m) => (
-                  <div key={m._idx} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                  <div key={m.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="font-medium text-gray-800">{m.name}</span>
                       <p className="text-[10px] text-gray-400">
@@ -267,7 +266,7 @@ export default function AdminPage() {
                     </div>
                     <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap mb-2">{m.message}</p>
                     <div className="flex justify-end">
-                      <button onClick={() => removeMessage(m._idx)} className="text-[11px] text-red-400 hover:text-red-600">삭제</button>
+                      <button onClick={() => removeMessage(m.id)} className="text-[11px] text-red-400 hover:text-red-600">삭제</button>
                     </div>
                   </div>
                 ))}

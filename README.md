@@ -15,7 +15,7 @@
 | 스크롤 인터랙션 | GSAP + ScrollTrigger |
 | 이미지 최적화 | next/image |
 | 인증 | 이메일 OTP (Nodemailer/Gmail) + HMAC 서명 세션 쿠키 |
-| 데이터 저장 | 파일시스템 JSON (`data/`) |
+| 데이터 저장 | SQLite 단일 파일 (`DATA_DIR/momentree.db`, better-sqlite3) + 업로드 파일 |
 
 ---
 
@@ -110,9 +110,9 @@ ENCRYPTION_KEY=openssl rand -base64 32 로 생성
 
 값이 설정되지 않으면 `/admin`, `/api/clients`, `/api/upload` 접근이 모두 차단됩니다.
 
-### 계좌번호 암호화
+### 고객 데이터 암호화
 
-신랑·신부 계좌번호/예금주는 저장 시 AES-256-GCM으로 암호화되어 `data/clients/*.json`에 기록됩니다. `ENCRYPTION_KEY`가 없으면 계좌 저장/조회가 실패합니다. 암호화 이전에 저장된 평문 데이터는 그대로 읽히다가 다음 저장 시 자동으로 암호화됩니다.
+청첩장 데이터 전체(계좌번호·예금주 포함 모든 필드)가 JSON으로 만들어져 AES-256-GCM으로 **통째로 암호화**되어 DB의 `customers.data_enc`에 저장됩니다. 검색·목록에 필요한 값(가입 이메일, 표시 이름 "홍길동 ♥ 김지수", 예식일, 템플릿)만 평문 컬럼으로 따로 둡니다. 표시 이름·예식일은 청첩장에 공개되는 값이고, 이메일은 로그인에 쓰이기 때문입니다. `ENCRYPTION_KEY`가 없거나 바뀌면 고객 데이터를 읽을 수 없으니 **키는 서버 밖에도 안전하게 보관**하세요.
 
 ### 업로드된 이미지/오디오는 어디에 저장되나
 
@@ -128,43 +128,47 @@ DATA_DIR=/절대/경로/data
 
 ### 백업 / 복구
 
-`bin/backup.sh`가 `DATA_DIR`(clients, rsvp, uploads)을 `momentree-YYYYMMDD-HHMMSS.tar.gz`로 묶어 `BACKUP_DIR`에 저장하고 최신 `KEEP`개(기본 14)만 남깁니다. 기본값은 `/data/momentree` → `/data/momentree-backups`. 로그인 코드(`otp/`)는 제외됩니다.
+`bin/backup.sh`가 `DATA_DIR`(DB + uploads)을 `momentree-YYYYMMDD-HHMMSS.tar.gz`로 묶어 `BACKUP_DIR`에 저장하고 최신 `KEEP`개(기본 14)만 남깁니다. 기본값은 `/data/momentree` → `/data/momentree-backups`. SQLite는 쓰는 도중 파일을 그냥 복사하면 깨질 수 있어서 **온라인 백업**(일관된 스냅샷)으로 DB를 뜹니다 — `sqlite3` CLI가 있으면 그걸, 없으면 실행 중인 컨테이너(`CONTAINER`, 기본 `momentree`)의 better-sqlite3를 씁니다. 로그인 코드(`otp` 테이블)는 5분짜리라 따로 신경 쓸 필요 없습니다.
 
 ```bash
 # 서버 crontab (매일 04:00)
 0 4 * * * /app/Momentree/bin/backup.sh >> /var/log/momentree-backup.log 2>&1
 
-# 복구 — 컨테이너를 멈춘 상태에서 압축 해제
+# 복구 — 컨테이너를 멈춘 상태에서 압축 해제 (momentree.db가 DB 파일)
 docker compose stop
+rm -f /data/momentree/momentree.db-wal /data/momentree/momentree.db-shm   # 이전 DB의 잔여 로그 파일
 tar -xzf /data/momentree-backups/momentree-XXXX.tar.gz -C /data/momentree
 docker compose start
 ```
 
-같은 서버 디스크에만 두면 디스크 장애 시 함께 사라지므로, 백업 디렉터리를 외부(S3, 다른 서버 등)로 주기적으로 복사하세요.
+같은 서버 디스크에만 두면 디스크 장애 시 함께 사라지므로, 백업 디렉터리를 외부(S3, 다른 서버 등)로 주기적으로 복사하세요. 백업에는 암호화된 데이터가 들어 있으니 `ENCRYPTION_KEY`도 별도로 보관해야 복구할 수 있습니다.
+
+### 파일(JSON) 저장소에서 DB로 옮기기
+
+DB를 처음 만드는 순간(배포 후 첫 요청) 기존 `data/clients`, `rsvp`, `guestbook`, `admins.json`, `share-index.json`을 **자동으로 가져옵니다**. 계좌 필드만 암호화돼 있던 예전 데이터는 풀어서 통째 암호화 형태로 다시 담고, 이미 나간 공유 ID(`?id=`)는 그대로 유지됩니다. 원본 파일은 건드리지 않고 남겨 두므로 문제가 있으면 DB 파일을 지우고 다시 시작하면 됩니다(가져오기가 다시 실행됨). 배포 직전에 `bin/backup.sh`를 한 번 실행해 두세요. 컨테이너 로그에 `[db] 기존 JSON 가져오기: 고객 N, RSVP N ...` 줄이 한 번 나옵니다. 문제없음을 확인한 뒤 옛 JSON 폴더는 정리해도 됩니다.
 
 ### 고객 찾기
 
-고객 파일명은 이메일이거나 의미 없는 슬러그라서, 저장할 때마다 서버가 파일 안 `_meta`(표시 이름, 소유자 이메일, 예식일, 생성·수정일)를 계산해 넣습니다. 오래된 파일은 고객이 다시 저장할 때 채워집니다. `_meta`는 공개 초대장 페이지로 내려가지 않습니다.
-
-- 어드민의 고객 목록은 "홍길동 ♥ 김지수 · 예식일"로 표시되고, 이름·이메일·파일명으로 검색됩니다.
-- 서버에서는 `bin/find-client.sh [키워드]` (읽기 전용, `DATA_DIR` 지정 가능)로 찾습니다.
+어드민의 고객 목록은 "홍길동 ♥ 김지수 · 예식일"로 표시되고, 이메일·이름·파일명·예식일로 검색됩니다 (`GET /api/clients?detail=1&q=키워드`).
 
 ### 테스트
 
-`npm test` — 세션 토큰, 계좌 암호화, rate limit, 파일 락, RSVP 권한(제출/수정/삭제)을 검증합니다 (Node 내장 test runner, 추가 의존성 없음).
+`npm test` — 세션 토큰, 암호화, rate limit, DB 스키마·고객 저장/검색, 기존 JSON 가져오기, 관리자·OTP, RSVP·방명록 권한(제출/수정/삭제)을 검증합니다 (Node 내장 test runner, 추가 의존성 없음).
 
 ---
 
 ## 데이터 저장 구조
 
-DB 없이 파일시스템 JSON으로 동작합니다.
+SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마는 `src/lib/db.ts`의 `MIGRATIONS` 배열에 정의되며 서버가 시작할 때 자동 적용됩니다(변경은 배열 끝에 추가만).
 
-```
-data/
-├── clients/{파일명}.json   ← 고객별 청첩장 데이터 (파일명 = 이메일 또는 슬러그)
-├── rsvp/{파일명}.json      ← 고객별 하객 RSVP 응답 목록
-└── otp/{이메일}.json       ← 발급된 로그인 코드 (검증 후 자동 삭제)
-```
+| 테이블 | 내용 |
+|---|---|
+| `customers` | 고객(청첩장): `file`(세션·링크 키), `email`, `share_id`(공개 링크 ID), `label`, `wedding_date`, `template`, `data_enc`(통째 암호화된 청첩장 데이터) |
+| `admins` | 추가 관리자 이메일 (슈퍼 관리자는 `ADMIN_EMAIL` 환경변수) |
+| `otp` | 발급된 로그인 코드 (검증 후 삭제, 만료분은 새 발급 때 정리) |
+| `rsvp_entries` / `guestbook_entries` | 하객 응답·방명록 (항목별 행, 고유 id로 수정/삭제) |
+
+업로드 파일(이미지·오디오)은 DB가 아니라 `DATA_DIR/uploads/`에 저장됩니다. 인스턴스를 여러 개로 늘리게 되면 Postgres로 옮기세요(쿼리는 표준 SQL 위주).
 
 ---
 
@@ -178,7 +182,7 @@ data/
 | `/api/admin/auth/logout` | POST | 세션 종료 |
 | `/api/clients` | GET/POST/DELETE | 청첩장 데이터 조회/저장/삭제 (customer는 자기 파일만) |
 | `/api/rsvp` | GET/POST | 하객 RSVP 조회/제출 — 비로그인은 공유 ID로만 접근 (파일명=이메일 노출 방지), 전체 목록은 관리자 전용 |
-| `/api/share` | GET | 청첩장 공유용 공개 ID 발급/조회 (로그인 필요, `data/share-index.json`에 저장) |
+| `/api/share` | GET | 청첩장 공유용 공개 ID 발급/조회 (로그인 필요) |
 | `/api/rsvp` | PATCH/DELETE | RSVP 항목 수정/삭제 (본인 또는 관리자만) |
 | `/api/upload` | POST | 이미지/오디오 파일 업로드 |
 
@@ -235,7 +239,7 @@ src/
     ├── preview/[template]/       ← 어드민 실시간 미리보기용 iframe 대상
     └── api/                      ← 위 API 표 참고
 
-data/                            ← 고객/RSVP/OTP 저장소 (파일시스템 DB)
+data/                            ← SQLite DB(momentree.db) + 업로드 파일
 public/images/                   ← 템플릿 공용 기본 이미지
 ```
 
@@ -246,7 +250,7 @@ public/images/                   ← 템플릿 공용 기본 이미지
 - **결제 연동**: 고객 플랜/구독 관리
 - **방명록 실시간 알림**: 새 RSVP 도착 시 관리자 알림
 - **AI 커스터마이징**: 채팅으로 텍스트·컬러 실시간 수정
-- **정식 DB 전환**: 파일시스템 → Postgres/SQLite (고객 수 증가 대비)
+- **Postgres 전환**: 인스턴스를 여러 개로 늘릴 때 (현재는 SQLite 단일 파일)
 
 ---
 

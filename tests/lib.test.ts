@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { createSessionToken, verifySessionToken } from "@/lib/adminAuth";
 import { encrypt, decrypt, applyToEncryptedFields } from "@/lib/accountCrypto";
 import { isRateLimited } from "@/lib/rateLimit";
-import { withFileLock } from "@/lib/fileLock";
 
 process.env.ENCRYPTION_KEY = Buffer.alloc(32, 7).toString("base64");
 
@@ -74,20 +73,6 @@ test("rate limit: 한도 초과 차단, 윈도우 지나면 해제, 키별 독�
   assert.equal(isRateLimited("k", 2, 1000, t + 2), true);
   assert.equal(isRateLimited("other", 2, 1000, t + 2), false);
   assert.equal(isRateLimited("k", 2, 1000, t + 1001), false);
-});
-
-test("fileLock: 같은 key의 read-modify-write가 직렬화되어 갱신 유실이 없다", async () => {
-  let value = 0;
-  await Promise.all(
-    Array.from({ length: 20 }, () =>
-      withFileLock("k", async () => {
-        const v = value;
-        await new Promise((r) => setTimeout(r, 1));
-        value = v + 1;
-      })
-    )
-  );
-  assert.equal(value, 20);
 });
 
 test("템플릿별 스키마: 쓰지 않는 필드는 숨기고 쓰는 필드는 유지", async () => {
