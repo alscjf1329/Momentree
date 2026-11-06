@@ -617,7 +617,7 @@ function BgmPlayer() {
 
   return (
     <>
-      <audio ref={audioRef} src={w.bgm.src} loop preload="auto" />
+      <audio ref={audioRef} src={w.bgm.src} loop preload="metadata" />
       <button
         onClick={toggle}
         aria-label={playing ? "배경음악 정지" : "배경음악 재생"}

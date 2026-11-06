@@ -3,21 +3,27 @@ import type { TemplateSchema } from "@/lib/schema";
 // common: true  → "기본 정보" 탭, 9개 템플릿 공유 (excludeTemplates로 특정 템플릿만 제외 가능 —
 //                 예: 봉투 이미지는 8개 템플릿엔 공용이지만 garden엔 봉투 UI가 없어서 제외)
 // common 없음   → "garden 전용 옵션" 탭, garden에서만 편집 가능
+// garden 스키마를 폴백으로 쓰는 8개 템플릿. 이 템플릿들이 실제로 렌더링하지 않는 필드는 어드민 폼에서 숨긴다
+// (src/templates/*/index.tsx + 공용 sections/*가 참조하는 필드를 기준으로 정리).
+const BASIC = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury"];
+const NO_GALLERY = BASIC.filter((t) => t !== "classic" && t !== "blossom");
+const NO_NAME_FULL = ["editorial", "modern"];
+
 export const gardenSchema: TemplateSchema = {
   name: "garden",
   sections: [
     {
       title: "히어로 문구",
       fields: [
-        { key: "mainTitle", type: "textarea", label: "메인 타이틀 (큰 글씨, 줄바꿈 가능)", common: true, placeholder: "We're getting married" },
-        { key: "subInfo", type: "array", label: "보조 정보 (작은 글씨, 줄바꿈 = 새 줄)", common: true },
+        { key: "mainTitle", type: "textarea", label: "메인 타이틀 (큰 글씨, 줄바꿈 가능)", common: true, excludeTemplates: BASIC, placeholder: "We're getting married" },
+        { key: "subInfo", type: "array", label: "보조 정보 (작은 글씨, 줄바꿈 = 새 줄)", common: true, excludeTemplates: BASIC },
       ],
     },
     {
       title: "신랑 정보",
       fields: [
         { key: "groom.name", type: "text", label: "이름", common: true, required: true, placeholder: "홍길동" },
-        { key: "groom.nameFull", type: "text", label: "전체이름", common: true, placeholder: "홍 길 동" },
+        { key: "groom.nameFull", type: "text", label: "전체이름", common: true, excludeTemplates: NO_NAME_FULL, placeholder: "홍 길 동" },
         { key: "groom.fatherName", type: "text", label: "부친", common: true },
         { key: "groom.motherName", type: "text", label: "모친", common: true },
         { key: "groom.relation", type: "text", label: "관계 (예: 장남/차남/막내아들)", common: true, placeholder: "장남" },
@@ -39,7 +45,7 @@ export const gardenSchema: TemplateSchema = {
       title: "신부 정보",
       fields: [
         { key: "bride.name", type: "text", label: "이름", common: true, required: true, placeholder: "김지수" },
-        { key: "bride.nameFull", type: "text", label: "전체이름", common: true, placeholder: "김 지 수" },
+        { key: "bride.nameFull", type: "text", label: "전체이름", common: true, excludeTemplates: NO_NAME_FULL, placeholder: "김 지 수" },
         { key: "bride.fatherName", type: "text", label: "부친", common: true },
         { key: "bride.motherName", type: "text", label: "모친", common: true },
         { key: "bride.relation", type: "text", label: "관계 (예: 장녀/차녀/막내딸)", common: true, placeholder: "장녀" },
@@ -87,12 +93,13 @@ export const gardenSchema: TemplateSchema = {
     {
       title: "참석여부 팝업 문구",
       fields: [
-        { key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구", common: true },
+        { key: "rsvpMessage", type: "array", label: "가든 첫 진입 팝업 문구", common: true, excludeTemplates: BASIC },
         {
           key: "rsvpPopupDelaySec",
           type: "text",
           label: "팝업 뜨는 시간 (초)",
           common: true,
+          excludeTemplates: BASIC,
           placeholder: "비워두면 자동 계산 (예: 3.5)",
           pattern: "^$|^[0-9]+(\\.[0-9]+)?$",
           errorMessage: "숫자만 입력하세요 (예: 3.5)",
@@ -120,6 +127,7 @@ export const gardenSchema: TemplateSchema = {
           type: "array-object",
           label: "안내사항",
           common: true,
+          excludeTemplates: BASIC,
           helpText: "Location-Contact 사이, 한 장씩 스와이프로 표시",
           itemFields: [
             { key: "title", type: "text", label: "제목", placeholder: "예: 주차 안내" },
@@ -131,21 +139,22 @@ export const gardenSchema: TemplateSchema = {
     {
       title: "배경음악",
       fields: [
-        { key: "bgm.title", type: "text", label: "제목", common: true },
-        { key: "bgm.src", type: "file", label: "파일 (mp3)", common: true, placeholder: "/audio/bgm.mp3" },
+        { key: "bgm.title", type: "text", label: "제목", common: true, excludeTemplates: BASIC },
+        { key: "bgm.src", type: "file", label: "파일 (mp3)", common: true, excludeTemplates: BASIC, placeholder: "/audio/bgm.mp3" },
       ],
     },
     {
       title: "이미지 경로",
       fields: [
         { key: "introBg", type: "image", label: "인트로 배경", common: true },
-        { key: "envelopeClosed", type: "image", label: "봉투 (닫힘)", excludeTemplates: ["garden"] },
-        { key: "envelopeOpen", type: "image", label: "봉투 (열림)", excludeTemplates: ["garden"] },
+        { key: "envelopeClosed", type: "image", label: "봉투 (닫힘)", excludeTemplates: ["garden", ...BASIC.filter((t) => t !== "classic")] },
+        { key: "envelopeOpen", type: "image", label: "봉투 (열림)", excludeTemplates: ["garden", ...BASIC.filter((t) => t !== "classic")] },
         {
           key: "gallery",
           type: "array-object",
           label: "갤러리",
           common: true,
+          excludeTemplates: NO_GALLERY,
           bulkImageUpload: true,
           itemFields: [
             { key: "src", type: "image", label: "경로" },
