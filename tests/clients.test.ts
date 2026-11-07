@@ -21,7 +21,7 @@ before(async () => {
   db = await import("@/lib/db");
 });
 
-type Sess = { role: "admin" | "customer"; file?: string };
+type Sess = { role: "admin" | "customer"; file?: string; email?: string };
 async function req(method: string, session: Sess, opts: { body?: unknown; query?: string } = {}) {
   return new NextRequest("http://localhost/api/clients" + (opts.query ?? ""), {
     method,
@@ -80,6 +80,7 @@ test("목록 검색: 이메일·이름·예식일·파일명, 특수문자는 �
 
 test("API: 고객 본인 저장 시 소유자 기록, 응답에 소유자·내부 컬럼 없음, 관리자 목록 검색, 경로 순회 차단", async () => {
   const customer: Sess = { role: "customer", file: "new@x.com" };
+  store.saveCustomer("new@x.com", wedding("", ""), "new@x.com"); // 최초 로그인 때 만들어지는 고객+소유자 멤버
   assert.equal((await route.POST(await req("POST", customer, { body: { data: wedding("가", "나") } }))).status, 200);
   assert.equal(raw("new@x.com").email, "new@x.com");
 
@@ -97,4 +98,25 @@ test("API: 고객 본인 저장 시 소유자 기록, 응답에 소유자·내�
   assert.equal((await route.DELETE(await req("DELETE", customer, { query: "?file=new@x.com" }))).status, 401); // 삭제는 관리자만
   assert.equal((await route.DELETE(await req("DELETE", admin, { query: "?file=new@x.com" }))).status, 200);
   assert.equal(store.customerExists("new@x.com"), false);
+});
+
+test("공동 편집: 초대받은 편집자는 저장 가능·멤버 관리 불가, 제외되면 기존 세션도 즉시 차단", async () => {
+  const members = await import("@/app/api/members/route");
+  store.saveCustomer("own@x.com", wedding("가", "나"), "own@x.com");
+  const owner: Sess = { role: "customer", file: "own@x.com", email: "own@x.com" };
+  const editor: Sess = { role: "customer", file: "own@x.com", email: "ed@x.com" };
+  const mreq = async (method: string, s: Sess, body?: unknown, query = "") => new NextRequest("http://localhost/api/members" + query, {
+    method, body: body ? JSON.stringify(body) : undefined,
+    headers: { "content-type": "application/json", cookie: `${ADMIN_SESSION_COOKIE}=${await createSessionToken("test-secret", s)}` },
+  });
+
+  assert.equal((await route.POST(await req("POST", editor, { body: { data: wedding("가", "나") } }))).status, 401); // 아직 멤버 아님
+  assert.equal((await members.POST(await mreq("POST", owner, { email: "ED@x.com" }))).status, 200);
+  assert.equal((await members.POST(await mreq("POST", owner, { email: "bad" }))).status, 400);
+  assert.equal((await route.POST(await req("POST", editor, { body: { data: wedding("수정", "나") } }))).status, 200);
+  assert.equal(store.getCustomer("own@x.com")!.groom.name, "수정");
+  assert.equal((await members.POST(await mreq("POST", editor, { email: "x@x.com" }))).status, 403); // 편집자는 멤버 관리 불가
+  assert.equal((await members.DELETE(await mreq("DELETE", owner, undefined, "?email=own@x.com"))).status, 404); // 소유자 제거 불가
+  assert.equal((await members.DELETE(await mreq("DELETE", owner, undefined, "?email=ed@x.com"))).status, 200);
+  assert.equal((await route.POST(await req("POST", editor, { body: { data: wedding("또", "나") } }))).status, 401);
 });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
+import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
 import { resolvePublicFile } from "@/lib/shareId";
 import { addRsvp, deleteRsvp, listRsvp, listRsvpSlugs, updateRsvp } from "@/lib/entries";
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
 async function canEdit(req: NextRequest, slug: string): Promise<boolean> {
   const session = await getSession(req);
   if (!session) return false;
-  return session.role === "admin" || session.file === slug;
+  return session.role === "admin" || (session.file === slug && can(session, "guests"));
 }
 
 // PATCH /api/rsvp  body: { slug, id, ...fields }  → 항목 수정 (본인 파일 또는 관리자만)

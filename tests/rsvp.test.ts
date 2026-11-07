@@ -21,6 +21,7 @@ before(async () => {
   const store = await import("@/lib/customers");
   const { WEDDING } = await import("@/content");
   store.saveCustomer("couple", WEDDING, null);
+  (await import("@/lib/access")).addMember("couple", "couple", "owner"); // 테스트 세션은 file==이메일
   store.saveCustomer("other@x.com", WEDDING, "other@x.com");
   shareId = store.getShareId("couple")!;
   otherShareId = store.getShareId("other@x.com")!;

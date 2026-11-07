@@ -1,6 +1,7 @@
 import type { WeddingData } from "@/types";
 import { getDb } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
+import { addMember } from "@/lib/access";
 import { newShareId } from "@/lib/newShareId";
 import { WEDDING } from "@/content";
 
@@ -54,8 +55,9 @@ export function customerExists(file: string): boolean {
   return !!getDb().prepare("select 1 from customers where file = ?").get(file);
 }
 
-// 저장(없으면 생성). email은 새로 만들 때만 기록한다 (관리자가 대신 저장해도 소유자는 바뀌지 않음).
+// 저장(없으면 생성). email은 새로 만들 때만 기록하고 그 사람을 소유자 멤버로 등록한다 (관리자가 대신 저장해도 소유자는 바뀌지 않음).
 export function saveCustomer(file: string, data: WeddingData, email?: string | null): void {
+  const existed = customerExists(file);
   const now = new Date().toISOString();
   getDb()
     .prepare(
@@ -75,6 +77,7 @@ export function saveCustomer(file: string, data: WeddingData, email?: string | n
       data_enc: seal(data),
       now,
     });
+  if (!existed && email) addMember(file, email, "owner"); // 가입 이메일 = 소유자
 }
 
 export function deleteCustomer(file: string): boolean {

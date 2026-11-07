@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidClientFilename } from "@/lib/newClient";
 import { resolvePublicFile } from "@/lib/shareId";
 import { getSession } from "@/lib/session";
+import { can } from "@/lib/access";
 import { addGuestbook, deleteGuestbook, listGuestbook } from "@/lib/entries";
 
 export type { GuestbookEntry } from "@/lib/entries";
@@ -33,7 +34,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   const session = await getSession(req);
-  if (!session || (session.role !== "admin" && session.file !== slug)) {
+  if (!session || (session.role !== "admin" && !(session.file === slug && can(session, "guests")))) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   return deleteGuestbook(slug, id) ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "not found" }, { status: 404 });

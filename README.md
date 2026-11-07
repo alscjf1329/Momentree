@@ -165,6 +165,7 @@ SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마
 |---|---|
 | `customers` | 고객(청첩장): `file`(세션·링크 키), `email`, `share_id`(공개 링크 ID), `label`, `wedding_date`, `template`, `data_enc`(통째 암호화된 청첩장 데이터) |
 | `admins` | 추가 관리자 이메일 (슈퍼 관리자는 `ADMIN_EMAIL` 환경변수) |
+| `customer_members` | 청첩장별 멤버 (file, email, role). 소유자=가입 이메일, 초대한 사람=편집자. 권한은 `src/lib/access.ts`의 표 한 곳에서 정의 |
 | `otp` | 발급된 로그인 코드 (검증 후 삭제, 만료분은 새 발급 때 정리) |
 | `rsvp_entries` / `guestbook_entries` | 하객 응답·방명록 (항목별 행, 고유 id로 수정/삭제) |
 
@@ -178,6 +179,8 @@ SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마
 |---|---|---|
 | `/api/admin/auth/request-code` | POST | 이메일로 OTP 발송 |
 | `/api/admin/auth/verify-code` | POST | OTP 검증, 세션 쿠키 발급 |
+| `/api/admin/auth/switch` | POST | 내가 멤버인 다른 청첩장으로 전환 |
+| `/api/members` | GET/POST/DELETE | 함께 편집하는 사람 관리 (소유자·관리자만, 편집자 초대) |
 | `/api/admin/auth/me` | GET | 현재 세션의 role/file 조회 |
 | `/api/admin/auth/logout` | POST | 세션 종료 |
 | `/api/clients` | GET/POST/DELETE | 청첩장 데이터 조회/저장/삭제 (customer는 자기 파일만) |

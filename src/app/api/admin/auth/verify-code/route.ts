@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     saveCustomer(result.file, { ...DEFAULT_WEDDING_DATA, slug: result.file }, result.file);
   }
 
-  const token = await createSessionToken(secret, { role: result.role, file: result.file });
+  const token = await createSessionToken(secret, { role: result.role, file: result.file, email });
   const res = NextResponse.json({ ok: true });
   res.cookies.set(ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,

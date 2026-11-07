@@ -9,6 +9,7 @@ import { DEFAULT_WEDDING_DATA, generateFilename, namesToSlug } from "@/lib/newCl
 import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
 import ShareLinkCard from "@/components/admin/ShareLinkCard";
+import MembersCard from "@/components/admin/MembersCard";
 import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 
@@ -30,6 +31,8 @@ export default function SetupForm() {
   const dir = useClientDirectory();
   const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
   const isCustomer = role === "customer";
+  const [memberRole, setMemberRole] = useState<string | null>(null);
+  const [myFiles, setMyFiles] = useState<{ file: string; role: string }[]>([]);
 
   const schema = getSchemaForTemplate(data.template);
   const errors = validateBySchema(schema, data);
@@ -48,6 +51,8 @@ export default function SetupForm() {
     fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(me => {
       if (me?.role === "customer" && me.file) {
         setRole("customer");
+        setMemberRole(me.memberRole);
+        setMyFiles(me.files ?? []);
         loadFile(me.file);
       } else {
         setRole("admin");
@@ -180,6 +185,20 @@ export default function SetupForm() {
               </div>
             </div>
           )}
+
+          {/* 여러 청첩장의 멤버이면 전환 */}
+          {myFiles.length > 1 && (
+            <select value={filename} className="w-full px-2.5 py-2 text-[11px] border border-gray-200 rounded-lg bg-white"
+              onChange={async e => {
+                const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: e.target.value }) });
+                if (r.ok) location.reload();
+              }}>
+              {myFiles.map(f => <option key={f.file} value={f.file}>{f.file}</option>)}
+            </select>
+          )}
+
+          {/* 함께 편집하는 사람 (소유자·관리자만) */}
+          {filename && (role === "admin" || memberRole === "owner") && <MembersCard file={filename} admin={role === "admin"} />}
 
           {/* 내 청첩장 QR / 공유 */}
           {filename && <ShareLinkCard template={data.template} filename={filename} />}

@@ -46,12 +46,14 @@ export type SessionRole = "admin" | "customer";
 export interface SessionPayload {
   exp: number;
   role: SessionRole;
-  file?: string;
+  file?: string; // 고객: 지금 편집 중인 청첩장 / 관리자: 관리자 이메일
+  email?: string; // 로그인한 사람의 이메일 (예전 토큰엔 없음 — 그땐 file이 곧 이메일)
+  memberRole?: string; // getSession이 DB에서 확인해 채운다 (토큰에는 저장하지 않음)
 }
 
 export async function createSessionToken(
   secret: string,
-  identity: { role: SessionRole; file?: string }
+  identity: { role: SessionRole; file?: string; email?: string }
 ): Promise<string> {
   const payload = JSON.stringify({ exp: Date.now() + SESSION_TTL_MS, ...identity });
   const payloadB64 = base64url(encoder.encode(payload));

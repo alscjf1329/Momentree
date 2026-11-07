@@ -54,6 +54,20 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX guestbook_entries_slug ON guestbook_entries(slug, id);
   `,
+  // v2: 청첩장별 멤버 (여러 명이 함께 편집). role은 TEXT라 새 역할은 코드(access.ts)만 고치면 된다.
+  `
+  CREATE TABLE customer_members (
+    file     TEXT NOT NULL REFERENCES customers(file) ON DELETE CASCADE ON UPDATE CASCADE,
+    email    TEXT NOT NULL COLLATE NOCASE, -- 로그인 때 대소문자가 달라도 같은 사람
+    role     TEXT NOT NULL,
+    added_at TEXT NOT NULL,
+    PRIMARY KEY (file, email)
+  );
+  CREATE INDEX customer_members_email ON customer_members(email);
+  INSERT INTO customer_members (file, email, role, added_at)
+    SELECT file, coalesce(email, CASE WHEN file LIKE '%@%' THEN file END), 'owner', created_at
+    FROM customers WHERE coalesce(email, CASE WHEN file LIKE '%@%' THEN file END) IS NOT NULL;
+  `,
 ];
 
 export function migrate(db: Database.Database): void {

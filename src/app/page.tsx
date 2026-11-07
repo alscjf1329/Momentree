@@ -48,7 +48,7 @@ export default async function Home() {
               <Link href={session.role === "admin" ? "/admin" : "/admin/setup"}
                 className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90 max-w-[160px] truncate"
                 style={{ background: "var(--color-primary-dark)" }}>
-                {session.role === "admin" ? "관리자" : session.file} 님
+                {session.role === "admin" ? "관리자" : (session.email ?? session.file)} 님
               </Link>
             ) : (
               <Link href="/admin/login"

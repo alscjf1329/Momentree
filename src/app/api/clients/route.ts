@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { WeddingData } from "@/types";
 import { getSession } from "@/lib/session";
+import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
 import { deleteCustomer, getCustomer, listCustomers, saveCustomer } from "@/lib/customers";
 
@@ -29,6 +30,8 @@ export async function POST(req: NextRequest) {
   const session = await getSession(req);
   if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
+  if (!can(session, "edit")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+
   const body = await req.json();
   const filename = session.role === "customer" ? session.file : body.filename;
 
@@ -36,8 +39,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid filename" }, { status: 400 });
   }
 
-  // 새로 만들 때만 소유자 이메일을 기록 (고객 본인이 저장하는 경우 세션 이메일)
-  saveCustomer(filename, body.data as WeddingData, session.role === "customer" ? session.file : null);
+  // 소유자(멤버십)는 최초 로그인 때 만들어진다 — 여기선 내용만 저장
+  saveCustomer(filename, body.data as WeddingData);
   return NextResponse.json({ ok: true });
 }
 
