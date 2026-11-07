@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   }
 
   const token = await createSessionToken(secret, { role: result.role, file: result.file, email });
-  const res = NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true, role: result.role });
   res.cookies.set(ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

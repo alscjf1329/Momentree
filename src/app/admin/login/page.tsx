@@ -52,7 +52,8 @@ export default function AdminLoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "인증에 실패했습니다");
-      router.push("/admin");
+      // 고객은 바로 청첩장 편집 화면으로, 관리자는 대시보드로
+      router.push(data.role === "customer" ? "/admin/setup" : "/admin");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "인증에 실패했습니다");

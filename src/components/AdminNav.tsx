@@ -15,6 +15,8 @@ interface Me {
   file: string | null;
   email: string | null;
   superAdmin: boolean;
+  label: string | null;
+  memberRole: string | null;
 }
 
 function NavInner() {
@@ -62,7 +64,7 @@ function NavInner() {
             style={active(base)
               ? { background: "var(--color-primary-dark)", color: "#fff" }
               : { color: "#666" }}>
-            {base === "/admin/setup" && isCustomer ? "내 정보 설정" : label}
+            {base === "/admin/setup" && isCustomer ? "청첩장 편집" : label}
           </Link>
         ))}
       </nav>
@@ -70,8 +72,8 @@ function NavInner() {
       {/* 로그인 이메일 / 현재 선택된 파일 */}
       {isCustomer ? (
         me?.email && (
-          <span className="text-[11px] text-gray-400 max-w-[160px] truncate hidden sm:block">
-            {me.email}
+          <span className="text-[11px] text-gray-400 max-w-[220px] truncate hidden sm:block" title={me.email}>
+            {me.memberRole === "editor" ? `${me.label || "청첩장"} · 함께 편집 중` : me.email}
           </span>
         )
       ) : (

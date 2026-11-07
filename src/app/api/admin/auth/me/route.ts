@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { isSuperAdmin } from "@/lib/admins";
+import { getLabel } from "@/lib/customers";
 import { filesOf } from "@/lib/access";
 
 export async function GET(req: NextRequest) {
@@ -9,5 +10,6 @@ export async function GET(req: NextRequest) {
   const email = session.email ?? session.file ?? null;
   const superAdmin = session.role === "admin" && !!email && isSuperAdmin(email);
   return NextResponse.json({ authed: true, role: session.role, file: session.file ?? null, email, superAdmin,
-    memberRole: session.memberRole ?? null, files: session.role === "customer" && email ? filesOf(email) : [] });
+    memberRole: session.memberRole ?? null,
+    label: session.role === "customer" && session.file ? getLabel(session.file) : null, files: session.role === "customer" && email ? filesOf(email) : [] });
 }
