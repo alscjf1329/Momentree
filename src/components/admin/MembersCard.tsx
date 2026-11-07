@@ -10,6 +10,7 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
   const [members, setMembers] = useState<Member[]>([]);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const qs = admin ? `?file=${encodeURIComponent(file)}` : "";
 
   const load = useCallback(async () => {
@@ -18,14 +19,22 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
   }, [qs]);
   useEffect(() => { if (file) load(); }, [file, load]);
 
-  const add = async () => {
-    setError("");
+  const invite = async (to: string) => {
+    setError(""); setNotice("");
     const r = await fetch("/api/members", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, file: admin ? file : undefined }),
+      body: JSON.stringify({ email: to, file: admin ? file : undefined }),
     });
-    if (r.ok) { setEmail(""); load(); } else setError((await r.json()).error ?? "추가하지 못했습니다");
+    const j = await r.json();
+    if (!r.ok) return setError(j.error ?? "추가하지 못했습니다");
+    setEmail(""); load();
+    if (j.mailed) setNotice(`${to} 님께 초대 메일을 보냈어요`);
+    else { // 메일이 안 나가도 링크로 직접 전달할 수 있게
+      await navigator.clipboard?.writeText(j.loginUrl).catch(() => {});
+      setNotice("메일 발송에 실패했어요. 초대 링크를 복사했으니 직접 전달해 주세요");
+    }
   };
+  const add = () => invite(email);
   const remove = async (m: Member) => {
     if (!confirm(`${m.email} 님을 제외할까요?`)) return;
     await fetch(`/api/members?email=${encodeURIComponent(m.email)}${admin ? `&file=${encodeURIComponent(file)}` : ""}`, { method: "DELETE" });
@@ -43,7 +52,10 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
             <span className="truncate text-gray-600" title={m.email}>{m.email}</span>
             <span className="shrink-0 text-gray-400">
               {ROLE_LABEL[m.role] ?? m.role}
-              {m.role !== "owner" && <button onClick={() => remove(m)} className="ml-2 text-red-400 hover:underline">제외</button>}
+              {m.role !== "owner" && <>
+                <button onClick={() => invite(m.email)} className="ml-2 text-blue-400 hover:underline">초대 재발송</button>
+                <button onClick={() => remove(m)} className="ml-2 text-red-400 hover:underline">제외</button>
+              </>}
             </span>
           </div>
         ))}
@@ -53,7 +65,8 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
           <button onClick={add} className="text-[11px] px-3 bg-gray-900 text-white rounded-lg">추가</button>
         </div>
         {error && <p className="text-[11px] text-red-500">{error}</p>}
-        <p className="text-[10px] text-gray-400">추가한 분은 이 이메일로 로그인하면 같은 청첩장을 수정할 수 있어요.</p>
+        {notice && <p className="text-[11px] text-green-600">{notice}</p>}
+        <p className="text-[10px] text-gray-400">추가하면 초대 메일이 나가요. 받은 분이 메일의 버튼으로 로그인하면 같은 청첩장을 함께 수정할 수 있어요.</p>
       </div>
     </div>
   );

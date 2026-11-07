@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 import { generateOtpCode, type SessionRole } from "@/lib/adminAuth";
 import { isOnCooldown, issueOtp, OTP_TTL_MS } from "@/lib/adminOtp";
 import { isValidLoginEmail } from "@/lib/newClient";
 import { isAdmin } from "@/lib/admins";
 import { filesOf } from "@/lib/access";
+import { sendMail } from "@/lib/mailer";
 import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
@@ -49,21 +49,12 @@ export async function POST(req: NextRequest) {
   const code = generateOtpCode();
   await issueOtp(email, code, secret, role, file);
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: gmailUser, pass: gmailAppPassword },
-  });
-
-  try {
-    await transporter.sendMail({
-      from: `Momentree <${gmailUser}>`,
-      to: email,
-      subject: "[Momentree] 인증 코드",
-      html: `<p>인증 코드: <strong style="font-size:20px">${code}</strong></p><p>${OTP_TTL_MS / 60000}분간 유효합니다.</p>`,
-    });
-  } catch {
-    return NextResponse.json({ error: "이메일 발송에 실패했습니다" }, { status: 502 });
-  }
+  const sent = await sendMail(
+    email,
+    "[Momentree] 인증 코드",
+    `<p>인증 코드: <strong style="font-size:20px">${code}</strong></p><p>${OTP_TTL_MS / 60000}분간 유효합니다.</p>`
+  );
+  if (!sent) return NextResponse.json({ error: "이메일 발송에 실패했습니다" }, { status: 502 });
 
   return NextResponse.json({ ok: true });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -10,6 +10,13 @@ export default function AdminLoginPage() {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [invited, setInvited] = useState(false);
+
+  // 초대 메일의 링크(?email=)로 들어오면 이메일을 채워 둔다
+  useEffect(() => {
+    const e = new URLSearchParams(location.search).get("email");
+    if (e) { setEmail(e.trim()); setInvited(true); }
+  }, []);
 
   const requestCode = async () => {
     if (!email) {
@@ -59,7 +66,9 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
         <h1 className="text-lg font-semibold text-gray-800 mb-1">로그인</h1>
         <p className="text-xs text-gray-400 mb-6">
-          이메일로 인증 코드를 보내드립니다. 처음이면 계정이 자동으로 만들어져요.
+          {invited
+            ? "청첩장 공동 편집에 초대받으셨어요. 아래 이메일로 인증 코드를 받아 로그인하세요."
+            : "이메일로 인증 코드를 보내드립니다. 처음이면 계정이 자동으로 만들어져요."}
         </p>
 
         {step === "request" ? (
@@ -69,7 +78,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setEmail(e.target.value.trim())}
               placeholder="이메일 주소"
               type="email"
-              autoFocus
+              autoFocus={!invited}
               onKeyDown={(e) => e.key === "Enter" && requestCode()}
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm mb-3"
             />

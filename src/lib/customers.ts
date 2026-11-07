@@ -97,6 +97,14 @@ export function listCustomers(query = ""): CustomerSummary[] {
   return rows.map((r) => ({ file: r.file, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, updatedAt: r.updated_at }));
 }
 
+export function getLabel(file: string): string {
+  return (getDb().prepare("select label from customers where file = ?").pluck().get(file) as string | undefined) ?? "";
+}
+
+export function getTemplate(file: string): string {
+  return (getDb().prepare("select template from customers where file = ?").pluck().get(file) as string | undefined) ?? "classic";
+}
+
 export function getShareId(file: string): string | null {
   const row = getDb().prepare("select share_id from customers where file = ?").get(file) as Pick<Row, "share_id"> | undefined;
   return row?.share_id ?? null;

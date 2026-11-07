@@ -102,6 +102,17 @@ export default function SetupForm() {
     router.push("/admin/templates");
   };
 
+  const switcher = myFiles.length > 1 && (
+            <select value={filename} className="w-full px-2.5 py-2 text-[11px] border border-gray-200 rounded-lg bg-white"
+              onChange={async e => {
+                const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: e.target.value }) });
+                if (r.ok) location.reload();
+              }}>
+              {myFiles.map(f => <option key={f.file} value={f.file}>{f.file}</option>)}
+            </select>
+          );
+  const membersCard = filename && (role === "admin" || memberRole === "owner") && <MembersCard file={filename} admin={role === "admin"} />;
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* 상단 액션바 */}
@@ -109,6 +120,9 @@ export default function SetupForm() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <h1 className="text-sm font-semibold text-gray-700 truncate">{isCustomer ? "내 정보 설정" : "고객 정보 설정"}</h1>
+            {memberRole === "editor" && (
+              <span className="text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full shrink-0">함께 편집 중</span>
+            )}
             {filename && role === "admin" && (
               <span className="text-[10px] font-mono bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full truncate max-w-[140px] hidden sm:block">
                 {filename}
@@ -186,19 +200,8 @@ export default function SetupForm() {
             </div>
           )}
 
-          {/* 여러 청첩장의 멤버이면 전환 */}
-          {myFiles.length > 1 && (
-            <select value={filename} className="w-full px-2.5 py-2 text-[11px] border border-gray-200 rounded-lg bg-white"
-              onChange={async e => {
-                const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: e.target.value }) });
-                if (r.ok) location.reload();
-              }}>
-              {myFiles.map(f => <option key={f.file} value={f.file}>{f.file}</option>)}
-            </select>
-          )}
-
-          {/* 함께 편집하는 사람 (소유자·관리자만) */}
-          {filename && (role === "admin" || memberRole === "owner") && <MembersCard file={filename} admin={role === "admin"} />}
+          {switcher}
+          {membersCard}
 
           {/* 내 청첩장 QR / 공유 */}
           {filename && <ShareLinkCard template={data.template} filename={filename} />}
@@ -260,6 +263,9 @@ export default function SetupForm() {
           )}
 
           <AdminForm schema={schema} data={data} onChange={handleChange} errors={errors} />
+
+          {/* 모바일 전용: 전환 / 멤버 */}
+          <div className="lg:hidden space-y-3">{switcher}{membersCard}</div>
 
           {/* 모바일 전용: QR / 공유 */}
           {filename && (

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { addMember, can, INVITABLE, listMembers, removeMember } from "@/lib/access";
-import { customerExists } from "@/lib/customers";
+import { customerExists, getLabel, getShareId, getTemplate } from "@/lib/customers";
+import { sendMail, siteUrl } from "@/lib/mailer";
 import { isValidClientFilename, isValidLoginEmail } from "@/lib/newClient";
 
 // 청첩장 멤버(함께 편집하는 사람) 관리 — 소유자·관리자만. 고객은 자기가 편집 중인 청첩장, 관리자는 ?file= 지정.
@@ -31,9 +32,23 @@ export async function POST(req: NextRequest) {
   if (!isValidLoginEmail(email) || !INVITABLE.includes(role)) {
     return NextResponse.json({ error: "올바른 이메일/역할이 아닙니다" }, { status: 400 });
   }
-  return addMember(t.file!, email, role) === "full"
-    ? NextResponse.json({ error: "멤버가 너무 많습니다" }, { status: 400 })
-    : NextResponse.json({ ok: true });
+  if (addMember(t.file!, email, role) === "full") return NextResponse.json({ error: "멤버가 너무 많습니다" }, { status: 400 });
+
+  // 초대 메일 (이미 멤버여도 다시 보낼 수 있다). 실패해도 멤버 등록은 유지하고 mailed:false로 알린다.
+  const base = siteUrl(req);
+  const login = `${base}/admin/login?email=${encodeURIComponent(email)}`;
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`); // 이름은 고객이 입력한 값
+  const inviter = esc((await getSession(req))?.email ?? "관리자");
+  const label = esc(getLabel(t.file!) || "청첩장");
+  const preview = `${base}/invite/${getTemplate(t.file!)}?id=${getShareId(t.file!)}`;
+  const mailed = await sendMail(
+    email,
+    `[Momentree] ${inviter} 님이 '${label}' 청첩장 공동 편집에 초대했어요`,
+    `<p><b>${inviter}</b> 님이 <b>${label}</b> 청첩장을 함께 편집하도록 초대했어요.</p>
+     <p><a href="${login}" style="display:inline-block;padding:10px 18px;background:#1f2937;color:#fff;border-radius:8px;text-decoration:none">초대 수락하고 편집하기</a></p>
+     <p style="color:#666;font-size:13px">버튼을 누르고 이 이메일(${email})로 인증 코드를 받아 로그인하면 바로 편집 화면이 열립니다.<br>청첩장 미리보기: <a href="${preview}">${preview}</a></p>`
+  );
+  return NextResponse.json({ ok: true, mailed, loginUrl: login });
 }
 
 // DELETE ?email=&file=
