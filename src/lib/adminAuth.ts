@@ -39,7 +39,12 @@ export function generateOtpCode(): string {
   return String(arr[0] % 1_000_000).padStart(6, "0");
 }
 
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7일
+// 7일. me 호출 때 남은 기간이 절반 아래면 연장된다 (계속 쓰는 사람은 로그인이 풀리지 않음).
+export const sessionTtlMs = () => 7 * 24 * 60 * 60 * 1000;
+
+export function sessionCookieOptions() {
+  return { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge: sessionTtlMs() / 1000 };
+}
 
 export type SessionRole = "admin" | "customer";
 
@@ -55,7 +60,7 @@ export async function createSessionToken(
   secret: string,
   identity: { role: SessionRole; file?: string; email?: string }
 ): Promise<string> {
-  const payload = JSON.stringify({ exp: Date.now() + SESSION_TTL_MS, ...identity });
+  const payload = JSON.stringify({ exp: Date.now() + sessionTtlMs(), ...identity });
   const payloadB64 = base64url(encoder.encode(payload));
   const sig = await hmac(payloadB64, secret);
   return `${payloadB64}.${sig}`;

@@ -27,10 +27,11 @@ export function can(session: SessionPayload | null, action: Action): boolean {
 }
 
 // 로그인 시 열 청첩장: 내가 소유한 것 우선, 없으면 초대받은 첫 번째, 그것도 없으면 null(신규 가입)
-export function filesOf(email: string): { file: string; role: string }[] {
+export function filesOf(email: string): { file: string; role: string; label: string }[] {
   return getDb()
-    .prepare("select file, role from customer_members where email = ? order by role = 'owner' desc, added_at")
-    .all(email) as { file: string; role: string }[];
+    .prepare(`select m.file, m.role, c.label from customer_members m join customers c on c.file = m.file
+              where m.email = ? order by m.role = 'owner' desc, m.added_at`)
+    .all(email) as { file: string; role: string; label: string }[];
 }
 
 export function listMembers(file: string): Member[] {

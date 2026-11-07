@@ -32,7 +32,6 @@ export default function SetupForm() {
   const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
   const isCustomer = role === "customer";
   const [memberRole, setMemberRole] = useState<string | null>(null);
-  const [myFiles, setMyFiles] = useState<{ file: string; role: string }[]>([]);
 
   const schema = getSchemaForTemplate(data.template);
   const errors = validateBySchema(schema, data);
@@ -52,7 +51,6 @@ export default function SetupForm() {
       if (me?.role === "customer" && me.file) {
         setRole("customer");
         setMemberRole(me.memberRole);
-        setMyFiles(me.files ?? []);
         loadFile(me.file);
       } else {
         setRole("admin");
@@ -102,15 +100,6 @@ export default function SetupForm() {
     router.push("/admin/templates");
   };
 
-  const switcher = myFiles.length > 1 && (
-            <select value={filename} className="w-full px-2.5 py-2 text-[11px] border border-gray-200 rounded-lg bg-white"
-              onChange={async e => {
-                const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: e.target.value }) });
-                if (r.ok) location.reload();
-              }}>
-              {myFiles.map(f => <option key={f.file} value={f.file}>{f.file}</option>)}
-            </select>
-          );
   const membersCard = filename && (role === "admin" || memberRole === "owner") && <MembersCard file={filename} admin={role === "admin"} />;
 
   return (
@@ -200,7 +189,6 @@ export default function SetupForm() {
             </div>
           )}
 
-          {switcher}
           {membersCard}
 
           {/* 내 청첩장 QR / 공유 */}
@@ -265,7 +253,7 @@ export default function SetupForm() {
           <AdminForm schema={schema} data={data} onChange={handleChange} errors={errors} />
 
           {/* 모바일 전용: 전환 / 멤버 */}
-          <div className="lg:hidden space-y-3">{switcher}{membersCard}</div>
+          <div className="lg:hidden space-y-3">{membersCard}</div>
 
           {/* 모바일 전용: QR / 공유 */}
           {filename && (

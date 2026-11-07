@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/adminAuth";
+import { ADMIN_SESSION_COOKIE, createSessionToken, sessionCookieOptions } from "@/lib/adminAuth";
 import { memberRole } from "@/lib/access";
 import { getSession } from "@/lib/session";
 
@@ -12,8 +12,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(ADMIN_SESSION_COOKIE, await createSessionToken(secret, { role: "customer", file, email: session.email }), {
-    httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 7,
-  });
+  res.cookies.set(ADMIN_SESSION_COOKIE, await createSessionToken(secret, { role: "customer", file, email: session.email }), sessionCookieOptions());
   return res;
 }

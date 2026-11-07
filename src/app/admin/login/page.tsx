@@ -16,7 +16,11 @@ export default function AdminLoginPage() {
   useEffect(() => {
     const e = new URLSearchParams(location.search).get("email");
     if (e) { setEmail(e.trim()); setInvited(true); }
-  }, []);
+    // 이미 로그인한 상태에서 초대 링크를 눌렀다면 (같은 이메일이면) 바로 편집 화면으로
+    fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(me => {
+      if (me && (!e || me.email?.toLowerCase() === e.trim().toLowerCase())) router.replace(me.role === "customer" ? "/admin/setup" : "/admin");
+    }).catch(() => {});
+  }, [router]);
 
   const requestCode = async () => {
     if (!email) {

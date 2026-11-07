@@ -32,7 +32,7 @@ test("멤버: 대소문자 무시, 소유자는 제거 불가, 편집자 권한�
   a.addMember("o@x.com", "Ed@X.com", "editor");
   assert.equal(a.memberRole("o@x.com", "ed@x.com"), "editor");
   assert.equal(a.removeMember("o@x.com", "o@x.com"), false);
-  assert.deepEqual(a.filesOf("ed@x.com"), [{ file: "o@x.com", role: "editor" }]);
+  assert.deepEqual(a.filesOf("ed@x.com").map(({ file, role }) => ({ file, role })), [{ file: "o@x.com", role: "editor" }]);
   const s = (memberRole: string) => ({ exp: 1, role: "customer" as const, file: "o@x.com", memberRole });
   assert.equal(a.can(s("editor"), "edit"), true);
   assert.equal(a.can(s("editor"), "members"), false);

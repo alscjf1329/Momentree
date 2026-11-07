@@ -5,81 +5,74 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
+import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY } from "@/lib/newClient";
 
-const TEMPLATES = [
+const TEMPLATE_DEFS = [
   {
     id: "classic",
-    name: "클래식",
     mood: "다크 로맨틱",
     desc: "봉투 오프닝 스크롤 + 골드 포인트",
     bg: "linear-gradient(160deg,#1a1208 0%,#2a1e10 100%)",
   },
   {
     id: "editorial",
-    name: "에디토리얼",
     mood: "모던 매거진",
     desc: "다크 풀블리드 타이포그래피 + 필름스트립",
     bg: "linear-gradient(160deg,#0d0d0d 0%,#1a1a1a 100%)",
   },
   {
     id: "minimal",
-    name: "미니멀",
     mood: "클린 모던",
     desc: "화이트 히어로 + 2열 그리드 갤러리",
     bg: "linear-gradient(160deg,#ffffff 0%,#f4f4f4 100%)",
   },
   {
     id: "romantic",
-    name: "로맨틱",
     mood: "드리미 플로럴",
     desc: "보태니컬 SVG 데코 + 폴라로이드",
     bg: "linear-gradient(160deg,#fdf5f6 0%,#f0dde2 100%)",
   },
   {
     id: "twilight",
-    name: "트와이라잇",
     mood: "시네마틱 다크",
     desc: "별빛 + 블루퍼플 무드 + 무디 갤러리",
     bg: "linear-gradient(160deg,#080a14 0%,#0e1230 100%)",
   },
   {
     id: "blossom",
-    name: "블로섬",
     mood: "봄 벚꽃",
     desc: "떨어지는 꽃잎 + 플로럴 라인아트",
     bg: "linear-gradient(160deg,#fdf0f4 0%,#f8e4ec 100%)",
   },
   {
     id: "modern",
-    name: "모던",
     mood: "인스타 감성",
     desc: "웜톤 풀블리드 + 인스타그램 갤러리 그리드",
     bg: "linear-gradient(160deg,#f5efe7 0%,#e8d8c8 100%)",
   },
   {
     id: "luxury",
-    name: "럭셔리",
     mood: "프리미엄 네이비",
     desc: "딥 네이비 + 골드 코너 프레임 + 샴페인",
     bg: "linear-gradient(160deg,#070d1a 0%,#0e1628 100%)",
   },
   {
     id: "garden",
-    name: "가든",
     mood: "풀 + 화이트",
     desc: "풀숲 풀블리드 히어로 + 캘리그래피 + 화이트 그리드 갤러리",
     bg: "linear-gradient(160deg,#eaf0e4 0%,#d6e2cc 100%)",
   },
   {
     id: "mono",
-    name: "모노",
     mood: "블랙 + 화이트",
     desc: "흑백 그레이스케일 풀블리드 히어로 + 미니멀 타이포그래피",
     bg: "linear-gradient(160deg,#ffffff 0%,#d9d9d9 100%)",
   },
 ];
+
+const TEMPLATES = TEMPLATE_DEFS.map(t => ({ ...t, name: TEMPLATE_NAMES[t.id] }));
 
 function TemplatePreview({ id }: { id: string }) {
   if (id === "classic") return (
@@ -234,6 +227,8 @@ export default function TemplateList() {
   const dir = useClientDirectory();
   const [selecting, setSelecting] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [showAll, setShowAll] = useState(false);
+  const [current, setCurrent] = useState(""); // 지금 쓰는 템플릿
   const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
   const isCustomer = role === "customer";
 
@@ -253,6 +248,15 @@ export default function TemplateList() {
   }, [role]);
 
   const active = !!selectedFile;
+
+  useEffect(() => {
+    if (!selectedFile) { setCurrent(""); return; }
+    fetch(`/api/clients?file=${selectedFile}`).then(r => r.ok ? r.json() : null).then(d => setCurrent(d?.template ?? "")).catch(() => {});
+  }, [selectedFile]);
+
+  // 쓰는 것 + 추천 3종을 먼저, 나머지는 "더 보기" 뒤로
+  const featured = TEMPLATES.filter(t => t.id === current || RECOMMENDED_TEMPLATES.includes(t.id));
+  const visible = showAll ? [...featured, ...TEMPLATES.filter(t => !featured.includes(t))] : featured;
 
   // 템플릿 카드를 고르면: 기존 고객이면 template 필드만 바꿔 저장, 신규면 고객을 새로 만들고
   // 저장한 뒤 변수 입력(/admin/setup)으로 이동. 나머지 값은 그대로 유지되므로
@@ -420,7 +424,7 @@ export default function TemplateList() {
 
           {/* 템플릿 그리드 */}
           <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-            {TEMPLATES.map(t => (
+            {visible.map(t => (
               <div key={t.id}
                 className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all group">
                 {/* 프리뷰 */}
@@ -441,7 +445,7 @@ export default function TemplateList() {
                 {/* 카드 정보 */}
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-sm text-gray-800">{t.name}</p>
+                    <p className="font-semibold text-sm text-gray-800">{t.name}{t.id === current && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle">사용 중</span>}</p>
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{t.mood}</span>
                   </div>
                   <p className="text-[10px] text-gray-400 mb-3 leading-relaxed">{t.desc}</p>
@@ -456,6 +460,13 @@ export default function TemplateList() {
               </div>
             ))}
           </div>
+
+          {!showAll && TEMPLATES.length > visible.length && (
+            <button onClick={() => setShowAll(true)}
+              className="mt-4 w-full py-3 text-xs text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">
+              다른 템플릿 {TEMPLATES.length - visible.length}종 더 보기
+            </button>
+          )}
 
           {/* 모바일 공유 링크 */}
           {active && (

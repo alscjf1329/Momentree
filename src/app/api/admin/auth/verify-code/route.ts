@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/adminAuth";
+import { ADMIN_SESSION_COOKIE, createSessionToken, sessionCookieOptions } from "@/lib/adminAuth";
 import { verifyOtp } from "@/lib/adminOtp";
 import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
 import { customerExists, saveCustomer } from "@/lib/customers";
@@ -41,12 +41,6 @@ export async function POST(req: NextRequest) {
 
   const token = await createSessionToken(secret, { role: result.role, file: result.file, email });
   const res = NextResponse.json({ ok: true, role: result.role });
-  res.cookies.set(ADMIN_SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  res.cookies.set(ADMIN_SESSION_COOKIE, token, sessionCookieOptions());
   return res;
 }

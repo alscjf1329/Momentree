@@ -14,6 +14,7 @@ export interface CustomerSummary {
   label: string;
   owner: string; // 가입 이메일 (관리자가 만든 고객은 빈 문자열)
   weddingDate: string;
+  template: string;
   updatedAt: string;
 }
 
@@ -89,12 +90,12 @@ export function listCustomers(query = ""): CustomerSummary[] {
   const q = `%${query.trim().replace(/[\\%_]/g, "\\$&")}%`;
   const rows = getDb()
     .prepare(
-      `select file, email, label, wedding_date, updated_at from customers
+      `select file, email, label, wedding_date, template, updated_at from customers
        where @q = '%%' or file like @q escape '\\' or email like @q escape '\\' or label like @q escape '\\' or wedding_date like @q escape '\\'
        order by updated_at desc`
     )
-    .all({ q }) as Pick<Row, "file" | "email" | "label" | "wedding_date" | "updated_at">[];
-  return rows.map((r) => ({ file: r.file, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, updatedAt: r.updated_at }));
+    .all({ q }) as Pick<Row, "file" | "email" | "label" | "wedding_date" | "template" | "updated_at">[];
+  return rows.map((r) => ({ file: r.file, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at }));
 }
 
 export function getLabel(file: string): string {

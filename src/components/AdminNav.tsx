@@ -17,6 +17,7 @@ interface Me {
   superAdmin: boolean;
   label: string | null;
   memberRole: string | null;
+  files: { file: string; role: string; label: string }[];
 }
 
 function NavInner() {
@@ -69,8 +70,22 @@ function NavInner() {
         ))}
       </nav>
 
+      {/* 여러 청첩장의 멤버이면 어디서든 전환 (내 청첩장 + 초대받은 청첩장) */}
+      {isCustomer && me && me.files.length > 1 && (
+        <select value={me.file ?? ""} aria-label="청첩장 선택"
+          className="shrink-0 max-w-[150px] sm:max-w-[240px] text-[11px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-600"
+          onChange={async e => {
+            const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: e.target.value }) });
+            if (r.ok) location.href = "/admin/setup";
+          }}>
+          {me.files.map(f => (
+            <option key={f.file} value={f.file}>{f.label || f.file} · {f.role === "owner" ? "내 청첩장" : "함께 편집"}</option>
+          ))}
+        </select>
+      )}
+
       {/* 로그인 이메일 / 현재 선택된 파일 */}
-      {isCustomer ? (
+      {isCustomer && me && me.files.length > 1 ? null : isCustomer ? (
         me?.email && (
           <span className="text-[11px] text-gray-400 max-w-[220px] truncate hidden sm:block" title={me.email}>
             {me.memberRole === "editor" ? `${me.label || "청첩장"} · 함께 편집 중` : me.email}
