@@ -255,7 +255,7 @@ export default function TemplateList() {
   }, [selectedFile]);
 
   // 쓰는 것 + 추천 3종을 먼저, 나머지는 "더 보기" 뒤로
-  const featured = TEMPLATES.filter(t => t.id === current || RECOMMENDED_TEMPLATES.includes(t.id));
+  const featured = [...TEMPLATES.filter(t => t.id === current), ...TEMPLATES.filter(t => t.id !== current && RECOMMENDED_TEMPLATES.includes(t.id))]; // 쓰는 것이 맨 앞
   const visible = showAll ? [...featured, ...TEMPLATES.filter(t => !featured.includes(t))] : featured;
 
   // 템플릿 카드를 고르면: 기존 고객이면 template 필드만 바꿔 저장, 신규면 고객을 새로 만들고
@@ -300,7 +300,7 @@ export default function TemplateList() {
             <h1 className="text-sm font-semibold text-gray-700">템플릿 선택</h1>
             <p className="text-[10px] text-gray-400 hidden sm:block">
               {active
-                ? `"${selectedFile}" 고객의 템플릿을 바꿉니다 — 이미 입력한 정보는 유지됩니다`
+                ? (isCustomer ? "청첩장 템플릿을 바꿉니다 — 이미 입력한 정보는 그대로 유지돼요" : `"${selectedFile}" 고객의 템플릿을 바꿉니다 — 이미 입력한 정보는 유지됩니다`)
                 : isCustomer
                 ? "템플릿을 먼저 고르면 변수 입력 화면으로 이동합니다"
                 : "템플릿을 먼저 고르면 변수 입력 화면으로 이동합니다 · 고객은 이메일 로그인만으로도 스스로 계정을 만들 수 있어요 — 여기서는 직접 대신 만들어줄 때만 사용하세요"}
@@ -445,16 +445,16 @@ export default function TemplateList() {
                 {/* 카드 정보 */}
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-sm text-gray-800">{t.name}{t.id === current && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle">사용 중</span>}</p>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{t.mood}</span>
+                    <p className="font-semibold text-sm text-gray-800">{t.name}{t.id === current && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle whitespace-nowrap">사용 중</span>}</p>
+                    <span className="hidden sm:inline text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 whitespace-nowrap">{t.mood}</span>
                   </div>
                   <p className="text-[10px] text-gray-400 mb-3 leading-relaxed">{t.desc}</p>
                   <button
                     onClick={() => selectTemplate(t.id)}
-                    disabled={selecting !== null}
+                    disabled={selecting !== null || t.id === current}
                     className="block w-full py-2 text-center text-xs rounded-xl font-medium transition-colors bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50"
                   >
-                    {selecting === t.id ? "저장 중…" : active ? "이 템플릿 선택" : "이 템플릿으로 시작하기"}
+                    {selecting === t.id ? "저장 중…" : t.id === current ? "지금 쓰는 템플릿" : active ? "이 템플릿 선택" : "이 템플릿으로 시작하기"}
                   </button>
                 </div>
               </div>

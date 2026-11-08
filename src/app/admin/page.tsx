@@ -173,8 +173,14 @@ export default function AdminPage() {
 
           {tab === "rsvp" && (
             rsvps.length === 0 ? (
-              <div className="bg-white rounded-xl p-12 text-center text-gray-400 border border-gray-100">
-                <p className="text-sm">아직 응답이 없습니다</p>
+              <div className="bg-white rounded-xl p-10 text-center text-gray-400 border border-gray-100">
+                <p className="text-sm text-gray-500">아직 응답이 없어요</p>
+                <p className="text-xs mt-1.5">청첩장 링크를 하객께 보내면 참석 응답이 여기에 모여요</p>
+                {me?.role === "customer" && (
+                  <a href="/admin/setup" className="inline-block mt-4 px-4 py-2 text-xs rounded-lg text-white" style={{ background: "var(--color-primary-dark, #1f2937)" }}>
+                    공유 링크·QR 보기
+                  </a>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
@@ -251,8 +257,9 @@ export default function AdminPage() {
 
           {tab === "guestbook" && (
             messages.length === 0 ? (
-              <div className="bg-white rounded-xl p-12 text-center text-gray-400 border border-gray-100">
-                <p className="text-sm">아직 축하 메시지가 없습니다</p>
+              <div className="bg-white rounded-xl p-10 text-center text-gray-400 border border-gray-100">
+                <p className="text-sm text-gray-500">아직 축하 메시지가 없어요</p>
+                <p className="text-xs mt-1.5">하객이 남긴 방명록 메시지가 여기에 표시돼요</p>
               </div>
             ) : (
               <div className="space-y-3">

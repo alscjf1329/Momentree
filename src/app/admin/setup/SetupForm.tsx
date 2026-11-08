@@ -108,7 +108,7 @@ export default function SetupForm() {
       <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-sm font-semibold text-gray-700 truncate">{isCustomer ? "내 정보 설정" : "고객 정보 설정"}</h1>
+            <h1 className="text-sm font-semibold text-gray-700 truncate">{isCustomer ? "청첩장 편집" : "고객 정보 설정"}</h1>
             {memberRole === "editor" && (
               <span className="text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full shrink-0">함께 편집 중</span>
             )}
@@ -189,8 +189,6 @@ export default function SetupForm() {
             </div>
           )}
 
-          {membersCard}
-
           {/* 내 청첩장 QR / 공유 */}
           {filename && <ShareLinkCard template={data.template} filename={filename} />}
 
@@ -211,6 +209,7 @@ export default function SetupForm() {
               </div>
             </div>
           )}
+          {membersCard}
         </aside>
 
         {/* ── 가운데 폼 ── */}
