@@ -62,7 +62,7 @@ export default function AdminsManager() {
 
   if (!me.superAdmin) {
     return (
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-16 text-center text-sm text-gray-400">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-16 text-center text-sm text-sub">
         최상위 운영자만 접근할 수 있습니다
       </div>
     );
@@ -71,15 +71,15 @@ export default function AdminsManager() {
   return (
     <div className="max-w-xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <div className="mb-5">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-800">관리자 관리</h1>
-        <p className="text-xs text-gray-400 mt-0.5">
+        <h1 className="text-lg sm:text-xl font-semibold text-ink">관리자 관리</h1>
+        <p className="text-xs text-sub mt-0.5">
           추가된 이메일은 최상위 운영자와 동일하게 모든 고객을 관리할 수 있습니다
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4">
-        <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-2">최상위 운영자</p>
-        <p className="text-sm text-gray-700 font-mono">{superAdminEmail}</p>
+      <div className="bg-white rounded-xl border border-line p-4 mb-4">
+        <p className="text-[10px] font-semibold text-sub tracking-widest uppercase mb-2">최상위 운영자</p>
+        <p className="text-sm text-ink font-mono">{superAdminEmail}</p>
       </div>
 
       <form onSubmit={handleAdd} className="flex gap-2 mb-4">
@@ -89,28 +89,28 @@ export default function AdminsManager() {
           onChange={e => setEmail(e.target.value)}
           placeholder="추가할 관리자 이메일"
           required
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          className="flex-1 border border-[#d4d4d4] rounded-lg px-3 py-2 text-sm outline-none focus:border-ink"
         />
         <button
           type="submit"
           disabled={!email || loading}
-          className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm disabled:opacity-40"
+          className="px-4 py-2 rounded-lg bg-ink text-white text-sm disabled:opacity-40"
         >
           추가
         </button>
       </form>
-      {error && <p className="text-xs text-red-500 mb-4">{error}</p>}
+      {error && <p className="text-xs text-[#b42318] mb-4">{error}</p>}
 
       <div className="space-y-2">
         {admins.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">추가된 관리자가 없습니다</p>
+          <p className="text-sm text-sub text-center py-8">추가된 관리자가 없습니다</p>
         ) : (
           admins.map(a => (
-            <div key={a} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
-              <span className="text-sm text-gray-700 font-mono">{a}</span>
+            <div key={a} className="flex items-center justify-between bg-white rounded-xl border border-line px-4 py-3">
+              <span className="text-sm text-ink font-mono">{a}</span>
               <button
                 onClick={() => handleRemove(a)}
-                className="text-xs text-red-400 hover:text-red-600"
+                className="text-xs text-[#b42318] hover:text-red-600"
               >
                 삭제
               </button>

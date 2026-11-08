@@ -56,7 +56,7 @@ export default function PreviewPane({ template, data }: { template: string; data
     <>
       {/* 넓은 화면: 오른쪽 고정 패널 */}
       <div className="sticky top-[104px] hidden xl:block">
-        <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-2">실시간 미리보기</p>
+        <p className="text-[10px] font-semibold text-sub tracking-widest uppercase mb-2">실시간 미리보기</p>
         <div className="rounded-[32px] border-8 border-gray-800 overflow-hidden shadow-xl bg-white" style={{ width: 380, height: 720 }}>
           <PreviewFrame template={template} data={data} />
         </div>
@@ -71,8 +71,8 @@ export default function PreviewPane({ template, data }: { template: string; data
       {open && (
         <div className="xl:hidden fixed inset-0 z-50 bg-black/60 flex flex-col" role="dialog" aria-label="청첩장 미리보기">
           <div className="flex items-center justify-between px-4 h-12 bg-white shrink-0">
-            <span className="text-sm font-semibold text-gray-700">미리보기</span>
-            <button onClick={() => setOpen(false)} className="text-sm px-3 py-1.5 text-gray-600">닫기 ✕</button>
+            <span className="text-sm font-semibold text-ink">미리보기</span>
+            <button onClick={() => setOpen(false)} className="text-sm px-3 py-1.5 text-ink">닫기 ✕</button>
           </div>
           <div className="flex-1 bg-white min-h-0">
             <PreviewFrame template={template} data={data} />

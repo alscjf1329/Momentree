@@ -4,7 +4,7 @@ import type { FieldComponentProps } from "./types";
 
 export default function BooleanField({ field, path, value, onChange }: FieldComponentProps) {
   return (
-    <label className="flex items-center gap-2 text-sm text-gray-700 select-none">
+    <label className="flex items-center gap-2 text-sm text-ink select-none">
       <input
         type="checkbox"
         checked={!!value}

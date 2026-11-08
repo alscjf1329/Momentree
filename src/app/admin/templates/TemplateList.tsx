@@ -292,13 +292,13 @@ export default function TemplateList() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="bg-white min-h-[calc(100dvh-56px)]">
       {/* 액션바 */}
-      <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
+      <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b border-line">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-sm font-semibold text-gray-700">템플릿 선택</h1>
-            <p className="text-[10px] text-gray-400 hidden sm:block">
+            <h1 className="text-[17px] font-bold">템플릿</h1>
+            <p className="text-xs text-sub hidden sm:block">
               {active
                 ? (isCustomer ? "청첩장 템플릿을 바꿉니다 — 이미 입력한 정보는 그대로 유지돼요" : `"${selectedFile}" 고객의 템플릿을 바꿉니다 — 이미 입력한 정보는 유지됩니다`)
                 : isCustomer
@@ -308,7 +308,7 @@ export default function TemplateList() {
           </div>
           {role === "admin" && (
             <button onClick={() => setSelectedFile("")}
-              className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white shrink-0">
+              className="text-xs px-3 py-1.5 border border-[#d4d4d4] text-ink rounded-lg hover:bg-soft bg-white shrink-0">
               + 새 고객
             </button>
           )}
@@ -322,25 +322,25 @@ export default function TemplateList() {
 
           {/* 고객 선택 */}
           {role === "admin" && (
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
-              <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">고객 선택</p>
+          <div className="bg-white rounded-2xl border border-line overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-line bg-soft">
+              <p className="text-[10px] font-semibold text-sub tracking-widest uppercase">고객 선택</p>
             </div>
             <div className="p-3 space-y-2">
               <input
-                className="w-full px-2.5 py-2 text-[11px] font-mono border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white"
+                className="w-full px-2.5 py-2 text-[11px] font-mono border border-[#d4d4d4] rounded-lg outline-none focus:border-ink bg-white"
                 placeholder="파일명 직접 입력"
                 value={selectedFile}
                 onChange={e => setSelectedFile(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
               />
               {dir.total > 0 && (
                 <div className="space-y-0.5 max-h-48 overflow-y-auto">
-                  <input className="w-full mb-1 px-3 py-1.5 text-[11px] border border-gray-200 rounded-lg"
+                  <input className="w-full mb-1 px-3 py-1.5 text-[11px] border border-[#d4d4d4] rounded-lg"
                     placeholder="이름·이메일·파일명 검색" value={dir.q} onChange={e => dir.setQ(e.target.value)} />
                   {dir.clients.map(c => (
                     <button key={c.file} onClick={() => setSelectedFile(c.file)} title={c.file}
                       className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${
-                        selectedFile === c.file ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-50"
+                        selectedFile === c.file ? "bg-ink text-white" : "text-ink hover:bg-soft"
                       }`}>
                       {dir.display(c)}
                     </button>
@@ -353,16 +353,16 @@ export default function TemplateList() {
 
           {/* 공유 링크 */}
           {active && (
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
-                <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">공유 링크</p>
+            <div className="bg-white rounded-2xl border border-line overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-line bg-soft">
+                <p className="text-[10px] font-semibold text-sub tracking-widest uppercase">공유 링크</p>
               </div>
               <div className="p-3 space-y-1">
                 {TEMPLATES.map(t => (
                   <a key={t.id} href={`/invite/${t.id}?${inviteQuery}`} target="_blank"
-                    className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 group">
-                    <span className="text-[11px] text-gray-500">{t.name}</span>
-                    <span className="text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
+                    className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-soft group">
+                    <span className="text-[11px] text-sub">{t.name}</span>
+                    <span className="text-[10px] text-ink opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                   </a>
                 ))}
               </div>
@@ -372,9 +372,9 @@ export default function TemplateList() {
           {/* 설정으로 이동 */}
           {active && (
             <Link href={`/admin/setup?file=${selectedFile}`}
-              className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-gray-100 text-xs text-gray-600 hover:bg-gray-50 group">
+              className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-line text-xs text-ink hover:bg-soft group">
               <span>데이터 편집</span>
-              <span className="text-gray-300 group-hover:text-gray-500">→</span>
+              <span className="text-sub group-hover:text-sub">→</span>
             </Link>
           )}
         </aside>
@@ -384,18 +384,18 @@ export default function TemplateList() {
 
           {/* 모바일 고객 선택 */}
           {role === "admin" && (
-          <div className="lg:hidden mb-4 bg-white rounded-2xl border border-gray-100 p-4">
-            <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">고객 선택</p>
+          <div className="lg:hidden mb-4 bg-white rounded-2xl border border-line p-4">
+            <p className="text-[10px] font-semibold text-sub tracking-widest uppercase mb-3">고객 선택</p>
             <div className="flex gap-2 mb-2">
               <input
-                className="flex-1 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg outline-none focus:border-blue-400"
+                className="flex-1 px-3 py-2 text-xs font-mono border border-[#d4d4d4] rounded-lg outline-none focus:border-ink"
                 placeholder="파일명 입력 (예: kim-minjun)"
                 value={selectedFile}
                 onChange={e => setSelectedFile(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
               />
               {active && (
                 <Link href={`/admin/setup?file=${selectedFile}`}
-                  className="px-3 py-2 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 whitespace-nowrap">
+                  className="px-3 py-2 text-xs bg-[#f2f2f2] text-ink rounded-lg hover:bg-gray-200 whitespace-nowrap">
                   편집
                 </Link>
               )}
@@ -405,7 +405,7 @@ export default function TemplateList() {
                 {dir.clients.map(c => (
                   <button key={c.file} onClick={() => setSelectedFile(c.file)} title={c.file}
                     className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
-                      selectedFile === c.file ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600"
+                      selectedFile === c.file ? "bg-ink text-white border-ink" : "border-[#d4d4d4] text-ink"
                     }`}>
                     {dir.display(c)}
                   </button>
@@ -413,22 +413,22 @@ export default function TemplateList() {
               </div>
             )}
             {!active && (
-              <p className="text-[10px] text-amber-500 mt-2">고객을 선택해야 미리보기 링크가 활성화됩니다</p>
+              <p className="text-[10px] text-[#8a4b00] mt-2">고객을 선택해야 미리보기 링크가 활성화됩니다</p>
             )}
           </div>
           )}
 
           {error && (
-            <p className="text-xs text-red-500 mb-3">{error}</p>
+            <p className="text-xs text-[#b42318] mb-3">{error}</p>
           )}
 
           {/* 템플릿 그리드 */}
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {visible.map(t => (
               <div key={t.id}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all group">
+                className="bg-white rounded-[18px] border border-line overflow-hidden transition-all group">
                 {/* 프리뷰 */}
-                <div className="relative" style={{ height: "clamp(160px,22vw,260px)" }}>
+                <div className="relative aspect-[4/5]">
                   <TemplatePreview id={t.id} />
                   {/* 호버 오버레이 */}
                   {active && (
@@ -443,16 +443,16 @@ export default function TemplateList() {
                 </div>
 
                 {/* 카드 정보 */}
-                <div className="p-4">
+                <div className="p-3.5">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-sm text-gray-800">{t.name}{t.id === current && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle whitespace-nowrap">사용 중</span>}</p>
-                    <span className="hidden sm:inline text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 whitespace-nowrap">{t.mood}</span>
+                    <p className="font-semibold text-sm text-ink">{t.name}{t.id === current && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle whitespace-nowrap">사용 중</span>}</p>
+                    <span className="hidden sm:inline text-[9px] px-2 py-0.5 rounded-full bg-[#f2f2f2] text-sub whitespace-nowrap">{t.mood}</span>
                   </div>
-                  <p className="text-[10px] text-gray-400 mb-3 leading-relaxed">{t.desc}</p>
+                  <p className="text-[10px] text-sub mb-3 leading-relaxed">{t.desc}</p>
                   <button
                     onClick={() => selectTemplate(t.id)}
                     disabled={selecting !== null || t.id === current}
-                    className="block w-full py-2 text-center text-xs rounded-xl font-medium transition-colors bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50"
+                    className="block w-full h-11 text-center text-sm rounded-full font-bold transition-colors bg-ink text-white hover:opacity-90 disabled:opacity-40"
                   >
                     {selecting === t.id ? "저장 중…" : t.id === current ? "지금 쓰는 템플릿" : active ? "이 템플릿 선택" : "이 템플릿으로 시작하기"}
                   </button>
@@ -463,23 +463,23 @@ export default function TemplateList() {
 
           {!showAll && TEMPLATES.length > visible.length && (
             <button onClick={() => setShowAll(true)}
-              className="mt-4 w-full py-3 text-xs text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">
+              className="mt-4 w-full h-12 text-sm font-medium text-ink bg-white border border-[#d4d4d4] rounded-full">
               다른 템플릿 {TEMPLATES.length - visible.length}종 더 보기
             </button>
           )}
 
           {/* 모바일 공유 링크 */}
           {active && (
-            <div className="lg:hidden mt-4 bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="px-5 py-3 border-b border-gray-50 bg-gray-50/60">
-                <p className="text-xs font-semibold text-gray-500 tracking-widest uppercase">공유 링크</p>
+            <div className="lg:hidden mt-4 bg-white rounded-2xl border border-line overflow-hidden">
+              <div className="px-5 py-3 border-b border-line bg-soft">
+                <p className="text-xs font-semibold text-sub tracking-widest uppercase">공유 링크</p>
               </div>
               <div className="p-4 space-y-2">
                 {TEMPLATES.map(t => (
                   <div key={t.id} className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500">{t.name}</span>
+                    <span className="text-sub">{t.name}</span>
                     <a href={`/invite/${t.id}?${inviteQuery}`} target="_blank"
-                      className="text-blue-500 hover:underline font-mono text-[10px]">
+                      className="text-ink underline hover:underline font-mono text-[10px]">
                       /invite/{t.id}?{inviteQuery}
                     </a>
                   </div>
