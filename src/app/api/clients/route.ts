@@ -3,7 +3,7 @@ import type { WeddingData } from "@/types";
 import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
-import { deleteCustomer, getCustomer, listCustomers, saveCustomer } from "@/lib/customers";
+import { deleteCustomer, getCustomer, listCustomers, newCustomerFile, saveCustomer } from "@/lib/customers";
 
 // GET /api/clients               → 파일 목록 (customer는 자기 파일만)
 // GET /api/clients?detail=1      → 목록 + 표시 이름·소유자·예식일·수정일 (검색: &q=이메일/이름/예식일)
@@ -33,15 +33,22 @@ export async function POST(req: NextRequest) {
   if (!can(session, "edit")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const body = await req.json();
-  const filename = session.role === "customer" ? session.file : body.filename;
+  // 운영자가 filename 없이 보내면 새 고객 — 서버가 c-YYYYMM-난수 파일명을 발급해 돌려준다
+  const isNew = session.role === "admin" && !body.filename;
+  const filename = session.role === "customer" ? session.file : isNew ? newCustomerFile() : body.filename;
 
   if (!filename || !isValidClientFilename(filename)) {
     return NextResponse.json({ error: "invalid filename" }, { status: 400 });
   }
 
+  // 운영자가 지정한 파일명은 이미 있는 고객이어야 한다 (오타·덮어쓰기로 엉뚱한 고객이 생기지 않게)
+  if (session.role === "admin" && !isNew && !getCustomer(filename)) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
   // 소유자(멤버십)는 최초 로그인 때 만들어진다 — 여기선 내용만 저장
-  saveCustomer(filename, body.data as WeddingData);
-  return NextResponse.json({ ok: true });
+  saveCustomer(filename, isNew ? { ...(body.data as WeddingData), slug: filename } : (body.data as WeddingData));
+  return NextResponse.json({ ok: true, file: filename });
 }
 
 // DELETE /api/clients?file=x (admin 전용)

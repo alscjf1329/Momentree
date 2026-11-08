@@ -1,9 +1,9 @@
 import type { WeddingData } from "@/types";
 import { getDb } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
-import { addMember } from "@/lib/access";
+import { addMember, filesOf } from "@/lib/access";
 import { newShareId } from "@/lib/newShareId";
-import { DEFAULT_WEDDING_DATA as BLANK } from "@/lib/newClient";
+import { DEFAULT_WEDDING_DATA as BLANK, generateFilename } from "@/lib/newClient";
 
 // 고객(청첩장) 저장소 — 서버 전용.
 // 청첩장 데이터 전체를 JSON으로 만들어 통째로 암호화해 data_enc에 저장한다 (계좌번호 포함 모든 필드).
@@ -56,6 +56,20 @@ export function getCustomer(file: string): WeddingData | null {
 
 export function customerExists(file: string): boolean {
   return !!getDb().prepare("select 1 from customers where file = ?").get(file);
+}
+
+// 신규 고객 파일명 발급 — DB에 없는 값이 나올 때까지 재시도 (gen은 테스트용 주입)
+export function newCustomerFile(gen: () => string = generateFilename): string {
+  for (let i = 0; i < 20; i++) {
+    const f = gen();
+    if (!customerExists(f)) return f;
+  }
+  throw new Error("고객 파일명 발급 실패 (충돌 반복)");
+}
+
+// 이메일 → 로그인 시 열 파일: 멤버십 우선, 없으면 옛 방식(파일명=이메일) 고객, 그것도 없으면 null(신규)
+export function fileForEmail(email: string): string | null {
+  return filesOf(email)[0]?.file ?? (customerExists(email) ? email : null);
 }
 
 // 저장(없으면 생성). email은 새로 만들 때만 기록하고 그 사람을 소유자 멤버로 등록한다 (관리자가 대신 저장해도 소유자는 바뀌지 않음).

@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import type { WeddingData } from "@/types";
 import { getByPath, setByPath, validateBySchema, type FieldSchema } from "@/lib/schema";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
-import { DEFAULT_WEDDING_DATA, generateFilename, namesToSlug } from "@/lib/newClient";
+import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
 import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
@@ -84,7 +84,7 @@ export default function SetupForm() {
     } else {
       const last = localStorage.getItem(LS_KEY);
       if (last) loadFile(last);
-      else setFilename(generateFilename()); // Date.now() — 클라이언트 전용
+      // 새 고객이면 filename 은 비워 둔다 — 저장할 때 서버가 불변 ID를 발급한다
     }
   }, [fileParam, loadFile, role]);
 
@@ -104,16 +104,18 @@ export default function SetupForm() {
     const res = await fetch("/api/clients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename, data: { ...data, slug: filename } }),
+      body: JSON.stringify({ filename: filename || undefined, data: { ...data, slug: filename } }),
     });
     setSaving(false);
     if (res.ok) {
+      const file: string = (await res.json()).file ?? filename;
+      setFilename(file);
       setSaved(true);
-      localStorage.setItem(LS_KEY, filename);
+      localStorage.setItem(LS_KEY, file);
       dir.reload();
       setTimeout(() => setSaved(false), 2500);
       // 운영자가 새 파일을 만든 경우에만 URL에 반영
-      if (!isCustomer && fileParam !== filename) router.replace(`/admin/setup${q(view === "main" ? "" : `view=${view}`)}`);
+      if (!isCustomer && fileParam !== file) router.replace(`/admin/setup${q(view === "main" ? "" : `view=${view}`)}`);
     }
   };
 
@@ -161,13 +163,9 @@ export default function SetupForm() {
           <aside className="w-60 shrink-0 sticky top-[120px] hidden lg:flex flex-col gap-4">
             <div className="bg-white rounded-2xl border border-line overflow-hidden">
               <div className="px-4 py-3 border-b border-line bg-soft"><p className="text-xs font-bold text-sub">파일 관리</p></div>
-              <div className="p-3 space-y-2">
-                <input
-                  className="w-full px-3 h-11 text-[13px] font-mono border border-[#d4d4d4] rounded-xl outline-none focus:border-ink bg-white"
-                  placeholder="파일명 (영문·숫자·-)" value={filename}
-                  onChange={e => setFilename(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))} />
-                <button onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
-                  className="w-full h-10 text-[13px] bg-soft text-ink rounded-xl border border-line">이름으로 자동생성</button>
+              <div className="p-3">
+                <input readOnly value={filename} placeholder="저장하면 고객 ID가 발급돼요" aria-label="고객 파일 ID"
+                  className="w-full px-3 h-11 text-[13px] font-mono border border-line rounded-xl bg-soft text-sub" />
               </div>
             </div>
             {dir.total > 0 && (
@@ -184,13 +182,8 @@ export default function SetupForm() {
           {/* 운영자 모바일: 파일/고객 선택 */}
           {role === "admin" && (
             <div className="lg:hidden bg-soft rounded-2xl border border-line p-4 space-y-3">
-              <div className="flex gap-2">
-                <input className="flex-1 min-w-0 px-3 h-11 text-sm font-mono border border-[#d4d4d4] rounded-xl outline-none focus:border-ink bg-white"
-                  placeholder="파일명 자동생성됨" value={filename}
-                  onChange={e => setFilename(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))} />
-                <button onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
-                  className="px-3 h-11 text-sm bg-white border border-[#d4d4d4] rounded-xl whitespace-nowrap">자동생성</button>
-              </div>
+              <input readOnly value={filename} placeholder="저장하면 고객 ID가 발급돼요" aria-label="고객 파일 ID"
+                className="w-full px-3 h-11 text-sm font-mono border border-line rounded-xl bg-white text-sub" />
               {dir.total > 0 && <ClientSearch dir={dir} current={filename} onSelect={loadFile} />}
             </div>
           )}

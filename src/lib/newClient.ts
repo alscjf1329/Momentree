@@ -45,8 +45,13 @@ export function upcomingWeddingDate(now = new Date()): WeddingData["date"] {
   };
 }
 
-export function generateFilename(): string {
-  return `client-${Date.now().toString(36)}`;
+// 신규 고객 파일명: c-YYYYMM-난수6자(소문자+숫자). 이메일/이름과 무관하고 만든 뒤 바뀌지 않는다.
+// 서버는 customers.newCustomerFile()로 DB 유일성까지 확인해서 쓴다 (crypto는 브라우저·Node 공통).
+export function generateFilename(now = new Date()): string {
+  const A = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const r = crypto.getRandomValues(new Uint8Array(6));
+  const id = Array.from(r, (b) => A[b % A.length]).join(""); // 256%36 편향은 파일명 용도라 무시
+  return `c-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}-${id}`;
 }
 
 // 파일명으로 안전한지(경로 순회 문자 없는지) 확인 — 관리자 슬러그와 고객 이메일 파일명 공통 검증

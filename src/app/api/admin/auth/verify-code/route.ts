@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ADMIN_SESSION_COOKIE, createSessionToken, sessionCookieOptions } from "@/lib/adminAuth";
 import { verifyOtp } from "@/lib/adminOtp";
 import { DEFAULT_WEDDING_DATA, upcomingWeddingDate } from "@/lib/newClient";
-import { customerExists, saveCustomer } from "@/lib/customers";
+import { customerExists, fileForEmail, newCustomerFile, saveCustomer } from "@/lib/customers";
 import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -34,12 +34,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: ERROR_MESSAGES[result.status] }, { status });
   }
 
-  // 첫 로그인인 고객이면 계정이 아직 없으므로 기본 데이터로 자동 생성 (소유자 = 가입 이메일)
-  if (result.role === "customer" && result.file && !customerExists(result.file)) {
-    saveCustomer(result.file, { ...DEFAULT_WEDDING_DATA, slug: result.file, date: upcomingWeddingDate() }, result.file);
+  // 고객 파일은 이메일로 다시 조회(발급~검증 사이 초대 등 반영). 없으면 첫 로그인이므로 c-YYYYMM-난수 파일을 새로 만든다 (소유자 = 가입 이메일)
+  let file = result.file;
+  if (result.role === "customer") {
+    file = fileForEmail(email) ?? newCustomerFile();
+    if (!customerExists(file)) saveCustomer(file, { ...DEFAULT_WEDDING_DATA, slug: file, date: upcomingWeddingDate() }, email);
   }
 
-  const token = await createSessionToken(secret, { role: result.role, file: result.file, email });
+  const token = await createSessionToken(secret, { role: result.role, file, email });
   const res = NextResponse.json({ ok: true, role: result.role });
   res.cookies.set(ADMIN_SESSION_COOKIE, token, sessionCookieOptions());
   return res;

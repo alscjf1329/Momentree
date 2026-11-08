@@ -3,7 +3,7 @@ import { generateOtpCode, type SessionRole } from "@/lib/adminAuth";
 import { isOnCooldown, issueOtp, OTP_TTL_MS } from "@/lib/adminOtp";
 import { isValidLoginEmail } from "@/lib/newClient";
 import { isAdmin } from "@/lib/admins";
-import { filesOf } from "@/lib/access";
+import { fileForEmail } from "@/lib/customers";
 import { enqueueMail } from "@/lib/mailQueue";
 import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "올바른 이메일 형식이 아닙니다" }, { status: 400 });
     }
     role = "customer";
-    file = filesOf(email)[0]?.file ?? email; // 소유/초대받은 청첩장이 있으면 그것, 없으면 신규 가입
+    file = fileForEmail(email) ?? undefined; // 소유/초대받은 청첩장이 있으면 그것, 없으면 신규 가입(파일은 verify-code에서 발급)
   }
 
   if (await isOnCooldown(email)) {

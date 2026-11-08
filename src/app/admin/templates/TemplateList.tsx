@@ -7,7 +7,7 @@ import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
 import type { WeddingData } from "@/types";
-import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
+import { DEFAULT_WEDDING_DATA, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
 
 const TEMPLATE_DEFS = [
   {
@@ -272,7 +272,7 @@ export default function TemplateList() {
         const res = await fetch(`/api/clients?file=${encodeURIComponent(filename)}`);
         data = res.ok ? await res.json() : { ...DEFAULT_WEDDING_DATA };
       } else {
-        filename = generateFilename();
+        filename = ""; // 서버가 발급
         data = { ...DEFAULT_WEDDING_DATA, date: upcomingWeddingDate() };
       }
 
@@ -282,6 +282,7 @@ export default function TemplateList() {
         body: JSON.stringify({ filename, data: { ...data, template: templateId, slug: filename } }),
       });
       if (!res.ok) throw new Error("저장에 실패했습니다");
+      if (!filename) filename = (await res.json()).file as string;
 
       localStorage.setItem(LAST_FILE_KEY, filename);
       router.push(`/admin/setup?file=${encodeURIComponent(filename)}`);

@@ -137,3 +137,19 @@ test("없는 필드는 샘플(김민준·이서연)이 아니라 빈 값으로 �
   assert.equal(day.dayOfWeek, "토요일");
   assert.ok(new Date(day.iso).getTime() > new Date(2026, 10, 8).getTime() + 100 * 864e5);
 });
+
+test("운영자 저장: 파일명 없으면 서버가 c-ID 발급, 없는 파일명 지정은 404, 있는 파일은 갱신", async () => {
+  const admin: Sess = { role: "admin" };
+  const made = await route.POST(await req("POST", admin, { body: { data: wedding("가", "나") } }));
+  const { file } = await made.json();
+  assert.match(file, /^c-\d{6}-[a-z0-9]{6}$/);
+  assert.equal(store.getCustomer(file)!.slug, file);
+
+  const missing = await route.POST(await req("POST", admin, { body: { filename: "typo-file", data: wedding("다", "라") } }));
+  assert.equal(missing.status, 404);
+  assert.equal(store.getCustomer("typo-file"), null);
+
+  const upd = await route.POST(await req("POST", admin, { body: { filename: file, data: wedding("가", "마") } }));
+  assert.equal((await upd.json()).file, file);
+  assert.equal(raw(file).label, "가 ♥ 마");
+});
