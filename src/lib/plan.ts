@@ -6,7 +6,7 @@ export type Plan = "free" | "paid";
 // 가격 확정(19,900원, 1회 결제).
 export const PLAN_PRICE = 19900;
 
-// 유료 유지 기간: 예식일 + 3개월. 만료 처리는 아직 구현하지 않음.
+// 유료 유지 기간: 예식일 + 3개월. 지나면 getPlan이 무료로 계산한다(저장값은 그대로, 청첩장은 유지).
 // 하객 데이터 보관(retention.ts: 예식일 후 6개월 비공개·12개월 삭제)이 더 길어서 충돌하지 않는다.
 export const PAID_KEEP_MONTHS = 3;
 

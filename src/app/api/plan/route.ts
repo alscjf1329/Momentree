@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { isValidClientFilename } from "@/lib/newClient";
-import { getCustomer, getPlan, setPlan } from "@/lib/customers";
+import { getCustomer, getPlan, paidInfo, setPlan } from "@/lib/customers";
 import { countRsvp } from "@/lib/entries";
 import { photoLimit, rsvpLimit } from "@/lib/plan";
 
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   if (!file || !plan) return NextResponse.json({ error: "not found" }, { status: 404 });
   const lim = (n: number) => (Number.isFinite(n) ? n : null);
   return NextResponse.json({
-    plan, photos: getCustomer(file)?.gallery?.length ?? 0, photoLimit: lim(photoLimit(plan)),
+    plan, ...paidInfo(file), photos: getCustomer(file)?.gallery?.length ?? 0, photoLimit: lim(photoLimit(plan)),
     rsvp: countRsvp(file), rsvpLimit: lim(rsvpLimit(plan)),
   });
 }

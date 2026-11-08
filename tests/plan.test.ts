@@ -21,7 +21,7 @@ const call = async (method: string, route: string, session: Sess | null, body?: 
     headers: { "content-type": "application/json", ...(session ? { cookie: `${ADMIN_SESSION_COOKIE}=${await createSessionToken("test-secret", session)}` } : {}) },
   });
 const photos = (n: number) => Array.from({ length: n }, (_, i) => ({ src: `/p${i}.jpg`, alt: "" }));
-const wedding = (over: Partial<WeddingData> = {}): WeddingData => ({ ...WEDDING, template: "classic", gallery: photos(5), ...over });
+const wedding = (over: Partial<WeddingData> = {}): WeddingData => ({ ...WEDDING, date: { ...WEDDING.date, iso: "2999-01-01" }, template: "classic", gallery: photos(5), ...over }); // 예식일은 먼 미래(만료 방지)
 
 test("마이그레이션 v5: 기존 고객은 paid, 이후 신규는 free, 다시 돌려도 그대로", async () => {
   const { migrate } = await import("@/lib/db"); // 정적 import는 DATA_DIR 설정보다 먼저 평가돼 실제 data/를 건드린다
@@ -117,5 +117,28 @@ test("워터마크: 무료 고객 청첩장만 (공통부 한 곳)", async () =>
   assert.equal(store.getPlan("demo-classic"), null); // 데모(고객 아님)는 제한·워터마크 대상이 아니다
   const ctx = fs.readFileSync("src/context/WeddingContext.tsx", "utf8");
   assert.match(ctx, /watermark &&/); // 템플릿 10개가 아니라 Provider 한 곳에서 렌더
+});
+
+test("유료 만료: 예식일+3개월 직전/직후, 예식일 없음, 무료 무영향, 관리자 우회", async () => {
+  const store = await import("@/lib/customers");
+  const clients = await import("@/app/api/clients/route");
+  const mk = (f: string, date: string) => { store.saveCustomer(f, wedding({ date: { ...WEDDING.date, iso: date } }), f); return f; };
+  const D = (s: string) => new Date(s);
+  const paid = mk("exp@x.com", "2026-01-10");
+  store.setPlan(paid, "paid");
+  assert.equal(store.getPlan(paid, D("2026-04-09T23:59:59Z")), "paid"); // +3개월 직전
+  assert.equal(store.getPlan(paid, D("2026-04-10T00:00:00Z")), "free"); // 정각부터 만료
+  assert.deepEqual([store.paidInfo(paid, D("2026-05-01")).expired, store.paidInfo(paid, D("2026-03-01")).expired], [true, false]);
+  assert.ok(store.getCustomer(paid)); // 청첩장은 그대로
+  const none = mk("nodate@x.com", "");
+  store.setPlan(none, "paid");
+  assert.equal(store.getPlan(none, D("2099-01-01")), "paid"); // 예식일 없으면 만료 없음
+  assert.equal(store.getPlan(mk("fr@x.com", "2020-01-01"), D("2099-01-01")), "free");
+  // 서버 강제: 만료 고객은 유료 템플릿 거부, 관리자는 우회
+  const old = mk("old2@x.com", "2020-01-01");
+  store.setPlan(old, "paid");
+  const save = async (s: Sess) => (await clients.POST(await call("POST", "clients", s, { filename: old, data: wedding({ template: "luxury" }) }))).status;
+  assert.equal(await save({ role: "customer", file: old, email: old }), 403);
+  assert.equal(await save({ role: "admin", email: "a@x.com" }), 200);
 });
 

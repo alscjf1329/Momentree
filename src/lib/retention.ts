@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db";
 import { enqueueMail } from "@/lib/mailQueue";
+import { PAID_KEEP_MONTHS } from "@/lib/plan";
 
 // 하객 데이터(RSVP·방명록) 보관 정책 — 서버 전용.
 // 예식일 +6개월: 비공개(공개 조회 제외, 고객·편집자는 계속 열람) / +12개월: 행 완전 삭제 / 삭제 30일 전: 소유자에게 안내 메일 1회.
@@ -37,6 +38,12 @@ export function purgeAt(weddingDate: string | null | undefined): number | null {
 export function noticeAt(weddingDate: string | null | undefined): number | null {
   const p = purgeAt(weddingDate);
   return p === null ? null : p - NOTICE_DAYS * DAY;
+}
+
+// 유료 만료 시각(ms): 예식일 + PAID_KEEP_MONTHS. 예식일이 없으면 null(만료 없음).
+export function paidUntil(weddingDate: string | null | undefined): number | null {
+  const t = parse(weddingDate);
+  return t === null ? null : addMonths(t, PAID_KEEP_MONTHS);
 }
 
 // 공개 조회에서 숨길 파일인가 (고객이 아닌 데모 슬러그 등은 active)

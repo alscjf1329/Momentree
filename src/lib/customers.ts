@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
 import { addMember, filesOf } from "@/lib/access";
 import { planOf, type Plan } from "@/lib/plan";
+import { paidUntil } from "@/lib/retention";
 import { newShareId } from "@/lib/newShareId";
 import { DEFAULT_WEDDING_DATA as BLANK, generateFilename } from "@/lib/newClient";
 
@@ -119,7 +120,7 @@ export function listCustomers(query = ""): CustomerSummary[] {
        order by updated_at desc`
     )
     .all({ q }) as (Pick<Row, "file" | "email" | "share_id" | "label" | "wedding_date" | "template" | "updated_at"> & { plan: string })[];
-  return rows.map((r) => ({ file: r.file, shareId: r.share_id, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at, plan: planOf(r) }));
+  return rows.map((r) => ({ file: r.file, shareId: r.share_id, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at, plan: effectivePlan(r) }));
 }
 
 export function getLabel(file: string): string {
@@ -131,9 +132,21 @@ export function getTemplate(file: string): string {
 }
 
 // 고객이 없으면 null (데모 슬러그 등 — 제한 대상 아님)
-export function getPlan(file: string): Plan | null {
-  const row = getDb().prepare("select plan from customers where file = ?").get(file) as { plan: string } | undefined;
-  return row ? planOf(row) : null;
+// 유효 플랜: 저장값이 paid여도 예식일+3개월이 지나면 free (플랜을 읽는 모든 경로가 여기를 거친다)
+export function effectivePlan(row: { plan: string; wedding_date: string }, now: Date = new Date()): Plan {
+  const until = paidUntil(row.wedding_date);
+  return planOf(row) === "paid" && (until === null || now.getTime() < until) ? "paid" : "free";
+}
+export function getPlan(file: string, now: Date = new Date()): Plan | null {
+  const row = getDb().prepare("select plan, wedding_date from customers where file = ?").get(file) as { plan: string; wedding_date: string } | undefined;
+  return row ? effectivePlan(row, now) : null;
+}
+
+// 저장은 paid인데 유효 플랜이 free면 만료, 아니면 유료 만료 예정일(ms, 없으면 null)
+export function paidInfo(file: string, now: Date = new Date()): { expired: boolean; until: number | null } {
+  const row = getDb().prepare("select plan, wedding_date from customers where file = ?").get(file) as { plan: string; wedding_date: string } | undefined;
+  if (!row || planOf(row) !== "paid") return { expired: false, until: null };
+  return { expired: effectivePlan(row, now) === "free", until: paidUntil(row.wedding_date) };
 }
 
 export function setPlan(file: string, plan: Plan): boolean {
