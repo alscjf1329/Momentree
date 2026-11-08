@@ -34,7 +34,6 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
       setNotice("메일 발송에 실패했어요. 초대 링크를 복사했으니 직접 전달해 주세요");
     }
   };
-  const add = () => invite(email);
   const remove = async (m: Member) => {
     if (!confirm(`${m.email} 님을 제외할까요?`)) return;
     await fetch(`/api/members?email=${encodeURIComponent(m.email)}${admin ? `&file=${encodeURIComponent(file)}` : ""}`, { method: "DELETE" });
@@ -42,32 +41,51 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
-        <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">함께 편집</p>
-      </div>
-      <div className="p-3 space-y-2">
-        {members.map(m => (
-          <div key={m.email} className="flex items-center justify-between gap-2 text-[11px]">
-            <span className="truncate text-gray-600" title={m.email}>{m.email}</span>
-            <span className="shrink-0 text-gray-400">
-              {ROLE_LABEL[m.role] ?? m.role}
-              {m.role !== "owner" && <>
-                <button onClick={() => invite(m.email)} className="ml-2 text-blue-400 hover:underline">초대 재발송</button>
-                <button onClick={() => remove(m)} className="ml-2 text-red-400 hover:underline">제외</button>
-              </>}
+    <div className="flex flex-col gap-6">
+      <p className="text-sm leading-relaxed text-sub">같이 준비하는 분을 초대하면 이 청첩장을 함께 수정할 수 있어요.</p>
+
+      <ul>
+        {members.map((m, i) => (
+          <li key={m.email} className={`flex items-center gap-3 min-h-[68px] ${i > 0 ? "border-t border-line" : ""}`}>
+            <span className={`w-11 h-11 rounded-full flex items-center justify-center text-[15px] font-bold shrink-0 ${m.role === "owner" ? "bg-rose-soft text-rose" : "bg-[#f2f2f2]"}`}>
+              {m.email[0].toUpperCase()}
             </span>
-          </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[15px] font-bold truncate">{m.email}</p>
+              {m.role !== "owner" && (
+                <p className="flex gap-1.5">
+                  <button onClick={() => invite(m.email)} className="h-11 text-[13px] underline underline-offset-[3px]">초대 재발송</button>
+                  <button onClick={() => remove(m)} className="h-11 text-[13px] text-[#b42318]">제외</button>
+                </p>
+              )}
+            </div>
+            <span className="h-[26px] px-2.5 rounded-full bg-[#f2f2f2] text-[#444] text-xs font-medium inline-flex items-center">{ROLE_LABEL[m.role] ?? m.role}</span>
+          </li>
         ))}
-        <div className="flex gap-1.5 pt-1">
-          <input value={email} onChange={e => setEmail(e.target.value)} placeholder="초대할 이메일"
-            className="flex-1 min-w-0 px-2.5 py-1.5 text-[11px] border border-gray-200 rounded-lg" />
-          <button onClick={add} className="text-[11px] px-3 bg-gray-900 text-white rounded-lg">추가</button>
+      </ul>
+
+      <form className="flex flex-col gap-3" onSubmit={(e) => { e.preventDefault(); invite(email); }}>
+        <label className="flex flex-col gap-2 text-[13px] text-sub">초대할 이메일
+          <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="friend@example.com"
+            className="w-full h-[52px] box-border border border-[#d4d4d4] focus:border-ink outline-none rounded-[14px] px-4 text-base text-ink bg-white" />
+        </label>
+        <button type="submit" disabled={!email} className="h-[52px] rounded-full bg-ink text-white text-base font-bold disabled:opacity-40">초대 메일 보내기</button>
+        {error && <p role="alert" className="text-sm text-[#b42318]">{error}</p>}
+      </form>
+
+      <div className="bg-soft border border-line rounded-[18px] px-[18px] py-4 flex flex-col gap-2.5">
+        <b className="text-[13px]">권한 안내</b>
+        <div className="grid grid-cols-[1fr_auto_auto] gap-x-[18px] gap-y-2 text-[13px] items-center">
+          <span /><b className="text-xs text-sub">소유자</b><b className="text-xs text-sub">편집자</b>
+          <span>내용 수정 · 저장</span><span>✓</span><span>✓</span>
+          <span>하객 응답 관리</span><span>✓</span><span>✓</span>
+          <span>멤버 초대 · 제외</span><span>✓</span><span className="text-sub">—</span>
         </div>
-        {error && <p className="text-[11px] text-red-500">{error}</p>}
-        {notice && <p className="text-[11px] text-green-600">{notice}</p>}
-        <p className="text-[10px] text-gray-400">추가하면 초대 메일이 나가요. 받은 분이 메일의 버튼으로 로그인하면 같은 청첩장을 함께 수정할 수 있어요.</p>
       </div>
+
+      {notice && (
+        <p role="status" className="bg-[#e8f6ee] text-[#1b6b43] rounded-[14px] px-4 py-3.5 text-[13px] font-medium">{notice}</p>
+      )}
     </div>
   );
 }

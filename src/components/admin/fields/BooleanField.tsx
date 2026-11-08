@@ -9,7 +9,7 @@ export default function BooleanField({ field, path, value, onChange }: FieldComp
         type="checkbox"
         checked={!!value}
         onChange={(e) => onChange(path, e.target.checked)}
-        className="w-4 h-4 rounded border-gray-300"
+        className="w-4 h-4 rounded border-ink"
       />
       {field.label}
     </label>

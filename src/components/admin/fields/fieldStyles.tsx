@@ -1,6 +1,6 @@
 export const INPUT =
-  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white transition-colors";
+  "w-full min-h-[52px] px-4 py-3 text-base text-ink border border-[#d4d4d4] rounded-[14px] outline-none focus:border-ink bg-white transition-colors placeholder:text-[#9a9a9a]";
 
 export function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block text-xs font-medium text-gray-500 mb-1">{children}</label>;
+  return <label className="block text-[13px] text-sub mb-2">{children}</label>;
 }

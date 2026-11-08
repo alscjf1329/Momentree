@@ -5,3 +5,10 @@ export const TEMPLATE_NAMES: Record<string, string> = {
 };
 // 처음 보여줄 추천 템플릿 (나머지는 "더 보기")
 export const RECOMMENDED_TEMPLATES = ["classic", "minimal", "romantic"];
+
+// 요약 카드 썸네일 색 (템플릿 대표색)
+export const TEMPLATE_TINT: Record<string, { bg: string; fg: string }> = {
+  classic: { bg: "#2A1E10", fg: "#E6D2A8" }, editorial: { bg: "#0d0d0d", fg: "#f2ede8" }, minimal: { bg: "#F4F4F4", fg: "#111111" },
+  romantic: { bg: "#F6DDE3", fg: "#3d1f28" }, twilight: { bg: "#0e1230", fg: "#dde2f0" }, blossom: { bg: "#F8E4EC", fg: "#3a2030" },
+  modern: { bg: "#E8D8C8", fg: "#2d1e12" }, luxury: { bg: "#0e1628", fg: "#f0ece4" }, garden: { bg: "#DCE6D3", fg: "#2c3226" }, mono: { bg: "#DADADA", fg: "#111111" },
+};

@@ -17,7 +17,7 @@ export default function TextField({ field, path, value, onChange, error }: Field
         placeholder={field.placeholder}
         onChange={(e) => onChange(path, isNumeric ? +e.target.value : e.target.value)}
       />
-      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[10px] text-[#b42318] mt-1">{error}</p>}
     </div>
   );
 }

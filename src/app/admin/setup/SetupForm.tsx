@@ -1,30 +1,33 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import type { WeddingData } from "@/types";
-import { setByPath, validateBySchema } from "@/lib/schema";
+import { getByPath, setByPath, validateBySchema, type FieldSchema } from "@/lib/schema";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DEFAULT_WEDDING_DATA, generateFilename, namesToSlug } from "@/lib/newClient";
+import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
-import ShareLinkCard from "@/components/admin/ShareLinkCard";
-import MembersCard from "@/components/admin/MembersCard";
-import { useInviteQuery } from "@/lib/useShareId";
+import SubPageHeader from "@/components/admin/SubPageHeader";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 
 const DEFAULT_DATA = DEFAULT_WEDDING_DATA;
-const TEMPLATES = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden", "mono"] as const;
 const LS_KEY = "momentree_last_file";
+const VIEW_TITLE = { photos: "사진 · 갤러리", accounts: "축의금 계좌" } as const;
+
+const isEmpty = (v: unknown) => v == null || (typeof v === "string" && !v.trim()) || (Array.isArray(v) && v.every((x) => !String(x ?? "").trim()));
 
 export default function SetupForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const fileParam = searchParams.get("file") ?? "";
+  const viewParam = searchParams.get("view");
+  const view = viewParam === "photos" || viewParam === "accounts" ? viewParam : "main";
 
   // 서버/클라이언트 동일한 초기값 — Date.now() 는 useEffect 에서만 호출
   const [filename, setFilename] = useState(fileParam);
-  const inviteQuery = useInviteQuery(filename);
   const [data, setData] = useState<WeddingData>(DEFAULT_DATA);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -32,9 +35,24 @@ export default function SetupForm() {
   const [role, setRole] = useState<"admin" | "customer" | null>(null); // null = 아직 확인 전
   const isCustomer = role === "customer";
   const [memberRole, setMemberRole] = useState<string | null>(null);
+  const [memberCount, setMemberCount] = useState<number | null>(null);
 
   const schema = getSchemaForTemplate(data.template);
   const errors = validateBySchema(schema, data);
+
+  // 운영자는 선택한 고객(?file=)을 URL에 유지한다
+  const q = (extra = "") => {
+    const p = new URLSearchParams(extra);
+    if (!isCustomer && filename) p.set("file", filename);
+    const s = p.toString();
+    return s ? `?${s}` : "";
+  };
+  const base = `/admin/setup${q()}`;
+
+  // 필수 항목 진행률 (최상위 필수 필드 기준)
+  const required: FieldSchema[] = schema.sections.flatMap((s) => s.fields).filter((f) => f.required);
+  const doneCount = required.filter((f) => !isEmpty(getByPath(data, f.key))).length;
+  const allDone = required.length > 0 && doneCount === required.length;
 
   const loadFile = useCallback(async (f: string) => {
     if (!f) return;
@@ -59,11 +77,7 @@ export default function SetupForm() {
   }, [loadFile]);
 
   useEffect(() => {
-    if (role !== "admin") return; // role 확인 전이거나 customer면 관리자 전용 목록을 건드리지 않음
-  }, [role]);
-
-  useEffect(() => {
-    if (role !== "admin") return; // role 확인 전이거나 customer면 URL의 ?file= 무시, 항상 자기 파일 고정
+    if (role !== "admin") return; // customer는 URL의 ?file= 무시, 항상 자기 파일 고정
     if (fileParam) {
       loadFile(fileParam);
     } else {
@@ -72,6 +86,13 @@ export default function SetupForm() {
       else setFilename(generateFilename()); // Date.now() — 클라이언트 전용
     }
   }, [fileParam, loadFile, role]);
+
+  // 함께 편집 인원 (소유자·운영자만 볼 수 있음)
+  useEffect(() => {
+    if (!filename || !(role === "admin" || memberRole === "owner")) return;
+    fetch(`/api/members${role === "admin" ? `?file=${encodeURIComponent(filename)}` : ""}`)
+      .then(r => r.ok ? r.json() : null).then(m => Array.isArray(m) && setMemberCount(m.length)).catch(() => {});
+  }, [filename, role, memberRole]);
 
   const handleChange = (path: string, value: unknown) => {
     setData(prev => setByPath(prev, path, value));
@@ -90,7 +111,8 @@ export default function SetupForm() {
       localStorage.setItem(LS_KEY, filename);
       dir.reload();
       setTimeout(() => setSaved(false), 2500);
-      router.push(`/admin/setup?file=${filename}`);
+      // 운영자가 새 파일을 만든 경우에만 URL에 반영
+      if (!isCustomer && fileParam !== filename) router.replace(`/admin/setup${q(view === "main" ? "" : `view=${view}`)}`);
     }
   };
 
@@ -100,193 +122,142 @@ export default function SetupForm() {
     router.push("/admin/templates");
   };
 
-  const membersCard = filename && (role === "admin" || memberRole === "owner") && <MembersCard file={filename} admin={role === "admin"} />;
+  const saveButton = (
+    <button onClick={handleSave} disabled={saving}
+      className="h-10 px-5 rounded-full text-sm font-bold text-white disabled:opacity-50 shrink-0 transition-colors"
+      style={{ background: saved ? "#1b6b43" : "var(--color-ink)" }}>
+      {saving ? "저장 중…" : saved ? "✓ 저장됨" : "저장"}
+    </button>
+  );
+
+  const label = [data.groom.name, data.bride.name].map((n) => n?.trim()).filter(Boolean).join(" ♥ ");
+  const tint = TEMPLATE_TINT[data.template] ?? TEMPLATE_TINT.classic;
+  const dateText = data.date?.iso ? `${data.date.iso.slice(0, 10).replaceAll("-", ".")}` : "";
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      {/* 상단 액션바 */}
-      <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-sm font-semibold text-gray-700 truncate">{isCustomer ? "청첩장 편집" : "고객 정보 설정"}</h1>
-            {memberRole === "editor" && (
-              <span className="text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full shrink-0">함께 편집 중</span>
-            )}
-            {filename && role === "admin" && (
-              <span className="text-[10px] font-mono bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full truncate max-w-[140px] hidden sm:block">
-                {filename}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {role === "admin" && (
-              <button onClick={handleNewClient}
-                className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white">
-                + 새 고객
-              </button>
-            )}
-            <a href={`/admin/templates?file=${filename}`}
-              className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 bg-white hidden sm:block">
-              템플릿 →
-            </a>
-            <button onClick={handleSave} disabled={saving}
-              className="text-xs px-4 py-1.5 rounded-lg font-medium text-white disabled:opacity-50 transition-colors"
-              style={{ background: saved ? "#16a34a" : "#111" }}>
-              {saving ? "저장 중…" : saved ? "✓ 저장됨" : "저장"}
-            </button>
+    <div className="bg-white min-h-[calc(100dvh-56px)]">
+      {view === "main" ? (
+        <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b border-line">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+            <h1 className="text-[17px] font-bold truncate">{isCustomer ? "청첩장 편집" : "고객 정보 설정"}</h1>
+            <div className="flex items-center gap-2 shrink-0">
+              {role === "admin" && (
+                <button onClick={handleNewClient} className="h-10 px-4 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink hidden sm:block">+ 새 고객</button>
+              )}
+              <Link href={`/admin/templates${q()}`} className="h-10 px-4 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink hidden sm:inline-flex items-center">템플릿</Link>
+              {saveButton}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <SubPageHeader title={VIEW_TITLE[view]} back={base}>{saveButton}</SubPageHeader>
+      )}
 
-      {/* 본문 — 사이드바 + 폼 + 미리보기 */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-6 flex gap-6 items-start">
 
-        {/* ── 왼쪽 사이드바 ── */}
-        <aside className="w-56 shrink-0 sticky top-[104px] hidden lg:flex flex-col gap-4">
-
-          {/* 파일 관리 (customer는 항상 자기 파일 고정이라 편집 불필요) */}
-          {role === "admin" && (
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
-              <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">파일 관리</p>
-            </div>
-            <div className="p-3 space-y-2">
-              <input
-                className="w-full px-2.5 py-2 text-[11px] font-mono border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white"
-                placeholder="파일명 (영문·숫자·-)"
-                value={filename}
-                onChange={e => setFilename(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
-              />
-              <button
-                onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
-                className="w-full text-[11px] py-1.5 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 border border-gray-100">
-                이름으로 자동생성
-              </button>
-            </div>
-          </div>
-          )}
-
-          {/* 고객 목록 */}
-          {role === "admin" && dir.total > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
-                <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">고객 목록</p>
-              </div>
-              <div className="p-2 space-y-0.5 max-h-48 overflow-y-auto">
-                <input className="w-full mb-1 px-3 py-1.5 text-[11px] border border-gray-200 rounded-lg"
-                  placeholder="이름·이메일·파일명 검색" value={dir.q} onChange={e => dir.setQ(e.target.value)} />
-                {dir.clients.map(c => (
-                  <button key={c.file} onClick={() => loadFile(c.file)} title={c.file}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-[11px] transition-colors ${
-                      filename === c.file
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}>
-                    {dir.display(c)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 내 청첩장 QR / 공유 */}
-          {filename && <ShareLinkCard template={data.template} filename={filename} />}
-
-          {/* 공유 링크 */}
-          {filename && (
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-gray-50 bg-gray-50/60">
-                <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">공유 링크</p>
-              </div>
-              <div className="p-3 space-y-1">
-                {TEMPLATES.map(t => (
-                  <a key={t} href={`/invite/${t}?${inviteQuery}`} target="_blank"
-                    className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 group">
-                    <span className="text-[11px] text-gray-500 capitalize">{t}</span>
-                    <span className="text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-          {membersCard}
-        </aside>
-
-        {/* ── 가운데 폼 ── */}
-        <div className="flex-1 min-w-0 space-y-4">
-
-          {/* 모바일 전용: 파일 선택 + 고객 목록 */}
-          {role === "admin" && (
-          <div className="lg:hidden space-y-3">
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-              <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase mb-3">파일 관리</p>
-              <div className="flex gap-2 mb-2">
+        {/* 운영자 전용 사이드바: 파일 관리 + 고객 목록 */}
+        {role === "admin" && (
+          <aside className="w-60 shrink-0 sticky top-[120px] hidden lg:flex flex-col gap-4">
+            <div className="bg-white rounded-2xl border border-line overflow-hidden">
+              <div className="px-4 py-3 border-b border-line bg-soft"><p className="text-xs font-bold text-sub">파일 관리</p></div>
+              <div className="p-3 space-y-2">
                 <input
-                  className="flex-1 px-3 py-2.5 text-xs font-mono border border-gray-200 rounded-lg outline-none focus:border-blue-400 bg-white"
-                  placeholder="파일명 자동생성됨"
-                  value={filename}
-                  onChange={e => setFilename(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
-                />
-                <button
-                  onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
-                  className="px-3 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 whitespace-nowrap">
-                  자동생성
-                </button>
+                  className="w-full px-3 h-11 text-[13px] font-mono border border-[#d4d4d4] rounded-xl outline-none focus:border-ink bg-white"
+                  placeholder="파일명 (영문·숫자·-)" value={filename}
+                  onChange={e => setFilename(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))} />
+                <button onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
+                  className="w-full h-10 text-[13px] bg-soft text-ink rounded-xl border border-line">이름으로 자동생성</button>
+              </div>
+            </div>
+            {dir.total > 0 && (
+              <div className="bg-white rounded-2xl border border-line overflow-hidden">
+                <div className="px-4 py-3 border-b border-line bg-soft"><p className="text-xs font-bold text-sub">고객 목록</p></div>
+                <div className="p-2 space-y-0.5 max-h-72 overflow-y-auto">
+                  <input className="w-full mb-1 px-3 h-10 text-[13px] border border-[#d4d4d4] rounded-xl"
+                    placeholder="이름·이메일·파일명 검색" value={dir.q} onChange={e => dir.setQ(e.target.value)} />
+                  {dir.clients.map(c => (
+                    <button key={c.file} onClick={() => loadFile(c.file)} title={c.file}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-[13px] transition-colors ${filename === c.file ? "bg-ink text-white" : "text-ink hover:bg-soft"}`}>
+                      {dir.display(c)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </aside>
+        )}
+
+        <div className="flex-1 min-w-0 space-y-5 max-w-3xl mx-auto xl:mx-0">
+
+          {/* 운영자 모바일: 파일/고객 선택 */}
+          {role === "admin" && (
+            <div className="lg:hidden bg-soft rounded-2xl border border-line p-4 space-y-3">
+              <div className="flex gap-2">
+                <input className="flex-1 min-w-0 px-3 h-11 text-sm font-mono border border-[#d4d4d4] rounded-xl outline-none focus:border-ink bg-white"
+                  placeholder="파일명 자동생성됨" value={filename}
+                  onChange={e => setFilename(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))} />
+                <button onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
+                  className="px-3 h-11 text-sm bg-white border border-[#d4d4d4] rounded-xl whitespace-nowrap">자동생성</button>
               </div>
               {dir.total > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {dir.clients.map(c => (
                     <button key={c.file} onClick={() => loadFile(c.file)} title={c.file}
-                      className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
-                        filename === c.file ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600"
-                      }`}>
+                      className={`px-3 h-9 text-xs rounded-full border transition-colors ${filename === c.file ? "bg-ink text-white border-ink" : "border-[#d4d4d4] text-ink bg-white"}`}>
                       {dir.display(c)}
                     </button>
                   ))}
                 </div>
               )}
             </div>
-          </div>
           )}
 
-          <AdminForm schema={schema} data={data} onChange={handleChange} errors={errors} />
-
-          {/* 모바일 전용: 전환 / 멤버 */}
-          <div className="lg:hidden space-y-3">{membersCard}</div>
-
-          {/* 모바일 전용: QR / 공유 */}
-          {filename && (
-            <div className="lg:hidden">
-              <ShareLinkCard template={data.template} filename={filename} />
-            </div>
-          )}
-
-          {/* 모바일 전용: 공유 링크 */}
-          {filename && (
-            <div className="lg:hidden bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="px-5 py-3 border-b border-gray-50 bg-gray-50/60">
-                <h2 className="text-xs font-semibold text-gray-500 tracking-widest uppercase">공유 링크</h2>
+          {/* 요약 카드 + 진행률 (메인 화면) */}
+          {view === "main" && (
+            <>
+              <div className="flex gap-3.5 items-center">
+                <div className="w-[72px] h-[92px] rounded-[14px] shrink-0 flex flex-col items-center justify-center gap-0.5 font-serif text-xs text-center px-1"
+                  style={{ background: tint.bg, color: tint.fg }}>
+                  <span className="truncate max-w-full">{data.groom.name || "신랑"}</span><span style={{ color: "#C2255C" }}>♥</span><span className="truncate max-w-full">{data.bride.name || "신부"}</span>
+                </div>
+                <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+                  <b className="text-lg truncate">{label || "이름을 입력해 주세요"}</b>
+                  <span className="text-[13px] text-sub">{[dateText, TEMPLATE_NAMES[data.template] ?? data.template].filter(Boolean).join(" · ")}</span>
+                  {(role === "admin" || memberRole === "owner") && filename && (
+                    <Link href={`/admin/members${q()}`} className="text-xs underline underline-offset-[3px] text-ink w-fit min-h-[28px] inline-flex items-center">
+                      함께 편집 {memberCount ?? 1}명
+                    </Link>
+                  )}
+                </div>
               </div>
-              <div className="p-4 space-y-2">
-                {TEMPLATES.map(t => (
-                  <div key={t} className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500 capitalize">{t}</span>
-                    <a href={`/invite/${t}?${inviteQuery}`} target="_blank"
-                      className="text-blue-500 hover:underline font-mono text-[11px]">
-                      /invite/{t}?{inviteQuery}
-                    </a>
-                  </div>
-                ))}
+
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between text-[13px]">
+                  <b>{allDone ? "필수 항목을 모두 입력했어요" : "입력 진행률"}</b>
+                  <span className="text-sub">필수 {doneCount} / {required.length}</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-line overflow-hidden" role="progressbar" aria-valuenow={doneCount} aria-valuemax={required.length}>
+                  <div className="h-full bg-ink rounded-full transition-all" style={{ width: `${required.length ? (doneCount / required.length) * 100 : 0}%` }} />
+                </div>
+                {allDone && filename && (
+                  <Link href={`/admin/share${q()}`} className="h-11 mt-1 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink flex items-center justify-center">
+                    청첩장 공유하기
+                  </Link>
+                )}
               </div>
-            </div>
+            </>
           )}
 
-        </div>{/* /center */}
+          <AdminForm schema={schema} data={data} onChange={handleChange} errors={errors} view={view}
+            links={{ photos: `/admin/setup${q("view=photos")}`, accounts: `/admin/setup${q("view=accounts")}` }} />
 
-        {/* ── 오른쪽 실시간 미리보기 ── */}
+          {view !== "main" && (
+            <Link href={base} className="h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center">완료</Link>
+          )}
+        </div>
+
         <PreviewPane template={data.template} data={data} />
-
-      </div>{/* /layout */}
+      </div>
     </div>
   );
 }

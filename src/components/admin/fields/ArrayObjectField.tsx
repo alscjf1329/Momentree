@@ -62,12 +62,12 @@ export default function ArrayObjectField({
               type="button"
               onClick={() => bulkInputRef.current?.click()}
               disabled={!!bulkProgress}
-              className="text-[11px] text-blue-500 hover:underline disabled:opacity-40"
+              className="text-[11px] text-ink font-medium underline underline-offset-2 hover:underline disabled:opacity-40"
             >
               {bulkProgress ? `업로드 중 ${bulkProgress.done}/${bulkProgress.total}` : "여러 장 한번에 추가"}
             </button>
           )}
-          <button type="button" onClick={addItem} className="text-[11px] text-blue-500 hover:underline">
+          <button type="button" onClick={addItem} className="text-[11px] text-ink font-medium underline underline-offset-2 hover:underline">
             + 항목 추가
           </button>
         </div>
@@ -85,12 +85,12 @@ export default function ArrayObjectField({
           }}
         />
       )}
-      {field.helpText && <p className="text-[10px] text-gray-400 mb-1">{field.helpText}</p>}
+      {field.helpText && <p className="text-[10px] text-sub mb-1">{field.helpText}</p>}
       <div className="space-y-2">
         {items.map((_, i) => (
-          <div key={i} className="border border-gray-100 rounded-lg p-2.5 space-y-2 bg-gray-50/60">
+          <div key={i} className="border border-line rounded-xl p-2.5 space-y-2 bg-soft/60">
             <div className="flex items-center justify-end">
-              <button type="button" onClick={() => removeItem(i)} className="text-[11px] text-red-400 hover:underline">
+              <button type="button" onClick={() => removeItem(i)} className="text-[11px] text-[#b42318] hover:underline">
                 삭제
               </button>
             </div>
@@ -101,7 +101,7 @@ export default function ArrayObjectField({
             </div>
           </div>
         ))}
-        {items.length === 0 && <p className="text-[11px] text-gray-300">항목이 없습니다</p>}
+        {items.length === 0 && <p className="text-[11px] text-sub">항목이 없습니다</p>}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export default function EncryptedField({ field, path, value, onChange, error }: 
       <Label>
         <span className="inline-flex items-center gap-1">
           {field.label}
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="text-sub">
             <rect x="4" y="11" width="16" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
             <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
@@ -23,7 +23,7 @@ export default function EncryptedField({ field, path, value, onChange, error }: 
         placeholder={field.placeholder}
         onChange={(e) => onChange(path, e.target.value)}
       />
-      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[10px] text-[#b42318] mt-1">{error}</p>}
     </div>
   );
 }

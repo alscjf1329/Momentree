@@ -52,15 +52,15 @@ export default function FileDropZone({
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`rounded-lg border-2 border-dashed p-3 text-center cursor-pointer transition-colors ${
-          dragging ? "border-blue-400 bg-blue-50" : "border-gray-200 hover:border-gray-300"
+        className={`rounded-xl border-2 border-dashed p-3 text-center cursor-pointer transition-colors ${
+          dragging ? "border-ink bg-soft" : "border-[#d4d4d4] hover:border-ink"
         }`}
       >
         {kind === "image" && value && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={value} alt="" className="w-full aspect-video object-cover rounded mb-2 bg-gray-100" />
+          <img src={value} alt="" className="w-full aspect-video object-cover rounded mb-2 bg-soft" />
         )}
-        <p className="text-[11px] text-gray-500 truncate">
+        <p className="text-[11px] text-sub truncate">
           {uploading
             ? "업로드 중…"
             : value
@@ -81,7 +81,7 @@ export default function FileDropZone({
           }}
         />
       </div>
-      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[10px] text-[#b42318] mt-1">{error}</p>}
     </div>
   );
 }

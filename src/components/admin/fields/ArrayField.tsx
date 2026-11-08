@@ -8,7 +8,7 @@ export default function ArrayField({ field, path, value, onChange, error }: Fiel
   return (
     <div>
       <Label>{field.label}</Label>
-      {field.helpText && <p className="text-[10px] text-gray-400 -mt-0.5 mb-1">{field.helpText}</p>}
+      {field.helpText && <p className="text-[10px] text-sub -mt-0.5 mb-1">{field.helpText}</p>}
       <textarea
         className={INPUT + " resize-none"}
         rows={4}
@@ -16,7 +16,7 @@ export default function ArrayField({ field, path, value, onChange, error }: Fiel
         placeholder={field.placeholder}
         onChange={(e) => onChange(path, e.target.value.split("\n"))}
       />
-      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[10px] text-[#b42318] mt-1">{error}</p>}
     </div>
   );
 }

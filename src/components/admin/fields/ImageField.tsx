@@ -16,7 +16,7 @@ export default function ImageField({ field, path, value, onChange, error }: Fiel
         placeholder={field.placeholder ?? "/images/example.jpg"}
         onChange={(e) => onChange(path, e.target.value)}
       />
-      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[10px] text-[#b42318] mt-1">{error}</p>}
     </div>
   );
 }

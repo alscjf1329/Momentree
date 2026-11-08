@@ -16,7 +16,7 @@ export default function FileField({ field, path, value, onChange, error }: Field
         placeholder={field.placeholder ?? "/audio/example.mp3"}
         onChange={(e) => onChange(path, e.target.value)}
       />
-      {error && <p className="text-[10px] text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[10px] text-[#b42318] mt-1">{error}</p>}
     </div>
   );
 }

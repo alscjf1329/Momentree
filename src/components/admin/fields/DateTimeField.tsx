@@ -36,9 +36,9 @@ export default function DateTimeField({ field, path, value, onChange }: FieldCom
           <input className={INPUT} type="number" min={1} max={31} value={date.day} onChange={(e) => setDatePart("day", +e.target.value)} />
         </div>
         <div className="flex gap-1 mt-1">
-          <p className="text-[10px] text-gray-400 w-1/3 text-center">연</p>
-          <p className="text-[10px] text-gray-400 w-1/3 text-center">월</p>
-          <p className="text-[10px] text-gray-400 w-1/3 text-center">일</p>
+          <p className="text-[10px] text-sub w-1/3 text-center">연</p>
+          <p className="text-[10px] text-sub w-1/3 text-center">월</p>
+          <p className="text-[10px] text-sub w-1/3 text-center">일</p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
