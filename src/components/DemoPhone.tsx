@@ -25,7 +25,7 @@ export default function DemoPhone() {
   const [id, setId] = useState(ITEMS[0].id);
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-6 w-full min-w-0">
       <div className="flex gap-3 overflow-x-auto w-full px-6 pb-1 no-scrollbar" role="tablist" aria-label="예시 템플릿">
         {ITEMS.map((t) => {
           const on = t.id === id;

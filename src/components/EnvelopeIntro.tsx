@@ -42,7 +42,7 @@ export default function EnvelopeIntro({ onComplete }: { onComplete: () => void }
 
           {/* 봉투 */}
           <div style={{ perspective: "900px", perspectiveOrigin: "50% 35%" }}>
-            <div className="relative" style={{ width: 300, height: 200 }}>
+            <div className="relative" style={{ width: "min(300px, 86vw)", aspectRatio: "3 / 2" }}>
 
               {/* 봉투 몸체 */}
               <div

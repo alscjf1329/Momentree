@@ -84,3 +84,10 @@ select {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+/* 듀얼 스크린(서피스 듀오 등) 펼침: 힌지를 가로지르지 않도록 첫 화면 영역 안에서만 그린다 */
+@media (horizontal-viewport-segments: 2) {
+  body {
+    width: env(viewport-segment-width 0 0);
+  }
+}

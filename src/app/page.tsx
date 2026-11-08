@@ -45,7 +45,7 @@ export default async function Home() {
       {/* 약속 한 줄 */}
       <section className="max-w-md mx-auto px-6 pt-10 pb-8 flex flex-col gap-[18px] text-center sm:pt-16">
         <span className="text-xs font-bold tracking-[0.14em] text-rose">MOBILE WEDDING INVITATION</span>
-        <h1 className="font-serif font-semibold text-[36px] leading-[1.3] tracking-tight">두 분의 하루를<br />링크 하나로</h1>
+        <h1 className="font-serif font-semibold text-[clamp(28px,9vw,36px)] leading-[1.3] tracking-tight">두 분의 하루를<br />링크 하나로</h1>
         <p className="text-[15px] leading-[1.7] text-sub">
           사진과 문구만 채우면 청첩장이 완성돼요. 카톡으로 보내고, 참석 응답은 한곳에서 확인하세요.
         </p>
