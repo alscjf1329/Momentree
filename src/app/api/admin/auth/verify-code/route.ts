@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ADMIN_SESSION_COOKIE, createSessionToken, sessionCookieOptions } from "@/lib/adminAuth";
 import { verifyOtp } from "@/lib/adminOtp";
-import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
+import { DEFAULT_WEDDING_DATA, upcomingWeddingDate } from "@/lib/newClient";
 import { customerExists, saveCustomer } from "@/lib/customers";
 import { clientIp, isRateLimited } from "@/lib/rateLimit";
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
   // 첫 로그인인 고객이면 계정이 아직 없으므로 기본 데이터로 자동 생성 (소유자 = 가입 이메일)
   if (result.role === "customer" && result.file && !customerExists(result.file)) {
-    saveCustomer(result.file, { ...DEFAULT_WEDDING_DATA, slug: result.file }, result.file);
+    saveCustomer(result.file, { ...DEFAULT_WEDDING_DATA, slug: result.file, date: upcomingWeddingDate() }, result.file);
   }
 
   const token = await createSessionToken(secret, { role: result.role, file: result.file, email });

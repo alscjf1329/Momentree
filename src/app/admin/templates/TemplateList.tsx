@@ -7,7 +7,7 @@ import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
 import type { WeddingData } from "@/types";
-import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY } from "@/lib/newClient";
+import { DEFAULT_WEDDING_DATA, generateFilename, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
 
 const TEMPLATE_DEFS = [
   {
@@ -273,7 +273,7 @@ export default function TemplateList() {
         data = res.ok ? await res.json() : { ...DEFAULT_WEDDING_DATA };
       } else {
         filename = generateFilename();
-        data = { ...DEFAULT_WEDDING_DATA };
+        data = { ...DEFAULT_WEDDING_DATA, date: upcomingWeddingDate() };
       }
 
       const res = await fetch("/api/clients", {

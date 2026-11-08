@@ -3,7 +3,7 @@ import { getDb } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
 import { addMember } from "@/lib/access";
 import { newShareId } from "@/lib/newShareId";
-import { WEDDING } from "@/content";
+import { DEFAULT_WEDDING_DATA as BLANK } from "@/lib/newClient";
 
 // 고객(청첩장) 저장소 — 서버 전용.
 // 청첩장 데이터 전체를 JSON으로 만들어 통째로 암호화해 data_enc에 저장한다 (계좌번호 포함 모든 필드).
@@ -39,8 +39,9 @@ function open(blob: string): WeddingData {
   // decrypt()는 실패 시 입력을 그대로 돌려주므로, 여전히 암호문이면 복호화 실패로 처리
   if (plain.startsWith("enc:")) throw new Error("고객 데이터를 복호화하지 못했습니다 (ENCRYPTION_KEY 확인)");
   const data = JSON.parse(plain) as WeddingData;
-  // 이후에 필드가 추가돼도 오래된 데이터가 깨지지 않게 기본값과 병합 (groom/bride는 한 단계 더)
-  return { ...WEDDING, ...data, groom: { ...WEDDING.groom, ...data.groom }, bride: { ...WEDDING.bride, ...data.bride } };
+  // 이후에 필드가 추가돼도 오래된 데이터가 깨지지 않게 빈 기본값과 병합 (groom/bride는 한 단계 더).
+  // 데모용 샘플(김민준·이서연…)이 아니라 빈 값이어야, 없는 필드가 고객 청첩장에 남의 정보로 나오지 않는다.
+  return { ...BLANK, ...data, groom: { ...BLANK.groom, ...data.groom }, bride: { ...BLANK.bride, ...data.bride }, date: { ...BLANK.date, ...data.date }, venue: { ...BLANK.venue, ...data.venue } };
 }
 
 function labelOf(data: WeddingData): string {

@@ -31,6 +31,20 @@ export const DEFAULT_WEDDING_DATA: WeddingData = {
   envelopeOpen: "/images/envelope-open.jpg",
 };
 
+const DAY_NAMES = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+
+// 새 청첩장의 기본 예식일: 약 4개월 뒤의 첫 토요일 (지난 날짜가 기본값으로 들어가지 않게)
+export function upcomingWeddingDate(now = new Date()): WeddingData["date"] {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 120);
+  d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return {
+    ...DEFAULT_WEDDING_DATA.date,
+    year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate(), dayOfWeek: DAY_NAMES[d.getDay()],
+    iso: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+  };
+}
+
 export function generateFilename(): string {
   return `client-${Date.now().toString(36)}`;
 }

@@ -120,3 +120,20 @@ test("공동 편집: 초대받은 편집자는 저장 가능·멤버 관리 불�
   assert.equal((await members.DELETE(await mreq("DELETE", owner, undefined, "?email=ed@x.com"))).status, 200);
   assert.equal((await route.POST(await req("POST", editor, { body: { data: wedding("또", "나") } }))).status, 401);
 });
+
+test("없는 필드는 샘플(김민준·이서연)이 아니라 빈 값으로 채워진다", async () => {
+  const { upcomingWeddingDate } = await import("@/lib/newClient");
+  // 일부 필드만 가진 옛 데이터
+  store.saveCustomer("old@x.com", { template: "garden", groom: { name: "홍" }, bride: { name: "김" } } as unknown as WeddingData, null);
+  const d = store.getCustomer("old@x.com")!;
+  assert.equal(d.groom.name, "홍");
+  assert.equal(d.groom.fatherName, ""); // 샘플 "김철수"가 아님
+  assert.equal(d.groom.accounts[0].number, "");
+  assert.equal(d.venue.name, "");
+  assert.equal(JSON.stringify(d).includes("김민준"), false);
+
+  // 새 계정 기본 예식일은 미래의 토요일
+  const day = upcomingWeddingDate(new Date(2026, 10, 8));
+  assert.equal(day.dayOfWeek, "토요일");
+  assert.ok(new Date(day.iso).getTime() > new Date(2026, 10, 8).getTime() + 100 * 864e5);
+});
