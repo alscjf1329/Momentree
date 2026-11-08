@@ -1,174 +1,106 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
+import DemoPhone from "@/components/DemoPhone";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
-const TEMPLATES = [
-  { id: "classic",   name: "클래식",     mood: "다크 로맨틱",    desc: "봉투 오프닝 + 골드 포인트",    bg: "linear-gradient(150deg,#1a1208,#2d1f0f)", accent: "#c9a96e", text: "#fff" },
-  { id: "editorial", name: "에디토리얼",  mood: "모던 매거진",    desc: "풀블리드 타이포 + 필름스트립",  bg: "linear-gradient(150deg,#0d0d0d,#1a1a1a)",  accent: "#f2ede8", text: "#fff" },
-  { id: "minimal",   name: "미니멀",     mood: "클린 모던",      desc: "화이트 히어로 + 그리드 갤러리",  bg: "linear-gradient(150deg,#ffffff,#f4f4f4)",  accent: "#3a3a3a", text: "#1a1a1a" },
-  { id: "romantic",  name: "로맨틱",     mood: "드리미 플로럴",   desc: "보태니컬 SVG + 폴라로이드",    bg: "linear-gradient(150deg,#fdf5f6,#f0dde2)",  accent: "#b8758a", text: "#3d1f28" },
-  { id: "twilight",  name: "트와이라잇",  mood: "시네마틱 다크",  desc: "별빛 + 블루퍼플 무드",          bg: "linear-gradient(150deg,#080a14,#0e1230)",  accent: "#8b9ec4", text: "#dde2f0" },
-  { id: "blossom",   name: "블로섬",     mood: "봄 벚꽃",        desc: "떨어지는 꽃잎 + 플로럴",        bg: "linear-gradient(150deg,#fdf0f4,#f8e4ec)",  accent: "#c4758a", text: "#3a2030" },
-  { id: "modern",    name: "모던",       mood: "인스타 감성",     desc: "웜톤 풀블리드 + IG 그리드",     bg: "linear-gradient(150deg,#f5efe7,#e8d8c8)",  accent: "#c47a5a", text: "#2d1e12" },
-  { id: "luxury",    name: "럭셔리",     mood: "프리미엄 네이비", desc: "딥 네이비 + 골드 프레임",        bg: "linear-gradient(150deg,#070d1a,#0e1628)",  accent: "#c9a96e", text: "#f0ece4" },
-  { id: "garden",    name: "가든",       mood: "풀숲 가든",      desc: "풀숲 히어로 + 캘리그래피",      bg: "linear-gradient(150deg,#eaf1e3,#c6d9bb)",  accent: "#5f7f50", text: "#2d3e27" },
-  { id: "mono",      name: "모노",       mood: "흑백 모노크롬",   desc: "블랙&화이트 타이포 + 슬라이드 갤러리", bg: "linear-gradient(150deg,#f4f4f4,#d8d8d8)", accent: "#000000", text: "#000000" },
+// 사진 격자 타일 (눌러서 해당 데모를 연다)
+const TILES = [
+  { id: "classic", label: "Kim · Lee", bg: "#2A1E10", fg: "#E6D2A8" },
+  { id: "romantic", label: "Kim ♡ Lee", bg: "#F6DDE3", fg: "#3d1f28" },
+  { id: "minimal", label: "KIM & LEE", bg: "#EDEDED", fg: "#111111" },
+  { id: "garden", label: "married", bg: "#DCE6D3", fg: "#2c3226" },
+  { id: "twilight", label: "Kim ✦ Lee", bg: "#0E1630", fg: "#C9D4F0" },
+  { id: "modern", label: "Kim & Lee", bg: "#EADBC8", fg: "#2d1e12" },
+  { id: "blossom", label: "Kim ♥ Lee", bg: "#FBE6EC", fg: "#3a2030" },
+  { id: "mono", label: "KIM · LEE", bg: "#F4F4F4", fg: "#111111" },
+  { id: "luxury", label: "Kim ✦ Lee", bg: "#0e1628", fg: "#f0ece4" },
 ];
 
 const STEPS = [
-  { n: "01", title: "정보 입력", desc: "신랑·신부 이름, 날짜, 장소를 입력합니다." },
-  { n: "02", title: "템플릿 선택",   desc: "10가지 템플릿 중 원하는 분위기를 고릅니다." },
-  { n: "03", title: "링크 공유",     desc: "생성된 URL을 카카오톡, 문자로 바로 공유합니다." },
+  { n: "01", title: "정보 입력", desc: "이름, 날짜, 장소와 사진을 채워요." },
+  { n: "02", title: "템플릿 선택", desc: "10가지 중 분위기에 맞게 골라요." },
+  { n: "03", title: "링크 공유", desc: "카카오톡·문자로 링크 하나만 보내요." },
 ];
 
 export default async function Home() {
   const secret = process.env.ADMIN_SESSION_SECRET;
   const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
   const session = secret ? await verifySessionToken(token, secret) : null;
+  const startHref = session ? (session.role === "admin" ? "/admin" : "/admin/setup") : "/admin/login";
 
   return (
-    <div style={{ background: "var(--color-cream)", minHeight: "100dvh", fontFamily: "var(--font-sans)" }}>
+    <div className="bg-white min-h-dvh text-ink" style={{ fontFamily: "var(--font-sans)" }}>
 
-      {/* 헤더 */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <span className="font-serif text-base sm:text-lg tracking-widest"
-            style={{ color: "var(--color-primary-dark)" }}>
-            Momentree
-          </span>
-          <div className="flex items-center gap-2">
-            <Link href="/invite/demo-classic" target="_blank"
-              className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-gray-50 hidden sm:block"
-              style={{ borderColor: "rgba(0,0,0,0.12)", color: "#777" }}>
-              예시 보기
-            </Link>
-            {session ? (
-              <Link href={session.role === "admin" ? "/admin" : "/admin/setup"}
-                className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90 max-w-[160px] truncate"
-                style={{ background: "var(--color-primary-dark)" }}>
-                {session.role === "admin" ? "관리자" : (session.email ?? session.file)} 님
-              </Link>
-            ) : (
-              <Link href="/admin/login"
-                className="text-xs px-4 py-1.5 rounded-full text-white transition-colors hover:opacity-90"
-                style={{ background: "var(--color-primary-dark)" }}>
-                로그인
-              </Link>
-            )}
-          </div>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-line">
+        <div className="max-w-5xl mx-auto px-5 sm:px-6 h-14 flex items-center justify-between">
+          <span className="font-serif font-semibold text-[21px] tracking-tight">momentree</span>
+          <Link href={startHref}
+            className="h-10 px-[18px] rounded-full border border-[#d4d4d4] inline-flex items-center text-sm font-medium max-w-[180px] truncate">
+            {session ? (session.role === "admin" ? "관리자" : "내 청첩장") : "로그인"}
+          </Link>
         </div>
       </header>
 
-      {/* 히어로 */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-10 sm:pb-16 text-center">
-        <p className="text-[10px] sm:text-xs tracking-[0.4em] mb-4 sm:mb-5"
-          style={{ color: "var(--color-warm-gray)" }}>
-          WEDDING INVITATION PLATFORM
+      {/* 약속 한 줄 */}
+      <section className="max-w-md mx-auto px-6 pt-10 pb-8 flex flex-col gap-[18px] text-center sm:pt-16">
+        <span className="text-xs font-bold tracking-[0.14em] text-rose">MOBILE WEDDING INVITATION</span>
+        <h1 className="font-serif font-semibold text-[36px] leading-[1.3] tracking-tight">두 분의 하루를<br />링크 하나로</h1>
+        <p className="text-[15px] leading-[1.7] text-sub">
+          사진과 문구만 채우면 청첩장이 완성돼요. 카톡으로 보내고, 참석 응답은 한곳에서 확인하세요.
         </p>
-        <h1 className="font-serif mb-5 sm:mb-6 leading-tight"
-          style={{ fontSize: "clamp(1.75rem,6vw,3.5rem)", color: "var(--color-primary-dark)" }}>
-          소중한 날을<br />아름답게 전하세요
-        </h1>
-        <p className="text-sm sm:text-base mb-8 sm:mb-10 mx-auto max-w-sm sm:max-w-md"
-          style={{ color: "var(--color-text-light)", lineHeight: 1.8 }}>
-          링크 하나로 청첩장을 전하고, 하객 응답까지 한곳에서 확인하세요.<br className="hidden sm:block" />
-          10가지 감성 템플릿 중 원하는 스타일을 골라보세요.
-        </p>
-        <div className="flex gap-3 justify-center flex-wrap">
-          <Link href="/invite/demo-classic" target="_blank"
-            className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-full text-sm font-medium text-white"
-            style={{ background: "var(--color-primary-dark)" }}>
-            예시 보기
+        <div className="flex flex-col gap-3 mt-1">
+          <Link href={startHref} className="h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center">
+            {session ? "내 청첩장 편집하기" : "무료로 시작하기"}
           </Link>
+          <a href="#example" className="h-11 flex items-center justify-center text-sm underline underline-offset-4">예시 청첩장 보기</a>
         </div>
       </section>
 
-      {/* 템플릿 카드 그리드 */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-14 sm:pb-20">
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-          {TEMPLATES.map(t => (
-            <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank"
-              className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"
-              style={{ background: "#fff" }}>
-              {/* 썸네일 */}
-              <div className="relative flex flex-col items-center justify-center gap-2"
-                style={{ height: "clamp(140px,30vw,200px)", background: t.bg }}>
-                <div style={{ width: 28, height: 1, background: t.accent, opacity: 0.6 }} />
-                <p className="font-serif tracking-widest font-light"
-                  style={{ fontSize: "clamp(12px,3vw,16px)", color: t.text, opacity: 0.9 }}>
-                  Kim · Lee
-                </p>
-                <span style={{ color: t.accent, fontSize: 10 }}>♥</span>
-                <p style={{ color: t.text, opacity: 0.4, fontSize: 9, letterSpacing: "0.3em" }}>2025.10.18</p>
-                <div style={{ width: 28, height: 1, background: t.accent, opacity: 0.6 }} />
-                {/* 호버 오버레이 */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: "rgba(0,0,0,0.35)" }}>
-                  <span className="text-white text-[10px] tracking-widest border border-white/40 px-3 py-1 rounded-full">
-                    미리보기
-                  </span>
-                </div>
-              </div>
-              {/* 정보 */}
-              <div className="p-3 sm:p-4">
-                <div className="flex items-center justify-between mb-0.5">
-                  <p className="font-medium text-xs sm:text-sm" style={{ color: "var(--color-text)" }}>{t.name}</p>
-                  <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 hidden sm:block">
-                    {t.mood}
-                  </span>
-                </div>
-                <p className="text-[10px] sm:text-[11px]" style={{ color: "var(--color-text-light)" }}>{t.desc}</p>
-              </div>
+      {/* 예시 청첩장 — 결과물을 먼저 보여준다 */}
+      <section id="example" className="bg-soft border-y border-line py-9 flex flex-col items-center gap-6 scroll-mt-14">
+        <div className="px-6 text-center flex flex-col gap-2">
+          <h2 className="font-serif font-semibold text-2xl leading-snug tracking-tight">이런 청첩장을<br />하객이 받게 돼요</h2>
+          <p className="text-sm text-sub">실제 템플릿을 폰으로 직접 열어보세요</p>
+        </div>
+        <DemoPhone />
+      </section>
+
+      {/* 템플릿 격자 */}
+      <section className="max-w-3xl mx-auto">
+        <p className="px-6 pt-8 pb-3 text-[13px] font-bold">모든 템플릿 둘러보기</p>
+        <div className="grid grid-cols-3 gap-0.5">
+          {TILES.map((t) => (
+            <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank" aria-label={`${t.id} 예시 보기`}
+              className="aspect-square flex items-center justify-center font-serif text-[13px] tracking-[0.08em]"
+              style={{ background: t.bg, color: t.fg }}>
+              {t.label}
             </Link>
           ))}
         </div>
-        <p className="text-center text-[10px] sm:text-xs mt-3"
-          style={{ color: "var(--color-warm-gray)" }}>
-          ↑ 카드 클릭 시 샘플 데이터로 미리보기
-        </p>
       </section>
 
       {/* 3단계 */}
-      <section className="py-12 sm:py-16" style={{ background: "var(--color-primary-dark)" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-[10px] tracking-[0.4em] mb-2"
-            style={{ color: "rgba(255,255,255,0.35)" }}>HOW IT WORKS</p>
-          <h2 className="font-serif text-center text-xl sm:text-2xl font-light mb-8 sm:mb-12"
-            style={{ color: "#fff" }}>
-            3단계로 완성
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-            {STEPS.map(s => (
-              <div key={s.n} className="text-center flex sm:flex-col items-center sm:items-center gap-4 sm:gap-0">
-                <p className="font-serif text-3xl sm:text-4xl font-light sm:mb-4 shrink-0"
-                  style={{ color: "var(--color-gold)", opacity: 0.5, minWidth: 48 }}>
-                  {s.n}
-                </p>
-                <div className="text-left sm:text-center">
-                  <p className="font-medium text-sm mb-1" style={{ color: "#fff" }}>{s.title}</p>
-                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="max-w-md mx-auto px-6 py-12 flex flex-col gap-6">
+        <h2 className="font-serif font-semibold text-2xl text-center tracking-tight">3단계로 완성</h2>
+        <ol className="flex flex-col gap-5">
+          {STEPS.map((s) => (
+            <li key={s.n} className="flex items-baseline gap-4">
+              <span className="font-serif text-2xl text-rose w-9 shrink-0">{s.n}</span>
+              <div><p className="font-bold text-[15px]">{s.title}</p><p className="text-sm text-sub mt-0.5">{s.desc}</p></div>
+            </li>
+          ))}
+        </ol>
+        <Link href={startHref} className="h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center mt-2">
+          {session ? "내 청첩장 편집하기" : "무료로 시작하기"}
+        </Link>
       </section>
 
-      {/* 푸터 */}
-      <footer className="py-6 sm:py-8" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-          <span className="font-serif text-sm tracking-widest" style={{ color: "var(--color-warm-gray)" }}>
-            Momentree
-          </span>
-          <p className="text-xs" style={{ color: "var(--color-warm-gray)" }}>
-            Wedding Invitation Platform
-          </p>
-        </div>
+      <footer className="border-t border-line py-7 px-6 text-center text-xs text-sub leading-relaxed">
+        <p>링크 하나 · 참석 응답 · 방명록 · 함께 편집</p>
+        <p className="mt-1">© momentree</p>
       </footer>
 
-      {/* PWA 설치 배너 */}
       <InstallBanner />
     </div>
   );

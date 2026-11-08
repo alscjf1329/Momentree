@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { isEmbedded } from "@/lib/isEmbedded";
 import { useWedding } from "@/context/WeddingContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -44,7 +45,7 @@ function RSVPIntroModal() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem("mono-rsvp-intro-seen")) return;
+    if (sessionStorage.getItem("mono-rsvp-intro-seen") || isEmbedded()) return;
     // 직접 지정한 시간이 있으면 그걸 쓰고, 없으면 히어로 애니메이션 길이에 맞춰 자동 계산
     const manualSec = parseFloat(w.rsvpPopupDelaySec ?? "");
     const delayMs = !isNaN(manualSec)
