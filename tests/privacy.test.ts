@@ -51,7 +51,7 @@ test("마이그레이션 v3: 평문 행 암호화, 재실행·이미 암호화�
   const after = snap();
   for (const s of ["평문이름", "평문메시지", "평문방명", "평문글"]) assert.ok(!after.includes(s), s);
   assert.ok(after.includes(sealed)); // 이미 암호화된 값은 다시 암호화하지 않음
-  assert.equal(db.pragma("user_version", { simple: true }), 3);
+  assert.equal(db.pragma("user_version", { simple: true }), 4);
 
   db.pragma("user_version = 2");
   migrate(db); // 재실행해도 변화 없음

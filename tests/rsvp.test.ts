@@ -19,7 +19,8 @@ before(async () => {
   route = await import("@/app/api/rsvp/route");
   guestbook = await import("@/app/api/guestbook/route");
   const store = await import("@/lib/customers");
-  const { WEDDING } = await import("@/content");
+  const { WEDDING: W } = await import("@/content");
+  const WEDDING = { ...W, date: { ...W.date, iso: "2099-01-01" } }; // 보관 기간(비공개·삭제)에 걸리지 않게 먼 미래 예식일
   store.saveCustomer("couple", WEDDING, null);
   (await import("@/lib/access")).addMember("couple", "couple", "owner"); // 테스트 세션은 file==이메일
   store.saveCustomer("other@x.com", WEDDING, "other@x.com");
