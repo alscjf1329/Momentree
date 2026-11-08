@@ -2,6 +2,7 @@ import type { WeddingData } from "@/types";
 import { getDb } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
 import { addMember, filesOf } from "@/lib/access";
+import { planOf, type Plan } from "@/lib/plan";
 import { newShareId } from "@/lib/newShareId";
 import { DEFAULT_WEDDING_DATA as BLANK, generateFilename } from "@/lib/newClient";
 
@@ -17,6 +18,7 @@ export interface CustomerSummary {
   weddingDate: string;
   template: string;
   updatedAt: string;
+  plan: Plan;
 }
 
 interface Row {
@@ -112,12 +114,12 @@ export function listCustomers(query = ""): CustomerSummary[] {
   const q = `%${query.trim().replace(/[\\%_]/g, "\\$&")}%`;
   const rows = getDb()
     .prepare(
-      `select file, email, share_id, label, wedding_date, template, updated_at from customers
+      `select file, email, share_id, label, wedding_date, template, updated_at, plan from customers
        where @q = '%%' or file like @q escape '\\' or email like @q escape '\\' or share_id like @q escape '\\' or label like @q escape '\\' or wedding_date like @q escape '\\'
        order by updated_at desc`
     )
-    .all({ q }) as Pick<Row, "file" | "email" | "share_id" | "label" | "wedding_date" | "template" | "updated_at">[];
-  return rows.map((r) => ({ file: r.file, shareId: r.share_id, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at }));
+    .all({ q }) as (Pick<Row, "file" | "email" | "share_id" | "label" | "wedding_date" | "template" | "updated_at"> & { plan: string })[];
+  return rows.map((r) => ({ file: r.file, shareId: r.share_id, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at, plan: planOf(r) }));
 }
 
 export function getLabel(file: string): string {
@@ -126,6 +128,16 @@ export function getLabel(file: string): string {
 
 export function getTemplate(file: string): string {
   return (getDb().prepare("select template from customers where file = ?").pluck().get(file) as string | undefined) ?? "classic";
+}
+
+// 고객이 없으면 null (데모 슬러그 등 — 제한 대상 아님)
+export function getPlan(file: string): Plan | null {
+  const row = getDb().prepare("select plan from customers where file = ?").get(file) as { plan: string } | undefined;
+  return row ? planOf(row) : null;
+}
+
+export function setPlan(file: string, plan: Plan): boolean {
+  return getDb().prepare("update customers set plan = ? where file = ?").run(plan, file).changes > 0;
 }
 
 export function getShareId(file: string): string | null {

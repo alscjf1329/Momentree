@@ -3,7 +3,8 @@ import type { WeddingData } from "@/types";
 import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
-import { deleteCustomer, getCustomer, listCustomers, newCustomerFile, saveCustomer } from "@/lib/customers";
+import { deleteCustomer, getCustomer, getPlan, listCustomers, newCustomerFile, saveCustomer } from "@/lib/customers";
+import { canUseTemplate, photoLimit, PLAN_MSG } from "@/lib/plan";
 
 // GET /api/clients               → 파일 목록 (customer는 자기 파일만)
 // GET /api/clients?detail=1      → 목록 + 표시 이름·소유자·예식일·수정일 (검색: &q=이메일/이름/예식일)
@@ -44,6 +45,14 @@ export async function POST(req: NextRequest) {
   // 운영자가 지정한 파일명은 이미 있는 고객이어야 한다 (오타·덮어쓰기로 엉뚱한 고객이 생기지 않게)
   if (session.role === "admin" && !isNew && !getCustomer(filename)) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
+  // 플랜 제한(서버 강제). 관리자 대행 편집은 제한 없음. 새로 만드는 고객은 무료로 본다.
+  if (session.role !== "admin") {
+    const plan = getPlan(filename) ?? "free";
+    const d = body.data as WeddingData;
+    if (!canUseTemplate(plan, d?.template)) return NextResponse.json({ error: PLAN_MSG.template }, { status: 403 });
+    if ((d?.gallery?.length ?? 0) > photoLimit(plan)) return NextResponse.json({ error: PLAN_MSG.photos(photoLimit(plan)) }, { status: 403 });
   }
 
   // 소유자(멤버십)는 최초 로그인 때 만들어진다 — 여기선 내용만 저장

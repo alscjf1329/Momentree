@@ -18,18 +18,18 @@ export default function RSVPSection() {
   const [companionName, setCompanionName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !attendance) return;
     setLoading(true);
-    setError(false);
+    setError("");
     try {
       await submitRSVP({ name, side, attendance, guests, companionName, slug: wedding.slug });
       setSubmitted(true);
-    } catch {
-      setError(true);
+    } catch (err) {
+      setError(err instanceof Error && err.message !== "failed" ? err.message : "전송에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -174,7 +174,7 @@ export default function RSVPSection() {
 
           {error && (
             <p className="text-xs text-red-500 text-center">
-              전송에 실패했습니다. 다시 시도해주세요.
+              {error}
             </p>
           )}
 

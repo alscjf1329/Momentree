@@ -86,6 +86,12 @@ const MIGRATIONS: (string | ((db: Database.Database) => void))[] = [
     if (!(db.pragma("table_info(customers)") as { name: string }[]).some((c) => c.name === "retention_notified_at"))
       db.exec("ALTER TABLE customers ADD COLUMN retention_notified_at TEXT");
   },
+  // v5: 플랜(free|paid). 컬럼을 새로 만드는 이 순간 이미 있던 고객은 모두 paid로 이관(기능 유지), 이후 신규는 free.
+  (db) => {
+    if ((db.pragma("table_info(customers)") as { name: string }[]).some((c) => c.name === "plan")) return;
+    db.exec("ALTER TABLE customers ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'");
+    db.exec("UPDATE customers SET plan = 'paid'");
+  },
 ];
 
 export function migrate(db: Database.Database): void {

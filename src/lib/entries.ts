@@ -41,6 +41,10 @@ export function listRsvp(slug: string): RsvpEntry[] {
   return (getDb().prepare("select * from rsvp_entries where slug = ? order by id").all(slug) as RsvpRow[]).map(toRsvp);
 }
 
+export function countRsvp(slug: string): number {
+  return getDb().prepare("select count(*) from rsvp_entries where slug = ?").pluck().get(slug) as number;
+}
+
 export function listRsvpSlugs(): string[] {
   return getDb().prepare("select distinct slug from rsvp_entries order by slug").pluck().all() as string[];
 }

@@ -9,6 +9,8 @@ import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
 import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import AdminForm from "@/components/admin/AdminForm";
+import PlanCard from "@/components/admin/PlanCard";
+import type { Plan } from "@/lib/plan";
 import PreviewPane from "@/components/admin/PreviewPane";
 import SubPageHeader from "@/components/admin/SubPageHeader";
 import ClientSearch from "@/components/admin/ClientSearch";
@@ -38,6 +40,7 @@ export default function SetupForm() {
   const isCustomer = role === "customer";
   const [memberRole, setMemberRole] = useState<string | null>(null);
   const [memberCount, setMemberCount] = useState<number | null>(null);
+  const [plan, setPlan] = useState<Plan | null>(null); // 무료면 미리보기에 워터마크
 
   const schema = getSchemaForTemplate(data.template);
   const errors = validateBySchema(schema, data);
@@ -119,6 +122,7 @@ export default function SetupForm() {
       body: JSON.stringify({ filename: filename || undefined, data: { ...data, slug: filename } }),
     });
     setSaving(false);
+    if (res.status === 403) alert((await res.json().catch(() => ({}))).error ?? "저장하지 못했어요"); // 플랜 제한 안내
     if (res.ok) {
       const file: string = (await res.json()).file ?? filename;
       setFilename(file);
@@ -254,6 +258,7 @@ export default function SetupForm() {
                 )}
               </div>
               )}
+              {filename && <PlanCard file={filename} admin={role === "admin"} onPlan={setPlan} />}
             </>
           )}
 
@@ -267,7 +272,7 @@ export default function SetupForm() {
           )}
         </div>
 
-        <PreviewPane template={data.template} data={data} />
+        <PreviewPane template={data.template} data={data} watermark={plan === "free"} />
       </div>
     </div>
   );

@@ -7,6 +7,8 @@ import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 import { tplPickedKey } from "@/lib/onboarding";
 import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
+import SupportLink from "@/components/SupportLink";
+import { canUseTemplate, type Plan } from "@/lib/plan";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
 
@@ -255,6 +257,15 @@ export default function TemplateList() {
     fetch(`/api/clients?file=${encodeURIComponent(selectedFile)}`).then(r => r.ok ? r.json() : null).then(d => setCurrent(d?.template ?? "")).catch(() => {});
   }, [selectedFile]);
 
+  // 무료 플랜 고객은 허용 목록 밖 템플릿이 잠긴다 (운영자 대행은 제한 없음, 새 고객은 무료로 시작)
+  const [plan, setPlan] = useState<Plan>("free");
+  const [upgrade, setUpgrade] = useState(false);
+  useEffect(() => {
+    if (!selectedFile) { setPlan("free"); return; }
+    fetch(`/api/plan?file=${encodeURIComponent(selectedFile)}`).then(r => r.ok ? r.json() : null).then(d => setPlan(d?.plan === "paid" ? "paid" : "free")).catch(() => {});
+  }, [selectedFile]);
+  const isLocked = (id: string) => role === "customer" && !canUseTemplate(plan, id);
+
   // 쓰는 것 + 추천 3종을 먼저, 나머지는 "더 보기" 뒤로
   const featured = [...TEMPLATES.filter(t => t.id === current), ...TEMPLATES.filter(t => t.id !== current && RECOMMENDED_TEMPLATES.includes(t.id))]; // 쓰는 것이 맨 앞
   const visible = showAll ? [...featured, ...TEMPLATES.filter(t => !featured.includes(t))] : featured;
@@ -263,6 +274,8 @@ export default function TemplateList() {
   // 저장한 뒤 변수 입력(/admin/setup)으로 이동. 나머지 값은 그대로 유지되므로
   // 나중에 템플릿을 다시 바꿔도 이미 입력한 공통 정보는 사라지지 않는다.
   const selectTemplate = async (templateId: string) => {
+    if (isLocked(templateId)) { setUpgrade(true); return; } // 서버도 막지만 먼저 안내
+    setUpgrade(false);
     setSelecting(templateId);
     setError("");
     try {
@@ -424,6 +437,9 @@ export default function TemplateList() {
           {error && (
             <p className="text-xs text-[#b42318] mb-3">{error}</p>
           )}
+          {upgrade && (
+            <p className="text-xs text-ink mb-3 leading-relaxed">이 템플릿은 유료(1회 결제)에서 쓸 수 있어요. 업그레이드가 필요하면 <SupportLink />해 주세요.</p>
+          )}
 
           {/* 템플릿 그리드 */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -448,7 +464,7 @@ export default function TemplateList() {
                 {/* 카드 정보 */}
                 <div className="p-3.5">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-sm text-ink">{t.name}{t.id === current && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle whitespace-nowrap">사용 중</span>}</p>
+                    <p className="font-semibold text-sm text-ink">{t.name}{isLocked(t.id) && <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-rose-soft text-rose align-middle whitespace-nowrap">유료</span>}{t.id === current &&<span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 align-middle whitespace-nowrap">사용 중</span>}</p>
                     <span className="hidden sm:inline text-[9px] px-2 py-0.5 rounded-full bg-[#f2f2f2] text-sub whitespace-nowrap">{t.mood}</span>
                   </div>
                   <p className="text-[10px] text-sub mb-3 leading-relaxed">{t.desc}</p>

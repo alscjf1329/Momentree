@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { addMember, can, INVITABLE, listMembers, removeMember } from "@/lib/access";
-import { customerExists, getLabel, getShareId, getTemplate } from "@/lib/customers";
+import { customerExists, getLabel, getPlan, getShareId, getTemplate } from "@/lib/customers";
+import { canInviteMembers, PLAN_MSG } from "@/lib/plan";
 import { siteUrl } from "@/lib/mailer";
 import { enqueueMail } from "@/lib/mailQueue";
 import { isValidClientFilename, isValidLoginEmail } from "@/lib/newClient";
@@ -28,6 +29,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const t = await target(req, body.file ?? null);
   if (t.error) return t.error;
+  // 멤버 초대는 유료만 (관리자 대행은 제한 없음)
+  if ((await getSession(req))?.role !== "admin" && !canInviteMembers(getPlan(t.file!) ?? "free")) {
+    return NextResponse.json({ error: PLAN_MSG.members }, { status: 403 });
+  }
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const role = body.role ?? "editor";
   if (!isValidLoginEmail(email) || !INVITABLE.includes(role)) {

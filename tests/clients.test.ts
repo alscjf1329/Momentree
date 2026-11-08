@@ -103,6 +103,7 @@ test("API: 고객 본인 저장 시 소유자 기록, 응답에 소유자·내�
 test("공동 편집: 초대받은 편집자는 저장 가능·멤버 관리 불가, 제외되면 기존 세션도 즉시 차단", async () => {
   const members = await import("@/app/api/members/route");
   store.saveCustomer("own@x.com", wedding("가", "나"), "own@x.com");
+  store.setPlan("own@x.com", "paid"); // 함께 편집은 유료만
   const owner: Sess = { role: "customer", file: "own@x.com", email: "own@x.com" };
   const editor: Sess = { role: "customer", file: "own@x.com", email: "ed@x.com" };
   const mreq = async (method: string, s: Sess, body?: unknown, query = "") => new NextRequest("http://localhost/api/members" + query, {

@@ -13,5 +13,6 @@ export async function submitRSVP(payload: RSVPPayload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("failed");
+  // 403 = 응답 마감 — 하객에게 보일 문구는 서버가 내려준다
+  if (!res.ok) throw new Error(res.status === 403 ? (await res.json().catch(() => ({}))).error ?? "failed" : "failed");
 }

@@ -43,8 +43,8 @@ export function importLegacyJson(db: Database.Database, dataDir: string): Import
   const shareIdOf = (file: string) => Object.keys(shareIndex).find((id) => shareIndex[id] === file) ?? newShareId();
 
   const insertCustomer = db.prepare(
-    `insert or ignore into customers (file, email, share_id, label, wedding_date, template, data_enc, created_at, updated_at)
-     values (@file, @email, @share_id, @label, @wedding_date, @template, @data_enc, @created_at, @updated_at)`
+    `insert or ignore into customers (file, email, share_id, label, wedding_date, template, data_enc, created_at, updated_at, plan)
+     values (@file, @email, @share_id, @label, @wedding_date, @template, @data_enc, @created_at, @updated_at, 'paid')` // 기존 고객이므로 paid
   );
   for (const name of jsonFiles(path.join(dataDir, "clients"))) {
     const file = name.slice(0, -".json".length);

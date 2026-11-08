@@ -11,12 +11,14 @@ import type { WeddingData } from "@/types";
 export default function PreviewPage() {
   const params = useParams<{ template: string }>();
   const [data, setData] = useState<WeddingData | null>(null);
+  const [watermark, setWatermark] = useState(false); // 무료 플랜 미리보기에도 워터마크 반영
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       if (event.data?.type !== "wedding-data") return;
       setData(event.data.data as WeddingData);
+      setWatermark(!!event.data.watermark);
     };
     window.addEventListener("message", handler);
     window.parent.postMessage({ type: "preview-ready" }, window.location.origin);
@@ -34,7 +36,7 @@ export default function PreviewPage() {
   const Template = TEMPLATE_MAP[params.template] ?? TEMPLATE_MAP.classic;
 
   return (
-    <WeddingProvider data={data}>
+    <WeddingProvider data={data} watermark={watermark}>
       <Template />
     </WeddingProvider>
   );

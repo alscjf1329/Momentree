@@ -4,7 +4,10 @@ import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
 import { resolvePublicFile } from "@/lib/shareId";
 import { isGuestDataHidden } from "@/lib/retention";
-import { addRsvp, deleteRsvp, listRsvp, listRsvpSlugs, updateRsvp } from "@/lib/entries";
+import { PLAN_MSG } from "@/lib/plan";
+import { getPlan } from "@/lib/customers";
+import { rsvpLimit } from "@/lib/plan";
+import { addRsvp, countRsvp, deleteRsvp, listRsvp, listRsvpSlugs, updateRsvp } from "@/lib/entries";
 
 export type { RsvpEntry } from "@/lib/entries";
 
@@ -32,6 +35,12 @@ export async function POST(req: NextRequest) {
 
   const slug = resolvePublicFile(idOrFile, await getSession(req));
   if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
+
+  // 무료 플랜은 응답 30건까지 새로 받는다 (기존 응답 수정은 PATCH라 영향 없음). 관리자·데모는 제한 없음.
+  const plan = getPlan(slug);
+  if (plan && (await getSession(req))?.role !== "admin" && countRsvp(slug) >= rsvpLimit(plan)) {
+    return NextResponse.json({ error: PLAN_MSG.rsvp }, { status: 403 });
+  }
 
   addRsvp(slug, rest);
   return NextResponse.json({ ok: true });

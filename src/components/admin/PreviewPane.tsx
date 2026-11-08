@@ -4,16 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import type { WeddingData } from "@/types";
 
 // 미리보기 iframe + 실시간 데이터 전달 (데스크톱 패널과 모바일 전체화면이 공용)
-function PreviewFrame({ template, data }: { template: string; data: WeddingData }) {
+function PreviewFrame({ template, data, watermark }: { template: string; data: WeddingData; watermark: boolean }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const dataRef = useRef(data);
+  const wmRef = useRef(watermark);
+  wmRef.current = watermark;
   const readyRef = useRef(false);
   dataRef.current = data;
   // 템플릿이 바뀌면 iframe이 새로 로드되고 preview-ready가 다시 온다 (onLoad에서 readyRef를 끄면 ready가 먼저 도착한 경우 이후 전달이 영영 막힘)
 
   const send = () => {
     iframeRef.current?.contentWindow?.postMessage(
-      { type: "wedding-data", data: dataRef.current },
+      { type: "wedding-data", data: dataRef.current, watermark: wmRef.current },
       window.location.origin
     );
   };
@@ -36,7 +38,7 @@ function PreviewFrame({ template, data }: { template: string; data: WeddingData 
     const t = setTimeout(send, 150);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, watermark]);
 
   return (
     <iframe
@@ -49,7 +51,7 @@ function PreviewFrame({ template, data }: { template: string; data: WeddingData 
   );
 }
 
-export default function PreviewPane({ template, data }: { template: string; data: WeddingData }) {
+export default function PreviewPane({ template, data, watermark = false }: { template: string; data: WeddingData; watermark?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -58,7 +60,7 @@ export default function PreviewPane({ template, data }: { template: string; data
       <div className="sticky top-[104px] hidden xl:block">
         <p className="text-[10px] font-semibold text-sub tracking-widest uppercase mb-2">실시간 미리보기</p>
         <div className="rounded-[32px] border-8 border-gray-800 overflow-hidden shadow-xl bg-white" style={{ width: 380, height: 720 }}>
-          <PreviewFrame template={template} data={data} />
+          <PreviewFrame template={template} data={data} watermark={watermark} />
         </div>
       </div>
 
@@ -75,7 +77,7 @@ export default function PreviewPane({ template, data }: { template: string; data
             <button onClick={() => setOpen(false)} className="text-sm px-3 py-1.5 text-ink">닫기 ✕</button>
           </div>
           <div className="flex-1 bg-white min-h-0">
-            <PreviewFrame template={template} data={data} />
+            <PreviewFrame template={template} data={data} watermark={watermark} />
           </div>
         </div>
       )}
