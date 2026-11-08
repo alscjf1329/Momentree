@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import SupportLink from "@/components/SupportLink";
+import { SUPPORT } from "@/lib/support";
 import { Suspense, useEffect, useState } from "react";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -118,6 +120,8 @@ function NavInner() {
               )}
               <div className="border-t border-line pt-1">
                 <Link href="/" className="flex items-center px-3 h-11 rounded-xl hover:bg-soft text-ink">홈으로</Link>
+                <Link href="/faq" className="flex items-center px-3 h-11 rounded-xl hover:bg-soft text-ink">자주 묻는 질문</Link>
+                {SUPPORT.kind === "kakao" && <SupportLink className="flex items-center px-3 h-11 rounded-xl hover:bg-soft text-ink" />}
                 <button onClick={logout} className="w-full text-left px-3 h-11 rounded-xl hover:bg-soft text-ink">로그아웃</button>
               </div>
             </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
+import SupportLink from "@/components/SupportLink";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
 // 사진 격자 타일 (눌러서 해당 데모를 연다)
@@ -99,7 +100,9 @@ export default async function Home() {
       <footer className="border-t border-line py-7 px-6 text-center text-xs text-sub leading-relaxed">
         <p>링크 하나 · 참석 응답 · 방명록 · 함께 편집</p>
         <p className="mt-1">© momentree</p>
-        <p className="mt-2 flex justify-center gap-4">
+        <p className="mt-2 flex flex-wrap justify-center gap-x-4">
+          <Link href="/faq" className="underline underline-offset-4">자주 묻는 질문</Link>
+          <SupportLink />
           <Link href="/terms" className="underline underline-offset-4">이용약관</Link>
           <Link href="/privacy" className="underline underline-offset-4">개인정보처리방침</Link>
         </p>
