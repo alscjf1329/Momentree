@@ -99,7 +99,7 @@ function NavInner() {
           {/* 계정 메뉴 */}
           <details className="relative shrink-0 group">
             <summary aria-label="내 계정" className="list-none cursor-pointer [&::-webkit-details-marker]:hidden w-10 h-10 rounded-full p-[2px]"
-              style={{ background: "linear-gradient(135deg,#F6A5BE,#C2255C)" }}>
+              style={{ background: "linear-gradient(135deg,#F6A5BE,var(--color-rose))" }}>
               <span className="w-full h-full rounded-full border-2 border-white bg-rose-soft text-rose text-sm font-bold flex items-center justify-center">{initial}</span>
             </summary>
             <div className="absolute right-0 top-12 w-64 bg-white border border-line rounded-2xl shadow-lg p-2 text-sm">

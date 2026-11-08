@@ -26,7 +26,7 @@ export default function DemoPhone() {
             <button key={t.id} role="tab" aria-selected={on} onClick={() => setId(t.id)}
               className="flex flex-col items-center gap-1.5 shrink-0 min-w-[64px]">
               <span className="w-[68px] h-[68px] rounded-full p-[3px] block transition-opacity"
-                style={{ background: on ? "linear-gradient(135deg,#F6A5BE,#C2255C)" : "#d4d4d4", opacity: on ? 1 : 0.7 }}>
+                style={{ background: on ? "linear-gradient(135deg,#F6A5BE,var(--color-rose))" : "#d4d4d4", opacity: on ? 1 : 0.7 }}>
                 <span className="w-full h-full rounded-full border-[3px] border-white flex items-center justify-center font-serif text-[11px]"
                   style={{ background: t.bg, color: t.fg }}>{t.name.slice(0, 3)}</span>
               </span>

@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 @theme {
+  /* 확정 팔레트(MOM-17): 흑백 + 로즈 #C2255C 하나, 배경 흰색 — 앱 화면(랜딩·관리·편집)용 */
+  --color-ink: #111111;
+  --color-sub: #6b6b6b;
+  --color-line: #ebebeb;
+  --color-soft: #fafafa;
+  --color-rose: #c2255c;
+  --color-rose-soft: #fdeef3;
+
+  /* 아래 크림·브라운·골드 계열은 청첩장 템플릿/테마(themes.ts)가 쓰는 기본값 — 앱 화면에는 쓰지 말 것 */
   --color-primary: #8b6f5e;
   --color-primary-light: #c4a898;
   --color-primary-dark: #5c4035;
@@ -10,14 +19,6 @@
   --color-warm-gray: #9e8e84;
   --color-text: #3d2e28;
   --color-text-light: #7a6358;
-
-  /* 앱 화면(관리·편집)용 — 청첩장 템플릿의 색과는 별개 */
-  --color-ink: #111111;
-  --color-sub: #6b6b6b;
-  --color-line: #ebebeb;
-  --color-soft: #fafafa;
-  --color-rose: #c2255c;
-  --color-rose-soft: #fdeef3;
 
   --font-serif: "Noto Serif KR", "Georgia", serif;
   --font-sans: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
