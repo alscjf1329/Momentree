@@ -11,6 +11,7 @@ import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import AdminForm from "@/components/admin/AdminForm";
 import PreviewPane from "@/components/admin/PreviewPane";
 import SubPageHeader from "@/components/admin/SubPageHeader";
+import ClientSearch from "@/components/admin/ClientSearch";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 
 const DEFAULT_DATA = DEFAULT_WEDDING_DATA;
@@ -170,18 +171,9 @@ export default function SetupForm() {
               </div>
             </div>
             {dir.total > 0 && (
-              <div className="bg-white rounded-2xl border border-line overflow-hidden">
-                <div className="px-4 py-3 border-b border-line bg-soft"><p className="text-xs font-bold text-sub">고객 목록</p></div>
-                <div className="p-2 space-y-0.5 max-h-72 overflow-y-auto">
-                  <input className="w-full mb-1 px-3 h-10 text-[13px] border border-[#d4d4d4] rounded-xl"
-                    placeholder="이름·이메일·파일명 검색" value={dir.q} onChange={e => dir.setQ(e.target.value)} />
-                  {dir.clients.map(c => (
-                    <button key={c.file} onClick={() => loadFile(c.file)} title={c.file}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-[13px] transition-colors ${filename === c.file ? "bg-ink text-white" : "text-ink hover:bg-soft"}`}>
-                      {dir.display(c)}
-                    </button>
-                  ))}
-                </div>
+              <div className="bg-white rounded-2xl border border-line">
+                <div className="px-4 py-3 border-b border-line bg-soft rounded-t-2xl"><p className="text-xs font-bold text-sub">고객 검색</p></div>
+                <div className="p-3"><ClientSearch dir={dir} current={filename} onSelect={loadFile} /></div>
               </div>
             )}
           </aside>
@@ -199,16 +191,7 @@ export default function SetupForm() {
                 <button onClick={() => setFilename(namesToSlug(data.groom.name, data.bride.name))}
                   className="px-3 h-11 text-sm bg-white border border-[#d4d4d4] rounded-xl whitespace-nowrap">자동생성</button>
               </div>
-              {dir.total > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {dir.clients.map(c => (
-                    <button key={c.file} onClick={() => loadFile(c.file)} title={c.file}
-                      className={`px-3 h-9 text-xs rounded-full border transition-colors ${filename === c.file ? "bg-ink text-white border-ink" : "border-[#d4d4d4] text-ink bg-white"}`}>
-                      {dir.display(c)}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {dir.total > 0 && <ClientSearch dir={dir} current={filename} onSelect={loadFile} />}
             </div>
           )}
 

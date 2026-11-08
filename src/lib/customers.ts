@@ -12,6 +12,7 @@ import { DEFAULT_WEDDING_DATA as BLANK } from "@/lib/newClient";
 export interface CustomerSummary {
   file: string;
   label: string;
+  shareId: string;
   owner: string; // 가입 이메일 (관리자가 만든 고객은 빈 문자열)
   weddingDate: string;
   template: string;
@@ -86,17 +87,17 @@ export function deleteCustomer(file: string): boolean {
   return getDb().prepare("delete from customers where file = ?").run(file).changes > 0;
 }
 
-// 최근 수정 순. 검색은 이메일·표시 이름·파일명·예식일 부분 일치.
+// 최근 수정 순. 검색은 이메일·고객ID(공유 ID)·표시 이름·파일명·예식일 부분 일치.
 export function listCustomers(query = ""): CustomerSummary[] {
   const q = `%${query.trim().replace(/[\\%_]/g, "\\$&")}%`;
   const rows = getDb()
     .prepare(
-      `select file, email, label, wedding_date, template, updated_at from customers
-       where @q = '%%' or file like @q escape '\\' or email like @q escape '\\' or label like @q escape '\\' or wedding_date like @q escape '\\'
+      `select file, email, share_id, label, wedding_date, template, updated_at from customers
+       where @q = '%%' or file like @q escape '\\' or email like @q escape '\\' or share_id like @q escape '\\' or label like @q escape '\\' or wedding_date like @q escape '\\'
        order by updated_at desc`
     )
-    .all({ q }) as Pick<Row, "file" | "email" | "label" | "wedding_date" | "template" | "updated_at">[];
-  return rows.map((r) => ({ file: r.file, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at }));
+    .all({ q }) as Pick<Row, "file" | "email" | "share_id" | "label" | "wedding_date" | "template" | "updated_at">[];
+  return rows.map((r) => ({ file: r.file, shareId: r.share_id, label: r.label, owner: r.email ?? "", weddingDate: r.wedding_date, template: r.template, updatedAt: r.updated_at }));
 }
 
 export function getLabel(file: string): string {

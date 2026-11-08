@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import ClientSearch from "@/components/admin/ClientSearch";
+import { useClientDirectory } from "@/lib/useClientDirectory";
 import type { RsvpEntry } from "@/app/api/rsvp/route";
 import type { GuestbookEntry } from "@/app/api/guestbook/route";
 
@@ -15,7 +17,7 @@ const MESSAGES_PER_PAGE = 5;
 
 export default function AdminPage() {
   const [me, setMe] = useState<Me | null>(null);
-  const [slugs, setSlugs] = useState<string[]>([]);
+  const dir = useClientDirectory();
   const [file, setFile] = useState("");
   const [tab, setTab] = useState<Tab>("rsvp");
   const [sideFilter, setSideFilter] = useState<"all" | "groom" | "bride">("all");
@@ -46,8 +48,6 @@ export default function AdminPage() {
         setFile(data.file);
         loadRsvps(data.file);
         loadMessages(data.file);
-      } else if (data?.role === "admin") {
-        fetch("/api/rsvp").then(r => r.json()).then(setSlugs).catch(() => {});
       }
     }).catch(() => {});
   }, [loadRsvps, loadMessages]);
@@ -125,15 +125,7 @@ export default function AdminPage() {
       {isAdmin && (
         <div className="bg-soft rounded-2xl border border-line p-4">
           <p className="text-xs font-bold text-sub mb-3">고객 선택</p>
-          {slugs.length === 0 ? (
-            <p className="text-[13px] text-sub">아직 RSVP 응답이 없습니다</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {slugs.map(s => (
-                <button key={s} onClick={() => selectFile(s)} className={`${chip(file === s)} font-mono`}>{s}</button>
-              ))}
-            </div>
-          )}
+          <ClientSearch dir={dir} current={file} onSelect={selectFile} />
         </div>
       )}
 
