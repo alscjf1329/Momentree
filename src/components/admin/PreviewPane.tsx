@@ -64,7 +64,7 @@ export default function PreviewPane({ template, data }: { template: string; data
 
       {/* 모바일·태블릿: 떠 있는 버튼 → 전체화면 미리보기 (입력한 내용이 그대로 반영됨) */}
       <button onClick={() => setOpen(true)}
-        className="xl:hidden fixed bottom-5 right-4 z-40 px-5 py-3 rounded-full text-sm font-medium text-white shadow-lg"
+        className="xl:hidden fixed bottom-24 sm:bottom-6 right-4 z-40 px-5 py-3 rounded-full text-sm font-medium text-white shadow-lg"
         style={{ background: "var(--color-primary-dark, #1f2937)" }}>
         미리보기
       </button>

@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-const NAV = [
-  { href: "/admin", label: "하객 현황" },
-  { href: "/admin/setup", label: "고객 설정" },
-  { href: "/admin/templates", label: "템플릿" },
-];
+const ICONS: Record<string, React.ReactNode> = {
+  "/admin": <><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8" /></>,
+  "/admin/setup": <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></>,
+  "/admin/templates": <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
+  "/admin/admins": <><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z" /></>,
+};
 
 interface Me {
   role: "admin" | "customer";
@@ -18,6 +19,14 @@ interface Me {
   label: string | null;
   memberRole: string | null;
   files: { file: string; role: string; label: string }[];
+}
+
+function Icon({ d }: { d: string }) {
+  return (
+    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {ICONS[d]}
+    </svg>
+  );
 }
 
 function NavInner() {
@@ -32,7 +41,12 @@ function NavInner() {
   }, []);
 
   const isCustomer = me?.role === "customer";
-  const nav = me?.superAdmin ? [...NAV, { href: "/admin/admins", label: "관리자 관리" }] : NAV;
+  const nav = [
+    { href: "/admin", label: "하객" },
+    { href: "/admin/setup", label: isCustomer ? "편집" : "고객 설정" },
+    { href: "/admin/templates", label: "템플릿" },
+    ...(me?.superAdmin ? [{ href: "/admin/admins", label: "관리자" }] : []),
+  ];
 
   const logout = async () => {
     await fetch("/api/admin/auth/logout", { method: "POST" });
@@ -40,104 +54,98 @@ function NavInner() {
     router.refresh();
   };
 
-  const active = (href: string) =>
-    href === "/admin" ? path === "/admin" : path.startsWith(href);
+  const switchTo = async (f: string) => {
+    const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: f }) });
+    if (r.ok) location.href = "/admin/setup";
+  };
 
-  // 파일 컨텍스트 유지하며 링크 생성 (customer는 항상 자기 파일에 고정되므로 굳이 붙이지 않아도 됨)
-  const href = (base: string) => (!isCustomer && file) ? `${base}?file=${file}` : base;
+  const active = (href: string) => (href === "/admin" ? path === "/admin" : path.startsWith(href));
+  // 운영자는 선택한 고객(?file=)을 유지한 채 이동 (고객은 항상 자기 청첩장에 고정)
+  const href = (base: string) => (!isCustomer && file ? `${base}?file=${file}` : base);
+  const initial = (me?.email ?? "?")[0].toUpperCase();
+  const shareHref = isCustomer ? "/admin/share" : file ? `/admin/share?file=${file}` : null;
+  const multi = isCustomer && (me?.files.length ?? 0) > 1;
 
   return (
-    <div className="px-4 sm:px-6 h-14 flex items-center gap-2 max-w-6xl mx-auto">
-      {/* 로고 */}
-      <Link href="/"
-        className="font-serif text-sm tracking-widest shrink-0 hidden sm:block"
-        style={{ color: "var(--color-primary-dark)" }}>
-        Momentree
-      </Link>
-      <span className="text-gray-200 hidden sm:block text-xs">|</span>
+    <>
+      <header className="sticky top-0 z-50 bg-white border-b border-line">
+        <div className="px-4 sm:px-6 h-14 flex items-center gap-3 max-w-6xl mx-auto">
+          <Link href="/" className="font-serif font-semibold text-[21px] tracking-tight text-ink shrink-0">momentree</Link>
 
-      {/* 탭 */}
-      <nav className="flex items-center gap-0.5 flex-1 overflow-x-auto"
-        style={{ scrollbarWidth: "none" }}>
+          {/* 넓은 화면: 위쪽 탭 */}
+          <nav className="hidden sm:flex items-center gap-1 flex-1 ml-4">
+            {nav.map(({ href: base, label }) => (
+              <Link key={base} href={href(base)}
+                className={`px-4 h-9 inline-flex items-center rounded-full text-sm transition-colors ${active(base) ? "bg-ink text-white font-medium" : "text-sub hover:bg-soft"}`}>
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex-1 sm:hidden" />
+
+          {!isCustomer && file && (
+            <span className="text-[11px] font-mono px-2.5 py-1 bg-soft rounded-full text-sub max-w-[120px] truncate hidden sm:block">{file}</span>
+          )}
+
+          {shareHref && (
+            <Link href={shareHref} aria-label="청첩장 공유"
+              className="w-10 h-10 rounded-full border border-[#d4d4d4] inline-flex items-center justify-center text-ink hover:bg-soft shrink-0">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7" /><path d="M16 6l-4-4-4 4" /><path d="M12 2v13" /></svg>
+            </Link>
+          )}
+
+          {/* 계정 메뉴 */}
+          <details className="relative shrink-0 group">
+            <summary aria-label="내 계정" className="list-none cursor-pointer [&::-webkit-details-marker]:hidden w-10 h-10 rounded-full p-[2px]"
+              style={{ background: "linear-gradient(135deg,#F6A5BE,#C2255C)" }}>
+              <span className="w-full h-full rounded-full border-2 border-white bg-rose-soft text-rose text-sm font-bold flex items-center justify-center">{initial}</span>
+            </summary>
+            <div className="absolute right-0 top-12 w-64 bg-white border border-line rounded-2xl shadow-lg p-2 text-sm">
+              <div className="px-3 py-2">
+                <p className="font-medium text-ink truncate">{me?.email ?? ""}</p>
+                {isCustomer && <p className="text-xs text-sub truncate">{me?.memberRole === "editor" ? `${me.label || "청첩장"} · 함께 편집 중` : "내 청첩장"}</p>}
+              </div>
+              {multi && (
+                <div className="border-t border-line py-1">
+                  <p className="px-3 py-1 text-xs text-sub">청첩장 전환</p>
+                  {me!.files.map(f => (
+                    <button key={f.file} onClick={() => switchTo(f.file)}
+                      className={`w-full text-left px-3 h-11 rounded-xl hover:bg-soft truncate ${f.file === me!.file ? "font-bold text-ink" : "text-ink"}`}>
+                      {f.label || f.file} <span className="text-xs text-sub">· {f.role === "owner" ? "내 청첩장" : "함께 편집"}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="border-t border-line pt-1">
+                <Link href="/" className="flex items-center px-3 h-11 rounded-xl hover:bg-soft text-ink">홈으로</Link>
+                <button onClick={logout} className="w-full text-left px-3 h-11 rounded-xl hover:bg-soft text-ink">로그아웃</button>
+              </div>
+            </div>
+          </details>
+        </div>
+      </header>
+
+      {/* 좁은 화면: 아래 탭 (엄지가 닿는 곳) */}
+      <nav aria-label="주 메뉴" className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-line flex"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {nav.map(({ href: base, label }) => (
-          <Link key={base} href={href(base)}
-            className="px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0"
-            style={active(base)
-              ? { background: "var(--color-primary-dark)", color: "#fff" }
-              : { color: "#666" }}>
-            {base === "/admin/setup" && isCustomer ? "청첩장 편집" : label}
+          <Link key={base} href={href(base)} aria-current={active(base) ? "page" : undefined}
+            className={`flex-1 h-16 flex flex-col items-center justify-center gap-0.5 text-xs ${active(base) ? "text-ink font-bold" : "text-sub"}`}>
+            <Icon d={base} />
+            {label}
           </Link>
         ))}
       </nav>
-
-      {/* 여러 청첩장의 멤버이면 어디서든 전환 (내 청첩장 + 초대받은 청첩장) */}
-      {isCustomer && me && me.files.length > 1 && (
-        <select value={me.file ?? ""} aria-label="청첩장 선택"
-          className="shrink-0 max-w-[150px] sm:max-w-[240px] text-[11px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-600"
-          onChange={async e => {
-            const r = await fetch("/api/admin/auth/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: e.target.value }) });
-            if (r.ok) location.href = "/admin/setup";
-          }}>
-          {me.files.map(f => (
-            <option key={f.file} value={f.file}>{f.label || f.file} · {f.role === "owner" ? "내 청첩장" : "함께 편집"}</option>
-          ))}
-        </select>
-      )}
-
-      {/* 로그인 이메일 / 현재 선택된 파일 */}
-      {isCustomer && me && me.files.length > 1 ? null : isCustomer ? (
-        me?.email && (
-          <span className="text-[11px] text-gray-400 max-w-[220px] truncate hidden sm:block" title={me.email}>
-            {me.memberRole === "editor" ? `${me.label || "청첩장"} · 함께 편집 중` : me.email}
-          </span>
-        )
-      ) : (
-        file && (
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] text-gray-400 hidden sm:block">파일</span>
-            <span className="text-[11px] font-mono px-2.5 py-1 bg-gray-100 rounded-lg text-gray-600 max-w-[120px] truncate">
-              {file}
-            </span>
-          </div>
-        )
-      )}
-
-      {/* 홈 */}
-      <Link href="/"
-        className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 shrink-0 hidden sm:block">
-        ← 홈
-      </Link>
-
-      {/* 로그아웃 */}
-      <button onClick={logout}
-        className="text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 shrink-0">
-        로그아웃
-      </button>
-    </div>
+    </>
   );
 }
 
 export default function AdminNav() {
   const path = usePathname();
   if (path === "/admin/login") return null;
-
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100"
-      style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.04)" }}>
-      <Suspense fallback={
-        <div className="px-4 sm:px-6 h-14 flex items-center gap-2 max-w-6xl mx-auto">
-          <nav className="flex items-center gap-0.5 flex-1">
-            {NAV.map(({ href, label }) => (
-              <Link key={href} href={href}
-                className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-gray-400 whitespace-nowrap">
-                {label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      }>
-        <NavInner />
-      </Suspense>
-    </header>
+    <Suspense fallback={<header className="sticky top-0 z-50 bg-white border-b border-line h-14" />}>
+      <NavInner />
+    </Suspense>
   );
 }

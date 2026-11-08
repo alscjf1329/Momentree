@@ -11,6 +11,14 @@
   --color-text: #3d2e28;
   --color-text-light: #7a6358;
 
+  /* 앱 화면(관리·편집)용 — 청첩장 템플릿의 색과는 별개 */
+  --color-ink: #111111;
+  --color-sub: #6b6b6b;
+  --color-line: #ebebeb;
+  --color-soft: #fafafa;
+  --color-rose: #c2255c;
+  --color-rose-soft: #fdeef3;
+
   --font-serif: "Noto Serif KR", "Georgia", serif;
   --font-sans: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
 }
