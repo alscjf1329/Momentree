@@ -4,7 +4,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Tbd } from "@/components/LegalPage";
 import SupportLink from "@/components/SupportLink";
+import ContactForm from "@/components/ContactForm";
+import { telegramConfigured } from "@/lib/notify";
 
+// 텔레그램 설정 여부를 요청 시점 env로 판단(빌드 시 고정 방지)
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "자주 묻는 질문 — Momentree" };
 
 const FAQS: { q: string; a: ReactNode }[] = [
@@ -41,6 +45,8 @@ export default function FaqPage() {
         <section className="mt-10 bg-soft border border-line rounded-lg px-4 py-4 text-sm leading-relaxed break-words">
           <p className="font-bold">원하는 답을 못 찾으셨나요?</p>
           <p className="mt-1"><SupportLink className="text-rose font-bold underline underline-offset-4" /></p>
+          {/* 운영자 알림 채널이 없으면 폼을 숨겨 접수된 척하지 않는다 */}
+          {telegramConfigured() && <><p className="mt-4 font-bold">메일로 문의</p><ContactForm /></>}
         </section>
 
         <footer className="mt-12 pt-5 border-t border-line text-xs text-sub flex gap-4">

@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { DATA_DIR } from "@/lib/paths";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
 import { deliverMail } from "@/lib/mailer";
+import { notifyOperator } from "@/lib/notify";
 
 // 메일 발송 파일 큐: DATA_DIR/mail-queue/{pending,sent,failed}/<id>.json
 // 선택 이유: 스키마 마이그레이션 없이 상태 = 디렉터리 이동(rename 한 번)으로 표현되는 파일 큐가 SQLite 테이블보다 단순.
@@ -75,6 +76,8 @@ async function attempt(id: string, o: MailOpts): Promise<boolean> {
       r.lastError = e instanceof Error ? e.name : "Error";
       if (r.attempts >= r.maxAttempts) {
         r.status = "failed"; write(o, "failed", r); fs.unlinkSync(f);
+        // failed로 넘어가는 순간 1회만 알림(id만, 수신자·본문 제외). 재시도 없는 로그인 코드(maxAttempts=1)는 제외
+        if (r.maxAttempts > 1) void notifyOperator(`[메일 실패] ${id} — ${r.attempts}회 시도 후 failed`);
       } else {
         r.nextAt = now() + (o.baseDelayMs ?? 30_000) * 2 ** (r.attempts - 1);
         write(o, "pending", r);

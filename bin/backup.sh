@@ -4,7 +4,16 @@
 # (sqlite3 CLI가 있으면 그걸, 없으면 실행 중인 컨테이너의 better-sqlite3를 사용).
 # 사용: bin/backup.sh                      (기본: /data/momentree → /data/momentree-backups, 14개 보관)
 #       DATA_DIR=... BACKUP_DIR=... KEEP=30 bin/backup.sh
-# cron 예시 (매일 04:00): 0 4 * * * /app/Momentree/bin/backup.sh >> /var/log/momentree-backup.log 2>&1
+#
+# [서버에서 직접 할 일 — 코드는 crontab을 건드리지 않는다]
+# 1) crontab 등록 (crontab -e), 매일 04:00:
+#      0 4 * * * /app/Momentree/bin/backup.sh >> /var/log/momentree-backup.log 2>&1
+#    실행 권한 확인: chmod +x /app/Momentree/bin/backup.sh
+# 2) 같은 서버 디스크에만 두면 디스크 장애 때 같이 사라지므로 외부로 복사할 것. 예(다른 서버로 rsync, 매일 05:00):
+#      0 5 * * * rsync -a /data/momentree-backups/ user@backup-host:/backups/momentree/
+#    또는 클라우드 스토리지로: rclone copy /data/momentree-backups remote:momentree-backups
+#    (백업에는 하객 응답 등 개인정보가 들어 있다 — 전송·보관 위치는 비공개로, 가능하면 암호화)
+# 3) 가끔 복원 연습: 백업을 tar -xzf 로 풀어 momentree.db가 열리는지 확인
 set -euo pipefail
 
 DATA_DIR="${DATA_DIR:-/data/momentree}"
