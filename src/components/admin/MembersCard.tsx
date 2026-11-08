@@ -28,11 +28,9 @@ export default function MembersCard({ file, admin }: { file: string; admin: bool
     const j = await r.json();
     if (!r.ok) return setError(j.error ?? "추가하지 못했습니다");
     setEmail(""); load();
-    if (j.mailed) setNotice(`${to} 님께 초대 메일을 보냈어요`);
-    else { // 메일이 안 나가도 링크로 직접 전달할 수 있게
-      await navigator.clipboard?.writeText(j.loginUrl).catch(() => {});
-      setNotice("메일 발송에 실패했어요. 초대 링크를 복사했으니 직접 전달해 주세요");
-    }
+    // 메일은 큐에 접수만 된 상태(곧 발송, 실패 시 자동 재시도). 안 오는 경우를 대비해 링크도 복사해 둔다.
+    await navigator.clipboard?.writeText(j.loginUrl).catch(() => {});
+    setNotice(`${to} 님께 초대 메일을 보내는 중이에요. 오래 안 오면 복사된 초대 링크를 직접 전달해 주세요`);
   };
   const remove = async (m: Member) => {
     if (!confirm(`${m.email} 님을 제외할까요?`)) return;

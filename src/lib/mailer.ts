@@ -1,17 +1,12 @@
 import nodemailer from "nodemailer";
 import type { NextRequest } from "next/server";
 
-// Gmail 발송 (OTP·초대 메일 공용). 설정이 없으면 false, 발송 실패도 false.
-export async function sendMail(to: string, subject: string, html: string): Promise<boolean> {
+// Gmail 발송. 설정이 없거나 SMTP 실패면 throw — 앱 코드는 직접 부르지 말고 mailQueue.enqueueMail을 쓴다.
+export async function deliverMail(to: string, subject: string, html: string): Promise<void> {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) return false;
-  try {
-    await nodemailer.createTransport({ service: "gmail", auth: { user, pass } }).sendMail({ from: `Momentree <${user}>`, to, subject, html });
-    return true;
-  } catch {
-    return false;
-  }
+  if (!user || !pass) throw new Error("mail not configured");
+  await nodemailer.createTransport({ service: "gmail", auth: { user, pass } }).sendMail({ from: `Momentree <${user}>`, to, subject, html });
 }
 
 // 메일 속 링크용 주소. SITE_URL이 있으면 그것, 없으면 프록시 헤더/요청 주소
