@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import QRCode from "qrcode";
 import SubPageHeader from "@/components/admin/SubPageHeader";
 import { useInviteQuery } from "@/lib/useShareId";
+import { sharedKey } from "@/lib/onboarding";
 import { TEMPLATE_NAMES } from "@/lib/templateNames";
 
 // 청첩장 공유: QR · 링크 복사 · 공유 시트(카카오톡 등) · 문자
@@ -33,6 +34,12 @@ export default function ShareView() {
     }).catch(() => {});
   }, [file]);
 
+  // 온보딩 체크리스트: 링크 복사·보내기·문자·QR 저장 중 하나를 눌렀을 때 '공유함'으로 기록 (브라우저 단위)
+  const markShared = () => {
+    if (!file) return;
+    try { localStorage.setItem(sharedKey(file), "1"); } catch { /* 무시 */ }
+  };
+
   const template = picked || info?.template || "";
   const url = info && typeof window !== "undefined" ? `${window.location.origin}/invite/${template}?${query}` : "";
   useEffect(() => {
@@ -40,11 +47,13 @@ export default function ShareView() {
   }, [url]);
 
   const copy = async () => {
+    markShared();
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   const share = async () => {
+    markShared();
     if (navigator.share) { try { await navigator.share({ url, title: "청첩장" }); } catch { /* 공유 시트를 닫음 */ } return; }
     copy();
   };
@@ -93,8 +102,8 @@ export default function ShareView() {
             <div className="flex flex-col gap-2.5">
               <button onClick={share} className={`${act} bg-ink text-white font-bold`}>카카오톡·메신저로 보내기</button>
               <div className="flex gap-2.5">
-                <a href={qr} download="청첩장-QR.png" className={`${act} flex-1 border border-[#d4d4d4] font-medium text-sm`}>QR 저장</a>
-                <a href={`sms:?body=${encodeURIComponent(url)}`} className={`${act} flex-1 border border-[#d4d4d4] font-medium text-sm`}>문자로 보내기</a>
+                <a href={qr} download="청첩장-QR.png" onClick={markShared} className={`${act} flex-1 border border-[#d4d4d4] font-medium text-sm`}>QR 저장</a>
+                <a href={`sms:?body=${encodeURIComponent(url)}`} onClick={markShared} className={`${act} flex-1 border border-[#d4d4d4] font-medium text-sm`}>문자로 보내기</a>
               </div>
               <a href={url} target="_blank" rel="noreferrer" className="h-11 flex items-center justify-center text-sm text-sub underline underline-offset-4">내 청첩장 미리 열어보기</a>
             </div>

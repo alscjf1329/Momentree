@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
+import { tplPickedKey } from "@/lib/onboarding";
 import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
@@ -285,6 +286,7 @@ export default function TemplateList() {
       if (!filename) filename = (await res.json()).file as string;
 
       localStorage.setItem(LAST_FILE_KEY, filename);
+      localStorage.setItem(tplPickedKey(filename), "1"); // 온보딩 체크리스트: 템플릿을 직접 골랐음
       router.push(`/admin/setup?file=${encodeURIComponent(filename)}`);
     } catch {
       setError("템플릿을 저장하지 못했습니다. 다시 시도해주세요.");

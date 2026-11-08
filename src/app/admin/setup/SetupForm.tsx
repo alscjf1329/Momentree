@@ -13,6 +13,7 @@ import PreviewPane from "@/components/admin/PreviewPane";
 import SubPageHeader from "@/components/admin/SubPageHeader";
 import ClientSearch from "@/components/admin/ClientSearch";
 import { useClientDirectory } from "@/lib/useClientDirectory";
+import { computeOnboarding, tplPickedKey, sharedKey } from "@/lib/onboarding";
 
 const DEFAULT_DATA = DEFAULT_WEDDING_DATA;
 const LS_KEY = "momentree_last_file";
@@ -54,6 +55,17 @@ export default function SetupForm() {
   const required: FieldSchema[] = schema.sections.flatMap((s) => s.fields).filter((f) => f.required);
   const doneCount = required.filter((f) => !isEmpty(getByPath(data, f.key))).length;
   const allDone = required.length > 0 && doneCount === required.length;
+
+  // 온보딩 체크리스트 (고객 계정 전용). 템플릿 선택·공유 여부는 localStorage 기록 — lib/onboarding.ts 참고
+  const [flags, setFlags] = useState({ templatePicked: false, shared: false });
+  useEffect(() => {
+    if (!filename) return;
+    try {
+      setFlags({ templatePicked: !!localStorage.getItem(tplPickedKey(filename)), shared: !!localStorage.getItem(sharedKey(filename)) });
+    } catch { /* 저장소 차단 시 미완료로 표시 */ }
+  }, [filename]);
+  const onboarding = computeOnboarding(data, flags);
+  const stepHref: Record<string, string> = { info: "#setup-form", photos: `/admin/setup${q("view=photos")}`, template: `/admin/templates${q()}`, share: `/admin/share${q()}` };
 
   const loadFile = useCallback(async (f: string) => {
     if (!f) return;
@@ -207,6 +219,26 @@ export default function SetupForm() {
                 </div>
               </div>
 
+              {isCustomer ? (
+                // 모두 끝나면 접힌 채로 두어 방해하지 않는다 (펼쳐서 다시 볼 수 있음)
+                <details key={String(onboarding.allDone)} open={!onboarding.allDone} className="rounded-2xl border border-line bg-soft">
+                  <summary className="px-4 min-h-[48px] flex items-center justify-between gap-3 cursor-pointer text-[13px]">
+                    <b>{onboarding.allDone ? "준비를 모두 마쳤어요" : "청첩장 준비 체크리스트"}</b>
+                    <span className="text-sub shrink-0">{onboarding.doneCount} / {onboarding.steps.length}</span>
+                  </summary>
+                  <ol className="px-2 pb-2">
+                    {onboarding.steps.map((s, i) => (
+                      <li key={s.id}>
+                        <Link href={stepHref[s.id]} className="min-h-[44px] px-2 rounded-xl flex items-center gap-3 text-sm">
+                          <span className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${s.done ? "bg-ink text-white" : "bg-white border border-line text-sub"}`}>{s.done ? "✓" : i + 1}</span>
+                          <span className={`min-w-0 flex-1 ${s.done ? "text-sub line-through" : "text-ink font-medium"}`}>{s.label}</span>
+                          <span className="text-sub shrink-0" aria-hidden>›</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              ) : (
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between text-[13px]">
                   <b>{allDone ? "필수 항목을 모두 입력했어요" : "입력 진행률"}</b>
@@ -221,11 +253,14 @@ export default function SetupForm() {
                   </Link>
                 )}
               </div>
+              )}
             </>
           )}
 
+          <div id="setup-form" className="scroll-mt-32">
           <AdminForm schema={schema} data={data} onChange={handleChange} errors={errors} view={view}
             links={{ photos: `/admin/setup${q("view=photos")}`, accounts: `/admin/setup${q("view=accounts")}` }} />
+          </div>
 
           {view !== "main" && (
             <Link href={base} className="h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center">완료</Link>
