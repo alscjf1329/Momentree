@@ -31,13 +31,13 @@ export default function AdminPage() {
 
   const loadRsvps = useCallback(async (f: string) => {
     if (!f) { setRsvps([]); return; }
-    const res = await fetch(`/api/rsvp?file=${f}`);
+    const res = await fetch(`/api/rsvp?file=${encodeURIComponent(f)}`);
     setRsvps(res.ok ? await res.json() : []);
   }, []);
 
   const loadMessages = useCallback(async (f: string) => {
     if (!f) { setMessages([]); return; }
-    const res = await fetch(`/api/guestbook?file=${f}`);
+    const res = await fetch(`/api/guestbook?file=${encodeURIComponent(f)}`);
     setMessages(res.ok ? await res.json() : []);
   }, []);
 
@@ -94,13 +94,13 @@ export default function AdminPage() {
 
   const removeRsvp = async (i: number) => {
     if (!confirm("이 응답을 삭제할까요?")) return;
-    await fetch(`/api/rsvp?file=${file}&id=${rsvps[i].id}`, { method: "DELETE" });
+    await fetch(`/api/rsvp?file=${encodeURIComponent(file)}&id=${rsvps[i].id}`, { method: "DELETE" });
     await loadRsvps(file);
   };
 
   const removeMessage = async (id: number) => {
     if (!confirm("이 메시지를 삭제할까요?")) return;
-    await fetch(`/api/guestbook?file=${file}&id=${id}`, { method: "DELETE" });
+    await fetch(`/api/guestbook?file=${encodeURIComponent(file)}&id=${id}`, { method: "DELETE" });
     await loadMessages(file);
   };
 

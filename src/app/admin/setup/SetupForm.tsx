@@ -57,7 +57,7 @@ export default function SetupForm() {
 
   const loadFile = useCallback(async (f: string) => {
     if (!f) return;
-    const res = await fetch(`/api/clients?file=${f}`);
+    const res = await fetch(`/api/clients?file=${encodeURIComponent(f)}`);
     if (res.ok) {
       setData(await res.json());
       setFilename(f);

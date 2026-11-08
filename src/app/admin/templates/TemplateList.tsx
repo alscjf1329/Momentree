@@ -251,7 +251,7 @@ export default function TemplateList() {
 
   useEffect(() => {
     if (!selectedFile) { setCurrent(""); return; }
-    fetch(`/api/clients?file=${selectedFile}`).then(r => r.ok ? r.json() : null).then(d => setCurrent(d?.template ?? "")).catch(() => {});
+    fetch(`/api/clients?file=${encodeURIComponent(selectedFile)}`).then(r => r.ok ? r.json() : null).then(d => setCurrent(d?.template ?? "")).catch(() => {});
   }, [selectedFile]);
 
   // 쓰는 것 + 추천 3종을 먼저, 나머지는 "더 보기" 뒤로
@@ -269,7 +269,7 @@ export default function TemplateList() {
       let data: WeddingData;
 
       if (filename) {
-        const res = await fetch(`/api/clients?file=${filename}`);
+        const res = await fetch(`/api/clients?file=${encodeURIComponent(filename)}`);
         data = res.ok ? await res.json() : { ...DEFAULT_WEDDING_DATA };
       } else {
         filename = generateFilename();
@@ -284,7 +284,7 @@ export default function TemplateList() {
       if (!res.ok) throw new Error("저장에 실패했습니다");
 
       localStorage.setItem(LAST_FILE_KEY, filename);
-      router.push(`/admin/setup?file=${filename}`);
+      router.push(`/admin/setup?file=${encodeURIComponent(filename)}`);
     } catch {
       setError("템플릿을 저장하지 못했습니다. 다시 시도해주세요.");
       setSelecting(null);
@@ -371,7 +371,7 @@ export default function TemplateList() {
 
           {/* 설정으로 이동 */}
           {active && (
-            <Link href={`/admin/setup?file=${selectedFile}`}
+            <Link href={`/admin/setup?file=${encodeURIComponent(selectedFile)}`}
               className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-line text-xs text-ink hover:bg-soft group">
               <span>데이터 편집</span>
               <span className="text-sub group-hover:text-sub">→</span>
@@ -394,7 +394,7 @@ export default function TemplateList() {
                 onChange={e => setSelectedFile(e.target.value.replace(/[^a-zA-Z0-9.@_+-]/g, ""))}
               />
               {active && (
-                <Link href={`/admin/setup?file=${selectedFile}`}
+                <Link href={`/admin/setup?file=${encodeURIComponent(selectedFile)}`}
                   className="px-3 py-2 text-xs bg-[#f2f2f2] text-ink rounded-lg hover:bg-gray-200 whitespace-nowrap">
                   편집
                 </Link>

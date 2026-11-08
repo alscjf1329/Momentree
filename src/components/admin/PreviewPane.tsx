@@ -9,6 +9,7 @@ function PreviewFrame({ template, data }: { template: string; data: WeddingData 
   const dataRef = useRef(data);
   const readyRef = useRef(false);
   dataRef.current = data;
+  // 템플릿이 바뀌면 iframe이 새로 로드되고 preview-ready가 다시 온다 (onLoad에서 readyRef를 끄면 ready가 먼저 도착한 경우 이후 전달이 영영 막힘)
 
   const send = () => {
     iframeRef.current?.contentWindow?.postMessage(
@@ -43,7 +44,6 @@ function PreviewFrame({ template, data }: { template: string; data: WeddingData 
       src={`/preview/${template}`}
       className="w-full h-full"
       style={{ border: 0 }}
-      onLoad={() => { readyRef.current = false; }}
       title="실시간 미리보기"
     />
   );
