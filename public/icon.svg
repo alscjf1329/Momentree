@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#5c4035"/>
-  <!-- 나뭇잎 실루엣 -->
-  <ellipse cx="256" cy="170" rx="70" ry="90" fill="#c9a96e" opacity="0.25"/>
-  <ellipse cx="188" cy="200" rx="55" ry="70" fill="#c9a96e" opacity="0.20"/>
-  <ellipse cx="324" cy="200" rx="55" ry="70" fill="#c9a96e" opacity="0.20"/>
-  <!-- M 글자 -->
-  <text x="256" y="360" font-family="Georgia,serif" font-size="260" font-weight="400" fill="#c9a96e" text-anchor="middle" letter-spacing="-8">M</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="마당"><title>마당</title><rect x="2" y="2" width="508" height="508" rx="112" fill="#FFFFFF" stroke="#EBEBEB" stroke-width="4"/><circle cx="256" cy="256" r="140" fill="none" stroke="#C2255C" stroke-linecap="round" stroke-linejoin="round" stroke-width="14"/><circle cx="256.0" cy="116.0" r="32" fill="#C2255C"/><circle cx="389.1" cy="212.7" r="32" fill="#C2255C"/><circle cx="338.3" cy="369.3" r="32" fill="#C2255C"/><circle cx="173.7" cy="369.3" r="32" fill="#C2255C"/><circle cx="122.9" cy="212.7" r="32" fill="#C2255C"/><circle cx="256" cy="256" r="20" fill="#6B6B6B"/></svg>
