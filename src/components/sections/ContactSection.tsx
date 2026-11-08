@@ -47,7 +47,7 @@ export default function ContactSection() {
               <button
                 type="button"
                 onClick={() => setOpenSide(isOpen ? null : side)}
-                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)] bg-[#EBEBEB] transition-colors duration-300 active:opacity-90"
+                className="w-full flex items-center justify-between px-5 py-4 text-sm tracking-widest text-[var(--color-text)] bg-[var(--section-alt,#EBEBEB)] transition-colors duration-300 active:opacity-90"
               >
                 <span className="font-medium">{side === "groom" ? "신랑측" : "신부측"}</span>
                 <svg

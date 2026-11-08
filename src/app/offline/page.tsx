@@ -7,7 +7,7 @@ export default function OfflinePage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "#faf6f1",
+        background: "#ffffff",
         fontFamily: "var(--font-sans)",
         gap: 16,
         textAlign: "center",

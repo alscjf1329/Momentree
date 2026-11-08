@@ -17,6 +17,7 @@ const VARS = {
   "--color-accent": "#1e2035",
   "--color-gold": "#c9b896",
   "--color-cream": "#0e0f1c",
+  "--section-alt": "#171a30",
   "--color-warm-gray": "#6a7090",
   "--color-text": "#e8eaf0",
   "--color-text-light": "#9aa0b8",
