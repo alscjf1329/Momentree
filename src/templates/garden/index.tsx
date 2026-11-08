@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { submitRSVP } from "@/lib/rsvp";
 import GreetingSection from "@/components/sections/GreetingSection";
+import PrivacyNote from "@/components/PrivacyNote";
 import CalendarSection from "@/components/sections/CalendarSection";
 import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
@@ -191,6 +192,7 @@ function RSVPIntroModal() {
 
                 {error && <p className="text-xs text-red-500 text-center mb-2">전송에 실패했습니다. 다시 시도해주세요.</p>}
 
+                <PrivacyNote />
                 <button type="submit" disabled={!name || !attendance || loading}
                   className="w-full mt-3 py-3.5 rounded-xl bg-[var(--color-text)] text-white text-sm tracking-widest disabled:opacity-40 transition-opacity">
                   {loading ? "전송 중..." : "전달하기"}

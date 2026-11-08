@@ -114,7 +114,11 @@ export default function AdminLoginPage() {
         {error && <p role="alert" className="text-sm text-[#b42318]">{error}</p>}
       </div>
 
-      <p className="py-6 text-center text-xs leading-relaxed text-sub">로그인하면 이 기기에서 7일간 유지돼요</p>
+      <p className="py-6 px-6 text-center text-xs leading-relaxed text-sub">
+        계속하면 <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">이용약관</a>·
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">개인정보처리방침</a>에 동의하게 돼요.
+        <br />로그인하면 이 기기에서 7일간 유지돼요
+      </p>
     </div>
   );
 }

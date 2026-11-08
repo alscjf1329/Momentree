@@ -99,6 +99,10 @@ export default async function Home() {
       <footer className="border-t border-line py-7 px-6 text-center text-xs text-sub leading-relaxed">
         <p>링크 하나 · 참석 응답 · 방명록 · 함께 편집</p>
         <p className="mt-1">© momentree</p>
+        <p className="mt-2 flex justify-center gap-4">
+          <Link href="/terms" className="underline underline-offset-4">이용약관</Link>
+          <Link href="/privacy" className="underline underline-offset-4">개인정보처리방침</Link>
+        </p>
       </footer>
 
       <InstallBanner />

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
+import PrivacyNote from "@/components/PrivacyNote";
 import { submitGuestbook, fetchGuestbook, type GuestbookEntry } from "@/lib/guestbook";
 
 const PAGE_SIZE = 5;
@@ -87,6 +88,7 @@ export default function GuestbookSection() {
           </p>
         )}
 
+        <PrivacyNote />
         <button
           type="submit"
           disabled={!name || !message || loading}

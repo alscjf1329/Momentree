@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useWedding } from "@/context/WeddingContext";
+import PrivacyNote from "@/components/PrivacyNote";
 import { submitRSVP } from "@/lib/rsvp";
 
 type Attendance = "attending" | "not_attending" | "";
@@ -177,6 +178,7 @@ export default function RSVPSection() {
             </p>
           )}
 
+          <PrivacyNote />
           <button
             type="submit"
             disabled={!name || !attendance || loading}
