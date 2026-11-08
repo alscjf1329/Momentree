@@ -42,5 +42,6 @@ data/
 public/images/*-????????.*
 public/audio/*-????????.*
 
-# Claude Code
-.claude/
+# Claude Code — 스킬·설정은 추적하고 로컬 전용만 제외
+.claude/worktrees/
+.claude/settings.local.json
