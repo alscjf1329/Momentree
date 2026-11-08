@@ -13,6 +13,7 @@ export default function ShareView() {
   const fileParam = useSearchParams().get("file") ?? "";
   const [file, setFile] = useState(fileParam);
   const [info, setInfo] = useState<{ template: string; label: string; date: string } | null>(null);
+  const [picked, setPicked] = useState(""); // 공유 링크에 쓸 템플릿 (기본: 고객의 현재 템플릿)
   const [qr, setQr] = useState("");
   const [copied, setCopied] = useState(false);
   const query = useInviteQuery(file);
@@ -32,7 +33,8 @@ export default function ShareView() {
     }).catch(() => {});
   }, [file]);
 
-  const url = info && typeof window !== "undefined" ? `${window.location.origin}/invite/${info.template}?${query}` : "";
+  const template = picked || info?.template || "";
+  const url = info && typeof window !== "undefined" ? `${window.location.origin}/invite/${template}?${query}` : "";
   useEffect(() => {
     if (url) QRCode.toDataURL(url, { width: 480, margin: 1 }).then(setQr).catch(() => {});
   }, [url]);
@@ -59,7 +61,7 @@ export default function ShareView() {
             <div className="flex flex-col items-center gap-4 bg-soft border border-line rounded-3xl px-5 py-6">
               <div className="text-center">
                 <b className="text-[15px]">{info.label || "청첩장"}</b>
-                <p className="text-xs text-sub mt-0.5">{[info.date.slice(0, 10).replaceAll("-", "."), TEMPLATE_NAMES[info.template] ?? info.template].filter(Boolean).join(" · ")}</p>
+                <p className="text-xs text-sub mt-0.5">{[info.date.slice(0, 10).replaceAll("-", "."), TEMPLATE_NAMES[template] ?? template].filter(Boolean).join(" · ")}</p>
               </div>
               {qr && (
                 // eslint-disable-next-line @next/next/no-img-element -- 클라이언트에서 만든 data URL
@@ -67,6 +69,17 @@ export default function ShareView() {
               )}
               <span className="text-xs text-sub">식장 입구나 청첩장 카드에 인쇄해도 좋아요</span>
             </div>
+
+            <label className="flex flex-col gap-2">
+              <span className="text-[13px] text-sub">이 링크로 보여줄 디자인</span>
+              <select value={template} onChange={e => setPicked(e.target.value)}
+                className="h-[52px] box-border border border-[#d4d4d4] rounded-[14px] px-4 text-sm bg-white">
+                {Object.entries(TEMPLATE_NAMES).map(([id, name]) => (
+                  <option key={id} value={id}>{name}{id === info.template ? " (현재)" : ""}</option>
+                ))}
+              </select>
+              <span className="text-xs text-sub">같은 정보로 디자인만 바꿔서 링크를 따로 만들 수 있어요</span>
+            </label>
 
             <div className="flex flex-col gap-2">
               <span className="text-[13px] text-sub">내 청첩장 링크</span>
