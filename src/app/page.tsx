@@ -3,24 +3,15 @@ import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
 import SupportLink from "@/components/SupportLink";
+import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
-// 사진 격자 타일 (눌러서 해당 데모를 연다)
-const TILES = [
-  { id: "classic", label: "Kim · Lee", bg: "#2A1E10", fg: "#E6D2A8" },
-  { id: "romantic", label: "Kim ♡ Lee", bg: "#F6DDE3", fg: "#3d1f28" },
-  { id: "minimal", label: "KIM & LEE", bg: "#EDEDED", fg: "#111111" },
-  { id: "garden", label: "married", bg: "#DCE6D3", fg: "#2c3226" },
-  { id: "twilight", label: "Kim ✦ Lee", bg: "#0E1630", fg: "#C9D4F0" },
-  { id: "modern", label: "Kim & Lee", bg: "#EADBC8", fg: "#2d1e12" },
-  { id: "blossom", label: "Kim ♥ Lee", bg: "#FBE6EC", fg: "#3a2030" },
-  { id: "mono", label: "KIM · LEE", bg: "#F4F4F4", fg: "#111111" },
-  { id: "luxury", label: "Kim ✦ Lee", bg: "#0e1628", fg: "#f0ece4" },
-];
+// 템플릿 격자 타일 (눌러서 해당 데모를 연다) — 실제 템플릿 목록·대표색에서 파생
+const TILES = Object.entries(TEMPLATE_NAMES).map(([id, label]) => ({ id, label, ...TEMPLATE_TINT[id] }));
 
 const STEPS = [
   { n: "01", title: "정보 입력", desc: "이름, 날짜, 장소와 사진을 채워요." },
-  { n: "02", title: "템플릿 선택", desc: "10가지 중 분위기에 맞게 골라요." },
+  { n: "02", title: "템플릿 선택", desc: `${TILES.length}가지 중 분위기에 맞게 골라요.` },
   { n: "03", title: "링크 공유", desc: "카카오톡·문자로 링크 하나만 보내요." },
 ];
 
@@ -37,7 +28,7 @@ export default async function Home() {
         <div className="max-w-5xl mx-auto px-5 sm:px-6 h-14 flex items-center justify-between">
           <span className="font-serif font-semibold text-[21px] tracking-tight">momentree</span>
           <Link href={startHref}
-            className="h-10 px-[18px] rounded-full border border-[#d4d4d4] inline-flex items-center text-sm font-medium max-w-[180px] truncate">
+            className="h-10 px-[18px] rounded-full border border-line inline-flex items-center text-sm font-medium max-w-[180px] truncate">
             {session ? (session.role === "admin" ? "관리자" : "내 청첩장") : "로그인"}
           </Link>
         </div>
@@ -72,7 +63,7 @@ export default async function Home() {
         <p className="px-6 pt-8 pb-3 text-[13px] font-bold">모든 템플릿 둘러보기</p>
         <div className="grid grid-cols-3 gap-0.5">
           {TILES.map((t) => (
-            <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank" aria-label={`${t.id} 예시 보기`}
+            <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank" aria-label={`${t.label} 예시 보기`}
               className="aspect-square flex items-center justify-center font-serif text-[13px] tracking-[0.08em]"
               style={{ background: t.bg, color: t.fg }}>
               {t.label}

@@ -2,20 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 
 // 랜딩의 예시 청첩장: 실제 데모 페이지(/invite/demo-*)를 폰 틀 안에서 보여준다.
 // 칩을 누르면 템플릿이 바뀌고, iframe은 화면에 가까워질 때만 불러온다(loading="lazy").
-const ITEMS = [
-  { id: "classic", name: "클래식", bg: "#2A1E10", fg: "#E6D2A8" },
-  { id: "romantic", name: "로맨틱", bg: "#F6DDE3", fg: "#3d1f28" },
-  { id: "blossom", name: "블로섬", bg: "#F8E4EC", fg: "#3a2030" },
-  { id: "luxury", name: "럭셔리", bg: "#0e1628", fg: "#f0ece4" },
-  { id: "twilight", name: "트와이라잇", bg: "#0e1230", fg: "#dde2f0" },
-  { id: "modern", name: "모던", bg: "#E8D8C8", fg: "#2d1e12" },
-  { id: "editorial", name: "에디토리얼", bg: "#0d0d0d", fg: "#f2ede8" },
-  { id: "minimal", name: "미니멀", bg: "#F4F4F4", fg: "#111111" },
-  { id: "mono", name: "모노", bg: "#DADADA", fg: "#111111" },
-];
+const ITEMS = Object.entries(TEMPLATE_NAMES)
+  .filter(([id]) => id !== "garden")
+  .map(([id, name]) => ({ id, name, ...TEMPLATE_TINT[id] }));
 // 가든은 대표 사진이 있어야 첫 화면이 완성돼서(샘플에는 사진 없음) 사진 없이도 예쁜 템플릿만 보여준다
 
 const W = 252; // 폰 화면 폭 — 청첩장은 390px 기준으로 그린 뒤 축소해서 보여준다
