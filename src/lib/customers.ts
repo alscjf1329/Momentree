@@ -98,7 +98,13 @@ export function saveCustomer(file: string, data: WeddingData, email?: string | n
 }
 
 export function deleteCustomer(file: string): boolean {
-  return getDb().prepare("delete from customers where file = ?").run(file).changes > 0;
+  // 하객 개인정보(RSVP·방명록)도 함께 지운다 — slug가 file이라 외래키가 없어 직접 지움. 고객 삭제 경로는 여기 하나뿐.
+  const db = getDb();
+  return db.transaction(() => {
+    db.prepare("delete from rsvp_entries where slug = ?").run(file);
+    db.prepare("delete from guestbook_entries where slug = ?").run(file);
+    return db.prepare("delete from customers where file = ?").run(file).changes > 0;
+  })();
 }
 
 // 최근 수정 순. 검색은 이메일·고객ID(공유 ID)·표시 이름·파일명·예식일 부분 일치.

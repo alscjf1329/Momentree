@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { openDb } from "@/lib/db";
 import { importLegacyJson } from "@/lib/legacyImport";
-import { applyToEncryptedFields, encrypt } from "@/lib/accountCrypto";
+import { applyToEncryptedFields, decrypt, encrypt } from "@/lib/accountCrypto";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { WEDDING } from "@/content";
 
@@ -47,8 +47,8 @@ test("기존 JSON 가져오기: 고객(계좌 복호화 후 통째 암호화)·�
   assert.ok(me.data_enc.startsWith("enc:v1:") && !me.data_enc.includes("111-222"));
 
   const rsvp = q<Record<string, string>>("select * from rsvp_entries order by id");
-  assert.deepEqual(rsvp.map((r) => r.name), ["하객1", "하객2"]);
-  assert.equal(rsvp[0].companion_name, "동반");
+  assert.deepEqual(rsvp.map((r) => decrypt(r.name)), ["하객1", "하객2"]); // 가져올 때 암호화됨
+  assert.equal(decrypt(rsvp[0].companion_name), "동반");
   assert.equal(q("select * from guestbook_entries").length, 1);
   assert.deepEqual(q<{ email: string }>("select email from admins").map((r) => r.email), ["boss@x.com"]);
 

@@ -3,12 +3,13 @@ import fs from "fs";
 import path from "path";
 import { DATA_DIR } from "@/lib/paths";
 import { importLegacyJson } from "@/lib/legacyImport";
+import { encrypt } from "@/lib/accountCrypto";
 
 // 서버 전용. 단일 파일 DB(DATA_DIR/momentree.db) — 컨테이너 1개 전제.
 // ponytail: 인스턴스가 여러 개가 되면 Postgres로 이전 (쿼리는 표준 SQL 위주로 유지).
 
 // 스키마 변경은 배열 끝에 추가만 한다 (이미 적용된 항목은 수정 금지). 적용 버전은 PRAGMA user_version에 기록.
-const MIGRATIONS: string[] = [
+const MIGRATIONS: (string | ((db: Database.Database) => void))[] = [
   `
   -- file: 기존 파일명(가입 이메일 또는 관리자가 정한 슬러그). 세션·링크가 이 값을 쓰므로 키로 유지한다.
   CREATE TABLE customers (
@@ -68,13 +69,27 @@ const MIGRATIONS: string[] = [
     SELECT file, coalesce(email, CASE WHEN file LIKE '%@%' THEN file END), 'owner', created_at
     FROM customers WHERE coalesce(email, CASE WHEN file LIKE '%@%' THEN file END) IS NOT NULL;
   `,
+  // v3: 하객 RSVP·방명록 개인정보 암호화. 이미 암호화된 값(enc:v1:)은 건너뛰므로 다시 돌려도 안전.
+  (db) => {
+    const plain = (v: string | null): v is string => !!v && !v.startsWith("enc:v1:");
+    const e = (v: string | null) => (plain(v) ? encrypt(v) : v);
+    const upR = db.prepare("update rsvp_entries set name=?, guests=?, companion_name=?, message=? where id=?");
+    for (const r of db.prepare("select id, name, guests, companion_name, message from rsvp_entries").all() as
+      { id: number; name: string; guests: string; companion_name: string | null; message: string | null }[])
+      if ([r.name, r.guests, r.companion_name, r.message].some(plain)) upR.run(e(r.name), e(r.guests), e(r.companion_name), e(r.message), r.id);
+    const upG = db.prepare("update guestbook_entries set name=?, message=? where id=?");
+    for (const r of db.prepare("select id, name, message from guestbook_entries").all() as { id: number; name: string; message: string }[])
+      if (plain(r.name) || plain(r.message)) upG.run(e(r.name), e(r.message), r.id);
+  },
 ];
 
 export function migrate(db: Database.Database): void {
   const current = db.pragma("user_version", { simple: true }) as number;
   for (let v = current; v < MIGRATIONS.length; v++) {
     db.transaction(() => {
-      db.exec(MIGRATIONS[v]);
+      const m = MIGRATIONS[v];
+      if (typeof m === "string") db.exec(m);
+      else m(db);
       db.pragma(`user_version = ${v + 1}`);
     })();
   }

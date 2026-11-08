@@ -90,8 +90,8 @@ export function importLegacyJson(db: Database.Database, dataDir: string): Import
     if (db.prepare("select 1 from rsvp_entries where slug = ?").get(slug)) continue;
     for (const e of entries) {
       insertRsvp.run({
-        slug, name: e.name ?? "", side: e.side ?? null, attendance: e.attendance ?? "attending", guests: e.guests ?? "",
-        companion_name: e.companionName ?? null, message: e.message ?? null, submitted_at: e.submittedAt ?? new Date().toISOString(),
+        slug, name: encrypt(e.name ?? ""), side: e.side ?? null, attendance: e.attendance ?? "attending", guests: encrypt(e.guests ?? ""),
+        companion_name: e.companionName ? encrypt(e.companionName) : null, message: e.message ? encrypt(e.message) : null, submitted_at: e.submittedAt ?? new Date().toISOString(),
       });
       result.rsvp++;
     }
@@ -106,7 +106,7 @@ export function importLegacyJson(db: Database.Database, dataDir: string): Import
     const entries = readJson<Record<string, string | undefined>[]>(path.join(dataDir, "guestbook", name)) ?? [];
     if (db.prepare("select 1 from guestbook_entries where slug = ?").get(slug)) continue;
     for (const e of entries) {
-      insertGuestbook.run({ slug, name: e.name ?? "", message: e.message ?? "", submitted_at: e.submittedAt ?? new Date().toISOString() });
+      insertGuestbook.run({ slug, name: encrypt(e.name ?? ""), message: encrypt(e.message ?? ""), submitted_at: e.submittedAt ?? new Date().toISOString() });
       result.guestbook++;
     }
   }
