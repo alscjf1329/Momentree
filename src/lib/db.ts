@@ -81,6 +81,11 @@ const MIGRATIONS: (string | ((db: Database.Database) => void))[] = [
     for (const r of db.prepare("select id, name, message from guestbook_entries").all() as { id: number; name: string; message: string }[])
       if (plain(r.name) || plain(r.message)) upG.run(e(r.name), e(r.message), r.id);
   },
+  // v4: 하객 데이터 삭제 예고 메일 발송 시각 (중복 발송 방지). NULL = 아직 안 보냄.
+  (db) => {
+    if (!(db.pragma("table_info(customers)") as { name: string }[]).some((c) => c.name === "retention_notified_at"))
+      db.exec("ALTER TABLE customers ADD COLUMN retention_notified_at TEXT");
+  },
 ];
 
 export function migrate(db: Database.Database): void {

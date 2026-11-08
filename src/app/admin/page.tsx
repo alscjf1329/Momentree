@@ -156,6 +156,10 @@ export default function AdminPage() {
             ))}
           </div>
 
+          <a href={`/api/guests/export?type=${tab}&file=${encodeURIComponent(file)}`} download
+            className="self-end h-9 px-4 rounded-full border border-line bg-soft text-[13px] text-ink inline-flex items-center">CSV 내려받기</a>
+          <p className="text-xs text-sub -mt-3">예식일 6개월 후 하객 응답·방명록은 하객에게 비공개되고, 12개월 후 완전히 삭제돼요. 삭제 30일 전 이메일로 알려드려요.</p>
+
           {tab === "rsvp" && (
             rsvps.length === 0 ? (
               <div className="rounded-2xl border border-line p-10 text-center">

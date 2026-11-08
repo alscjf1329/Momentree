@@ -3,14 +3,19 @@ import { isValidClientFilename } from "@/lib/newClient";
 import { resolvePublicFile } from "@/lib/shareId";
 import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
+import { isGuestDataHidden } from "@/lib/retention";
 import { addGuestbook, deleteGuestbook, listGuestbook } from "@/lib/entries";
 
 export type { GuestbookEntry } from "@/lib/entries";
 
 // GET /api/guestbook?file=<공유 ID>  → 해당 청첩장 방명록 (공개)
 export async function GET(req: NextRequest) {
-  const file = resolvePublicFile(req.nextUrl.searchParams.get("file"), await getSession(req));
+  const session = await getSession(req);
+  const file = resolvePublicFile(req.nextUrl.searchParams.get("file"), session);
   if (!file) return NextResponse.json({ error: "file required" }, { status: 400 });
+  // 예식일 6개월 후엔 비공개 — 고객·편집자(관리자 포함)만 계속 열람
+  const editor = session?.role === "admin" || (session?.file === file && can(session, "guests"));
+  if (!editor && isGuestDataHidden(file)) return NextResponse.json([]);
   return NextResponse.json(listGuestbook(file));
 }
 

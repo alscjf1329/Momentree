@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
 import { resolvePublicFile } from "@/lib/shareId";
+import { isGuestDataHidden } from "@/lib/retention";
 import { addRsvp, deleteRsvp, listRsvp, listRsvpSlugs, updateRsvp } from "@/lib/entries";
 
 export type { RsvpEntry } from "@/lib/entries";
@@ -16,7 +17,9 @@ export async function GET(req: NextRequest) {
   if (file) {
     const resolved = resolvePublicFile(file, session);
     if (!resolved) return NextResponse.json({ error: "not found" }, { status: 404 });
-    return NextResponse.json(listRsvp(resolved));
+    // 예식일 6개월 후엔 비공개 — 고객·편집자(관리자 포함)만 열람
+    const editor = session?.role === "admin" || (session?.file === resolved && can(session, "guests"));
+    return NextResponse.json(!editor && isGuestDataHidden(resolved) ? [] : listRsvp(resolved));
   }
 
   if (session?.role !== "admin") return NextResponse.json({ error: "unauthorized" }, { status: 401 });
