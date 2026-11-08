@@ -12,6 +12,6 @@ test("카카오 채널 URL 이 http(s) 면 kakao, 없거나 이상하면 이메�
 test("/faq 페이지 파일은 <details> 아코디언과 요금 placeholder 를 갖고 푸터에서 링크된다", () => {
   const faq = fs.readFileSync("src/app/faq/page.tsx", "utf8");
   assert.match(faq, /<details/);
-  assert.match(faq, /<Tbd>가격<\/Tbd>/);
+  assert.match(faq, /19,900원/);
   assert.match(fs.readFileSync("src/app/page.tsx", "utf8"), /href="\/faq"/);
 });

@@ -8,7 +8,6 @@ import { NextRequest } from "next/server";
 import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/adminAuth";
 import { WEDDING } from "@/content";
 import type { WeddingData } from "@/types";
-import { migrate } from "@/lib/db";
 import { planOf, canUseTemplate, photoLimit, rsvpLimit, hasWatermark, canInviteMembers, FREE_TEMPLATES } from "@/lib/plan";
 
 process.env.ADMIN_SESSION_SECRET = "test-secret";
@@ -24,7 +23,8 @@ const call = async (method: string, route: string, session: Sess | null, body?: 
 const photos = (n: number) => Array.from({ length: n }, (_, i) => ({ src: `/p${i}.jpg`, alt: "" }));
 const wedding = (over: Partial<WeddingData> = {}): WeddingData => ({ ...WEDDING, template: "classic", gallery: photos(5), ...over });
 
-test("마이그레이션 v5: 기존 고객은 paid, 이후 신규는 free, 다시 돌려도 그대로", () => {
+test("마이그레이션 v5: 기존 고객은 paid, 이후 신규는 free, 다시 돌려도 그대로", async () => {
+  const { migrate } = await import("@/lib/db"); // 정적 import는 DATA_DIR 설정보다 먼저 평가돼 실제 data/를 건드린다
   const db = new Database(":memory:");
   migrate(db);
   db.pragma("user_version = 4"); // plan 컬럼이 생기기 전 상태로 되돌린다
