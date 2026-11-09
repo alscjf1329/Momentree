@@ -1,3 +1,4 @@
+import { SERVICE_NAME } from "@/lib/brand";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
@@ -26,7 +27,7 @@ export default async function Home() {
 
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-line">
         <div className="max-w-5xl mx-auto px-5 sm:px-6 h-14 flex items-center justify-between">
-          <span className="font-serif font-semibold text-[21px] tracking-tight">momentree</span>
+          <span className="font-serif font-semibold text-[21px] tracking-tight">{SERVICE_NAME}</span>
           <Link href={startHref}
             className="h-10 px-[18px] rounded-full border border-line inline-flex items-center text-sm font-medium max-w-[180px] truncate">
             {session ? (session.role === "admin" ? "관리자" : "내 청첩장") : "로그인"}
@@ -90,7 +91,7 @@ export default async function Home() {
 
       <footer className="border-t border-line py-7 px-6 text-center text-xs text-sub leading-relaxed">
         <p>링크 하나 · 참석 응답 · 방명록 · 함께 편집</p>
-        <p className="mt-1">© momentree</p>
+        <p className="mt-1">© {SERVICE_NAME}</p>
         <p className="mt-2 flex flex-wrap justify-center gap-x-4">
           <Link href="/faq" className="underline underline-offset-4">자주 묻는 질문</Link>
           <SupportLink />

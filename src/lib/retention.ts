@@ -1,3 +1,4 @@
+import { SERVICE_NAME } from "@/lib/brand";
 import { getDb } from "@/lib/db";
 import { enqueueMail } from "@/lib/mailQueue";
 import { PAID_KEEP_MONTHS } from "@/lib/plan";
@@ -80,7 +81,7 @@ export async function runRetention(
       const site = (process.env.SITE_URL ?? "").replace(/\/$/, "");
       const ok = await enqueue({
         to: r.owner,
-        subject: "[Momentree] 하객 응답·방명록이 곧 삭제됩니다",
+        subject: `[${SERVICE_NAME}] 하객 응답·방명록이 곧 삭제됩니다`,
         html: `<p>${esc(r.label || "고객")}님의 청첩장에 모인 하객 참석 응답과 방명록이 <b>${date}</b>에 완전히 삭제됩니다.</p>` +
           `<p>보관이 필요하면 삭제 전에 ${site ? `<a href="${esc(site)}/admin">어드민 하객 화면</a>` : "어드민 하객 화면"}에서 &quot;CSV 내려받기&quot;로 저장해 주세요.</p>`,
       });

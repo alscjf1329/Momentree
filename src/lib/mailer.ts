@@ -1,3 +1,4 @@
+import { SERVICE_NAME_EN } from "@/lib/brand";
 import nodemailer from "nodemailer";
 import type { NextRequest } from "next/server";
 
@@ -6,7 +7,7 @@ export async function deliverMail(to: string, subject: string, html: string): Pr
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
   if (!user || !pass) throw new Error("mail not configured");
-  await nodemailer.createTransport({ service: "gmail", auth: { user, pass } }).sendMail({ from: `Momentree <${user}>`, to, subject, html });
+  await nodemailer.createTransport({ service: "gmail", auth: { user, pass } }).sendMail({ from: `${SERVICE_NAME_EN} <${user}>`, to, subject, html });
 }
 
 // 메일 속 링크용 주소. SITE_URL이 있으면 그것, 없으면 프록시 헤더/요청 주소

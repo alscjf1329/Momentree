@@ -1,15 +1,16 @@
+import { SERVICE_NAME } from "@/lib/brand";
 // 주의: 법률 검토 전 초안입니다. [확정 필요] 표기 항목은 정책 확정 후 채우세요.
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage, { Sec, Tbd } from "@/components/LegalPage";
 
-export const metadata: Metadata = { title: "이용약관 — Momentree" };
+export const metadata: Metadata = { title: `이용약관 — ${SERVICE_NAME}` };
 
 export default function TermsPage() {
   return (
     <LegalPage title="이용약관">
       <Sec title="1. 목적과 운영자">
-        <p>이 약관은 Momentree(이하 &quot;서비스&quot;)가 제공하는 모바일 청첩장 제작·공유 서비스의 이용 조건을 정합니다.</p>
+        <p>이 약관은 {SERVICE_NAME}(이하 &quot;서비스&quot;)가 제공하는 모바일 청첩장 제작·공유 서비스의 이용 조건을 정합니다.</p>
         <p>운영자: <Tbd>운영자 상호·대표자·사업자 정보</Tbd> / 문의: <Tbd>문의 이메일 또는 카카오 채널</Tbd></p>
       </Sec>
 

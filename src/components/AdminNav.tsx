@@ -1,4 +1,5 @@
 "use client";
+import { SERVICE_NAME } from "@/lib/brand";
 
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
@@ -72,7 +73,7 @@ function NavInner() {
     <>
       <header className="sticky top-0 z-50 bg-white border-b border-line">
         <div className="px-4 sm:px-6 h-14 flex items-center gap-3 max-w-6xl mx-auto">
-          <Link href="/" className="font-serif font-semibold text-[21px] tracking-tight text-ink shrink-0">momentree</Link>
+          <Link href="/" className="font-serif font-semibold text-[21px] tracking-tight text-ink shrink-0">{SERVICE_NAME}</Link>
 
           {/* 넓은 화면: 위쪽 탭 */}
           <nav className="hidden sm:flex items-center gap-1 flex-1 ml-4">

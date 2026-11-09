@@ -1,4 +1,4 @@
-# Momentree 작업 규칙
+# 마당(Madang) 작업 규칙
 
 모바일 청첩장 멀티테넌트 SaaS. Next.js 16 App Router · React 19 · Tailwind 4 · SQLite(better-sqlite3). 구조와 템플릿 목록은 README.md, 브랜드는 docs/brand-guide.md.
 

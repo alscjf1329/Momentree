@@ -1,3 +1,4 @@
+import { SERVICE_NAME } from "@/lib/brand";
 // 주의: 답변은 작성 시점 코드의 실제 기능 기준입니다. 기능이 바뀌면 함께 갱신하세요. 요금·문의 이메일은 [확정 필요] 표기.
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
@@ -9,7 +10,7 @@ import { telegramConfigured } from "@/lib/notify";
 
 // 텔레그램 설정 여부를 요청 시점 env로 판단(빌드 시 고정 방지)
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "자주 묻는 질문 — Momentree" };
+export const metadata: Metadata = { title: `자주 묻는 질문 — ${SERVICE_NAME}` };
 
 const FAQS: { q: string; a: ReactNode }[] = [
   { q: "청첩장은 어떻게 만드나요?", a: <>로그인 후 편집 화면에서 신랑·신부 이름, 예식 일시·장소, 사진 등을 입력하고 저장하면 됩니다. 처음 로그인하면 이름·일시·장소, 사진, 템플릿, 공유 4단계 체크리스트가 안내해 줘요.</> },
@@ -27,7 +28,7 @@ export default function FaqPage() {
   return (
     <main className="min-h-screen bg-white text-ink">
       <article className="max-w-xl mx-auto px-6 py-10 overflow-x-hidden">
-        <Link href="/" className="text-xs text-sub underline underline-offset-4">← Momentree</Link>
+        <Link href="/" className="text-xs text-sub underline underline-offset-4">← {SERVICE_NAME}</Link>
         <h1 className="font-serif font-semibold text-[28px] leading-[1.3] tracking-tight mt-4">자주 묻는 질문</h1>
 
         <div className="mt-6 border-t border-line">

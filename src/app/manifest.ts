@@ -1,9 +1,10 @@
+import { SERVICE_NAME } from "@/lib/brand";
 import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Momentree",
-    short_name: "Momentree",
+    name: SERVICE_NAME,
+    short_name: SERVICE_NAME,
     description: "두 분의 하루를 링크 하나로. 모바일 청첩장 서비스",
     start_url: "/",
     display: "standalone",

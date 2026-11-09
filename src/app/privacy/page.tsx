@@ -1,15 +1,16 @@
+import { SERVICE_NAME } from "@/lib/brand";
 // 주의: 법률 검토 전 초안입니다. [확정 필요] 표기 항목(운영자 정보·문의처·보관 기간·시행일)은 MOM-11 등 정책 확정 후 채우세요.
 // 내용은 작성 시점 코드의 실제 처리 방식(src/lib/*, src/app/api/*, bin/backup.sh)에 근거합니다. 코드가 바뀌면 함께 갱신하세요.
 import type { Metadata } from "next";
 import LegalPage, { Sec, Tbd } from "@/components/LegalPage";
 
-export const metadata: Metadata = { title: "개인정보처리방침 — Momentree" };
+export const metadata: Metadata = { title: `개인정보처리방침 — ${SERVICE_NAME}` };
 
 export default function PrivacyPage() {
   return (
     <LegalPage title="개인정보처리방침">
       <Sec title="1. 운영자">
-        <p>Momentree(이하 &quot;서비스&quot;)의 운영자는 다음과 같습니다.</p>
+        <p>{SERVICE_NAME}(이하 &quot;서비스&quot;)의 운영자는 다음과 같습니다.</p>
         <ul>
           <li>상호·대표자: <Tbd>운영자 상호 및 대표자명</Tbd></li>
           <li>사업자 정보: <Tbd>사업자등록번호·주소</Tbd></li>
