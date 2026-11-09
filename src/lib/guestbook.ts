@@ -16,7 +16,7 @@ export async function submitGuestbook(payload: GuestbookPayload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("failed");
+  if (!res.ok) throw new Error(res.status === 403 ? (await res.json().catch(() => ({}))).error ?? "failed" : "failed");
 }
 
 export async function fetchGuestbook(slug: string): Promise<GuestbookEntry[]> {

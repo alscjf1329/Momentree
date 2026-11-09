@@ -114,8 +114,10 @@ test("공유 ID: 파일명(이메일)으로는 비로그인 접근 불가, 목�
   assert.equal((await route.GET(await req("GET", { query: "?file=couple", session: { role: "customer", file: "couple" } }))).status, 200);
   assert.equal((await route.GET(await req("GET", { query: "?file=couple", session: { role: "customer", file: "other@x.com" } }))).status, 404);
   assert.equal((await route.GET(await req("GET", { query: "?file=couple", session: { role: "admin" } }))).status, 200);
-  // 데모 슬러그는 공유 ID 없이도 동작
-  assert.equal((await route.POST(await req("POST", { body: { ...guest("x"), slug: "demo-classic" } }))).status, 200);
+  // 예시 슬러그는 공유 ID 없이도 인식되지만 응답은 저장하지 않는다
+  assert.equal((await route.POST(await req("POST", { body: { ...guest("x"), slug: "demo-classic" } }))).status, 403);
+  assert.equal((await route.POST(await req("POST", { body: { ...guest("x"), slug: "example" } }))).status, 403);
+  assert.equal((await route.GET(await req("GET", { query: "?file=example" }))).status, 200);
 
   // 전체 목록(파일명=이메일 포함)은 관리자 전용
   assert.equal((await route.GET(await req("GET"))).status, 401);

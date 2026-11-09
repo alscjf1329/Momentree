@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidClientFilename } from "@/lib/newClient";
-import { resolvePublicFile } from "@/lib/shareId";
+import { resolvePublicFile, isExampleSlug } from "@/lib/shareId";
 import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
 import { isGuestDataHidden } from "@/lib/retention";
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   if (!slug || !name || !message) {
     return NextResponse.json({ error: "slug, name, message required" }, { status: 400 });
   }
+  if (isExampleSlug(slug)) return NextResponse.json({ error: "예시 청첩장이라 글은 저장되지 않아요." }, { status: 403 });
   addGuestbook(slug, String(name), String(message));
   return NextResponse.json({ ok: true });
 }

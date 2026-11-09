@@ -1,32 +1,33 @@
 import type { WeddingData } from "@/types";
-import { WEDDING } from "@/content";
+import { EXAMPLE } from "@/example";
 
-// slug → 청첩장 데이터 매핑
-// 실제 고객 데이터는 여기에 추가하거나 DB/CMS에서 fetch
+// slug → 청첩장 데이터 매핑. 데모는 모두 EXAMPLE에서 템플릿·테마만 바꾼 것이다.
+const demo = (slug: string, template: string, theme = "classic-cream"): WeddingData => ({ ...EXAMPLE, slug, template, theme });
+
 export const INVITES: Record<string, WeddingData> = {
-  // 기본 샘플
-  sample: WEDDING,
+  example: EXAMPLE,
+  sample: demo("sample", "classic"), // 예전 링크용
 
-  // ── 템플릿 데모 (클라이언트에게 보여주는 디자인 시안) ──────────────────
-  "demo-classic":   { ...WEDDING, slug: "demo-classic",   template: "classic",   theme: "classic-cream" },
-  "demo-editorial": { ...WEDDING, slug: "demo-editorial", template: "editorial", theme: "classic-cream" },
-  "demo-minimal":   { ...WEDDING, slug: "demo-minimal",   template: "minimal",   theme: "classic-cream" },
-  "demo-romantic":  { ...WEDDING, slug: "demo-romantic",  template: "romantic",  theme: "classic-cream" },
-  "demo-twilight":  { ...WEDDING, slug: "demo-twilight",  template: "twilight",  theme: "classic-cream" },
-  "demo-blossom":   { ...WEDDING, slug: "demo-blossom",   template: "blossom",   theme: "classic-cream" },
-  "demo-modern":    { ...WEDDING, slug: "demo-modern",    template: "modern",    theme: "classic-cream" },
-  "demo-luxury":    { ...WEDDING, slug: "demo-luxury",    template: "luxury",    theme: "classic-cream" },
-  "demo-garden":    { ...WEDDING, slug: "demo-garden",    template: "garden",    theme: "classic-cream" },
-  "demo-mono":      { ...WEDDING, slug: "demo-mono",      template: "mono",      theme: "classic-cream" },
+  // 템플릿 데모
+  "demo-classic": demo("demo-classic", "classic"),
+  "demo-editorial": demo("demo-editorial", "editorial"),
+  "demo-minimal": demo("demo-minimal", "minimal"),
+  "demo-romantic": demo("demo-romantic", "romantic"),
+  "demo-twilight": demo("demo-twilight", "twilight"),
+  "demo-blossom": demo("demo-blossom", "blossom"),
+  "demo-modern": demo("demo-modern", "modern"),
+  "demo-luxury": demo("demo-luxury", "luxury"),
+  "demo-garden": demo("demo-garden", "garden"),
+  "demo-mono": demo("demo-mono", "mono"),
 
-  // ── 테마 데모 (같은 레이아웃, 다른 컬러) ───────────────────────────────
-  "demo-minimal-white":   { ...WEDDING, slug: "demo-minimal-white",   template: "classic", theme: "minimal-white" },
-  "demo-dark-romance":    { ...WEDDING, slug: "demo-dark-romance",    template: "classic", theme: "dark-romance" },
-  "demo-garden-floral":   { ...WEDDING, slug: "demo-garden-floral",   template: "classic", theme: "garden-floral" },
-  "demo-film-vintage":    { ...WEDDING, slug: "demo-film-vintage",    template: "classic", theme: "film-vintage" },
-  "demo-modern-bold":     { ...WEDDING, slug: "demo-modern-bold",     template: "classic", theme: "modern-bold" },
-  "demo-blush-romantic":  { ...WEDDING, slug: "demo-blush-romantic",  template: "classic", theme: "blush-romantic" },
-  "demo-ocean-blue":      { ...WEDDING, slug: "demo-ocean-blue",      template: "classic", theme: "ocean-blue" },
+  // 테마 데모 (같은 레이아웃, 다른 컬러)
+  "demo-minimal-white": demo("demo-minimal-white", "classic", "minimal-white"),
+  "demo-dark-romance": demo("demo-dark-romance", "classic", "dark-romance"),
+  "demo-garden-floral": demo("demo-garden-floral", "classic", "garden-floral"),
+  "demo-film-vintage": demo("demo-film-vintage", "classic", "film-vintage"),
+  "demo-modern-bold": demo("demo-modern-bold", "classic", "modern-bold"),
+  "demo-blush-romantic": demo("demo-blush-romantic", "classic", "blush-romantic"),
+  "demo-ocean-blue": demo("demo-ocean-blue", "classic", "ocean-blue"),
 };
 
 export function getInvite(slug: string): WeddingData | null {

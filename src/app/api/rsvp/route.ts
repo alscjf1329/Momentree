@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
-import { resolvePublicFile } from "@/lib/shareId";
+import { resolvePublicFile, isExampleSlug } from "@/lib/shareId";
 import { isGuestDataHidden } from "@/lib/retention";
 import { PLAN_MSG } from "@/lib/plan";
 import { getPlan } from "@/lib/customers";
@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
   const slug = resolvePublicFile(idOrFile, await getSession(req));
   if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
 
-  // 무료 플랜은 응답 30건까지 새로 받는다 (기존 응답 수정은 PATCH라 영향 없음). 관리자·데모는 제한 없음.
+  if (isExampleSlug(slug)) return NextResponse.json({ error: "예시 청첩장이라 응답은 저장되지 않아요." }, { status: 403 });
+
+  // 무료 플랜은 응답 30건까지 새로 받는다 (기존 응답 수정은 PATCH라 영향 없음). 관리자는 제한 없음.
   const plan = getPlan(slug);
   if (plan && (await getSession(req))?.role !== "admin" && countRsvp(slug) >= rsvpLimit(plan)) {
     return NextResponse.json({ error: PLAN_MSG.rsvp }, { status: 403 });

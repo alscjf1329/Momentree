@@ -14,5 +14,10 @@ export function resolvePublicFile(idOrFile: unknown, session: SessionPayload | n
   if (session && (session.role === "admin" || session.file === idOrFile)) return idOrFile;
   const file = resolveShareId(idOrFile);
   if (file) return file;
-  return idOrFile.startsWith("demo-") ? idOrFile : null;
+  return isExampleSlug(idOrFile) ? idOrFile : null;
+}
+
+// 랜딩 예시(example·demo-*)는 고객이 아니라 응답·방명록을 저장하지 않는다
+export function isExampleSlug(s: string): boolean {
+  return s === "example" || s.startsWith("demo-");
 }

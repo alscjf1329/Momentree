@@ -15,7 +15,7 @@ export default function GuestbookSection() {
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchGuestbook(wedding.slug).then(setEntries);
@@ -31,15 +31,15 @@ export default function GuestbookSection() {
     e.preventDefault();
     if (!name || !message) return;
     setLoading(true);
-    setError(false);
+    setError("");
     try {
       await submitGuestbook({ name, message, slug: wedding.slug });
       setEntries((prev) => [{ name, message, submittedAt: new Date().toISOString() }, ...prev]);
       setPage(1);
       setName("");
       setMessage("");
-    } catch {
-      setError(true);
+    } catch (err) {
+      setError(err instanceof Error && err.message !== "failed" ? err.message : "전송에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function GuestbookSection() {
 
         {error && (
           <p className="text-xs text-red-500 text-center">
-            전송에 실패했습니다. 다시 시도해주세요.
+            {error}
           </p>
         )}
 
