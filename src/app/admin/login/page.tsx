@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
         </button>
       </div>
 
-      <div className="flex-1 w-full max-w-sm mx-auto px-6 pt-3 flex flex-col gap-6">
+      <div className="flex-1 w-full max-w-sm mx-auto px-6 pt-3 flex flex-col gap-6 sm:justify-center sm:pb-24">
         <div className="flex flex-col gap-2.5">
           <h1 className="font-serif font-semibold text-[30px] leading-[1.3] tracking-tight text-ink">
             {step === "verify" ? "코드를 입력하세요" : invited ? "함께 편집해요" : "이메일로 시작해요"}

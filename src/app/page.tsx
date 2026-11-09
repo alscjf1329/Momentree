@@ -36,13 +36,13 @@ export default async function Home() {
       </header>
 
       {/* 약속 한 줄 */}
-      <section className="max-w-md mx-auto px-6 pt-10 pb-8 flex flex-col gap-[18px] text-center sm:pt-16">
+      <section className="max-w-md sm:max-w-2xl mx-auto px-6 pt-10 pb-8 flex flex-col gap-[18px] text-center sm:pt-20 sm:pb-14 sm:items-center">
         <span className="text-xs font-bold tracking-[0.14em] text-rose">MOBILE WEDDING INVITATION</span>
-        <h1 className="font-serif font-semibold text-[clamp(28px,9vw,36px)] leading-[1.3] tracking-tight">두 분의 하루를<br />링크 하나로</h1>
-        <p className="text-[15px] leading-[1.7] text-sub">
+        <h1 className="font-serif font-semibold text-[clamp(28px,9vw,36px)] sm:text-5xl leading-[1.3] tracking-tight">두 분의 하루를<br />링크 하나로</h1>
+        <p className="text-[15px] sm:text-lg leading-[1.7] text-sub">
           사진과 문구만 채우면 청첩장이 완성돼요. 카톡으로 보내고, 참석 응답은 한곳에서 확인하세요.
         </p>
-        <div className="flex flex-col gap-3 mt-1">
+        <div className="flex flex-col gap-3 mt-1 sm:w-80">
           <Link href={startHref} className="h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center">
             {session ? "내 청첩장 편집하기" : "무료로 시작하기"}
           </Link>
@@ -51,18 +51,18 @@ export default async function Home() {
       </section>
 
       {/* 예시 청첩장 — 결과물을 먼저 보여준다 */}
-      <section id="example" className="bg-soft border-y border-line py-9 flex flex-col items-center gap-6 scroll-mt-14">
-        <div className="px-6 text-center flex flex-col gap-2">
-          <h2 className="font-serif font-semibold text-2xl leading-snug tracking-tight">이런 청첩장을<br />하객이 받게 돼요</h2>
+      <section id="example" className="bg-soft border-y border-line py-9 lg:py-16 lg:px-[calc((100%-64rem)/2)] flex flex-col lg:flex-row lg:justify-center lg:gap-16 items-center gap-6 scroll-mt-14">
+        <div className="px-6 text-center lg:text-left lg:w-80 lg:shrink-0 lg:px-0 flex flex-col gap-2">
+          <h2 className="font-serif font-semibold text-2xl lg:text-3xl leading-snug tracking-tight">이런 청첩장을<br />하객이 받게 돼요</h2>
           <p className="text-sm text-sub">실제 템플릿을 폰으로 직접 열어보세요</p>
         </div>
         <DemoPhone />
       </section>
 
       {/* 템플릿 격자 */}
-      <section className="max-w-3xl mx-auto">
-        <p className="px-6 pt-8 pb-3 text-[13px] font-bold">모든 템플릿 둘러보기</p>
-        <div className="grid grid-cols-3 gap-0.5">
+      <section className="max-w-3xl lg:max-w-5xl mx-auto">
+        <p className="px-6 pt-8 pb-3 text-[13px] lg:pt-14 font-bold">모든 템플릿 둘러보기</p>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-0.5 lg:px-6">
           {TILES.map((t) => (
             <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank" aria-label={`${t.label} 예시 보기`}
               className="aspect-square flex items-center justify-center font-serif text-[13px] tracking-[0.08em]"
@@ -74,9 +74,9 @@ export default async function Home() {
       </section>
 
       {/* 3단계 */}
-      <section className="max-w-md mx-auto px-6 py-12 flex flex-col gap-6">
+      <section className="max-w-md md:max-w-4xl mx-auto px-6 py-12 lg:py-20 flex flex-col gap-6 md:items-center">
         <h2 className="font-serif font-semibold text-2xl text-center tracking-tight">3단계로 완성</h2>
-        <ol className="flex flex-col gap-5">
+        <ol className="flex flex-col gap-5 md:flex-row md:gap-12">
           {STEPS.map((s) => (
             <li key={s.n} className="flex items-baseline gap-4">
               <span className="font-serif text-2xl text-rose w-9 shrink-0">{s.n}</span>
@@ -84,7 +84,7 @@ export default async function Home() {
             </li>
           ))}
         </ol>
-        <Link href={startHref} className="h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center mt-2">
+        <Link href={startHref} className="h-[52px] md:w-80 rounded-full bg-ink text-white text-base font-bold flex items-center justify-center mt-2">
           {session ? "내 청첩장 편집하기" : "무료로 시작하기"}
         </Link>
       </section>

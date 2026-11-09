@@ -113,7 +113,7 @@ export default function AdminPage() {
   const chip = (on: boolean) => `h-9 px-4 rounded-full text-[13px] border transition-colors ${on ? "bg-ink text-white border-ink font-medium" : "bg-soft border-line text-ink"}`;
 
   return (
-    <div className="max-w-2xl mx-auto px-5 py-6 sm:py-8 flex flex-col gap-5">
+    <div className="max-w-2xl lg:max-w-4xl mx-auto px-5 py-6 sm:py-8 flex flex-col gap-5">
       <div>
         <h1 className="text-[22px] font-bold text-ink">하객 현황</h1>
         <p className="text-[13px] text-sub mt-1">

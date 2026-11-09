@@ -27,7 +27,7 @@ const FAQS: { q: string; a: ReactNode }[] = [
 export default function FaqPage() {
   return (
     <main className="min-h-screen bg-white text-ink">
-      <article className="max-w-xl mx-auto px-6 py-10 overflow-x-hidden">
+      <article className="max-w-xl sm:max-w-2xl mx-auto px-6 py-10 sm:py-16 overflow-x-hidden">
         <Link href="/" className="text-xs text-sub underline underline-offset-4">← {SERVICE_NAME}</Link>
         <h1 className="font-serif font-semibold text-[28px] leading-[1.3] tracking-tight mt-4">자주 묻는 질문</h1>
 

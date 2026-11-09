@@ -19,7 +19,7 @@ export function Sec({ title, children }: { title: string; children: ReactNode })
 export default function LegalPage({ title, children }: { title: string; children: ReactNode }) {
   return (
     <main className="min-h-screen bg-white text-ink">
-      <article className="max-w-xl mx-auto px-6 py-10 overflow-x-hidden">
+      <article className="max-w-xl sm:max-w-2xl mx-auto px-6 py-10 sm:py-16 overflow-x-hidden">
         <Link href="/" className="text-xs text-sub underline underline-offset-4">← {SERVICE_NAME}</Link>
         <h1 className="font-serif font-semibold text-[28px] leading-[1.3] tracking-tight mt-4">{title}</h1>
         <p className="mt-4 border border-line rounded-lg px-3 py-2 text-xs leading-relaxed text-sub">
