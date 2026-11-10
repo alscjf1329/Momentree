@@ -97,7 +97,7 @@ export async function runRetention(
 const g = globalThis as unknown as { __retentionWorker?: NodeJS.Timeout };
 export function startRetentionWorker() {
   if (g.__retentionWorker) return;
-  const tick = () => void runRetention().catch((e) => console.warn("[retention] 실패", e instanceof Error ? e.name : e));
+  const tick = () => void runRetention().catch((e) => console.warn("[retention] 실패", e instanceof Error ? `${e.name}: ${e.message}` : e));
   g.__retentionWorker = setInterval(tick, DAY);
   g.__retentionWorker.unref();
   tick();
