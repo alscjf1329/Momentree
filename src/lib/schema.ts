@@ -53,6 +53,8 @@ export function setByPath<T>(obj: T, path: string, value: unknown): T {
   const keys = path.split(".");
   let cur = next;
   for (let i = 0; i < keys.length - 1; i++) {
+    // 상위 항목이 없는 옛 데이터(예: bgm·shuttleTimetable 없음)에서도 입력이 되도록 중간 객체를 만든다
+    if (cur[keys[i]] == null || typeof cur[keys[i]] !== "object") cur[keys[i]] = /^\d+$/.test(keys[i + 1]) ? [] : {};
     cur = cur[keys[i]] as Record<string, unknown>;
   }
   cur[keys[keys.length - 1]] = value;
