@@ -8,7 +8,8 @@ services:
     ports:
       - "3001:3000"
     volumes:
-      - /data/momentree:/data/momentree
+      # 호스트·컨테이너 경로를 .env의 DATA_DIR과 같게 — 하드코딩하면 DATA_DIR을 바꿔도 /data/momentree가 계속 생기고 데이터는 컨테이너 안에 쌓임
+      - ${DATA_DIR:-/data/momentree}:${DATA_DIR:-/data/momentree}
     environment:
       - NODE_ENV=production
     env_file:

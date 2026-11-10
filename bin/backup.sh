@@ -16,6 +16,11 @@
 # 3) 가끔 복원 연습: 백업을 tar -xzf 로 풀어 momentree.db가 열리는지 확인
 set -euo pipefail
 
+# 환경변수에 없으면 프로젝트 .env의 DATA_DIR을 따른다(앱·compose와 같은 경로)
+ENV_FILE="$(dirname "$0")/../.env"
+if [ -z "${DATA_DIR:-}" ] && [ -f "$ENV_FILE" ]; then
+  DATA_DIR="$(grep -E '^DATA_DIR=' "$ENV_FILE" | tail -1 | cut -d= -f2- | tr -d '"' || true)"
+fi
 DATA_DIR="${DATA_DIR:-/data/momentree}"
 BACKUP_DIR="${BACKUP_DIR:-/data/momentree-backups}"
 KEEP="${KEEP:-14}"
