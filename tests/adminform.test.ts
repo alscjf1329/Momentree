@@ -19,3 +19,9 @@ test("현재 모든 템플릿의 기본 화면 전용 항목은 비어 있다(= 
     assert.equal(spec.length, 0, `${id}에 기본 화면 전용 항목이 생기면 이 테스트를 갱신하세요: ${spec.map((f) => f.key)}`);
   }
 });
+
+test("2열 배치는 columns — grid면 한 칸을 접어도 옆 칸 높이에 묶여 빈 공간이 남는다", () => {
+  assert.match(form, /md:columns-2/);
+  assert.match(form, /break-inside-avoid/);
+  assert.ok(!/md:grid-cols-2/.test(form));
+});

@@ -71,7 +71,8 @@ export default function AdminForm({
       </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* 2열은 grid가 아니라 columns — grid는 한 칸을 접어도 옆 칸 높이를 따라가 빈 공간이 남는다 */}
+      <div className="md:columns-2 md:gap-4">
         {sections.map((section, i) => {
           const { errorCount, missing } = status(section.fields);
           const hasRequired = section.fields.some((f) => f.required);
@@ -81,16 +82,18 @@ export default function AdminForm({
             : missing > 0 ? { text: `필수 ${missing}개 남음`, tone: "warn" as const }
             : hasRequired ? { text: "✓ 완료", tone: "ok" as const } : undefined;
           return (
-          <SectionCard key={section.title} title={section.title} open={open} badge={badge}
+          <div key={section.title} className="mb-4 break-inside-avoid">
+          <SectionCard title={section.title} open={open} badge={badge}
             onToggle={() => setToggled((t) => ({ ...t, [key]: !open }))}>
             {section.fields.map((field) =>
               renderField({ field, data, basePath: "", onChange, errors })
             )}
           </SectionCard>
+          </div>
           );
         })}
         {sections.length === 0 && (
-          <p className="text-sm text-sub col-span-full">이 탭에 표시할 항목이 없습니다</p>
+          <p className="text-sm text-sub">이 탭에 표시할 항목이 없습니다</p>
         )}
       </div>
 

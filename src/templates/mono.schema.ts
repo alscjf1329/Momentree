@@ -100,7 +100,7 @@ export const monoSchema: TemplateSchema = {
       ],
     },
     {
-      title: "RSVP 폼 문구",
+      title: "참석 여부 폼 문구",
       fields: [
         { key: "rsvpNotice", type: "textarea", label: "상단 안내", common: true },
         { key: "rsvpDeadlineText", type: "text", label: "하단 마감 안내", common: true, placeholder: "10월 10일까지 알려주시면 감사하겠습니다" },
