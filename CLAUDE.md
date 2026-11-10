@@ -11,7 +11,7 @@
 ## 개발 명령
 - 테스트: `npm test` (Node 내장 러너, `tests/`). 타입: `npx tsc --noEmit`. 둘 다 통과해야 머지한다.
 - 개발 서버: `npm run dev` → http://localhost:3000, 어드민 /admin.
-- 배포: `bin/deploy.sh` (끝에서 /api/health 확인). 백업: `bin/backup.sh`.
+- 배포: `bin/deploy.sh` (끝에서 /api/health 확인). 백업: `bin/backup.sh`. 배포 전 `node bin/predeploy-check.mjs [.env]`로 읽기 전용 점검(docs/deploy-checklist.md).
 - git push는 키체인 때문에 비대화형에서 실패한다. 이 형태로 푸시한다:
   `git -c credential.helper= -c credential.helper='!gh auth git-credential' push`
 
