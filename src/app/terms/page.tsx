@@ -10,7 +10,7 @@ export default function TermsPage() {
     <LegalPage title="이용약관">
       <Sec title="1. 목적과 운영자">
         <p>이 약관은 Momentree(이하 &quot;서비스&quot;)가 제공하는 모바일 청첩장 제작·공유 서비스의 이용 조건을 정합니다.</p>
-        <p>운영자: <Tbd>운영자 상호·대표자·사업자 정보</Tbd> / 문의: <Tbd>문의 이메일 또는 카카오 채널</Tbd></p>
+        <p>운영자: <Tbd>운영자 상호·대표자·사업자 정보</Tbd> / 문의: <Tbd>문의 이메일</Tbd> 또는 서비스 내 문의하기</p>
       </Sec>
 
       <Sec title="2. 서비스 내용">

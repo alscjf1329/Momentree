@@ -4,6 +4,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { NextRequest } from "next/server";
+import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/adminAuth";
+import { WEDDING } from "@/content";
 import { notifyOperator, notifyOnce, ERROR_DEDUP_MS } from "@/lib/notify";
 
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "momentree-ops-"));
@@ -52,40 +54,97 @@ before(async () => {
   health = await import("@/app/api/health/route");
 });
 
-let ipN = 0;
-const post = (body: unknown, ip = `10.0.0.${++ipN}`) =>
-  contact.POST(new NextRequest("http://x/api/contact", { method: "POST", headers: { "x-forwarded-for": ip }, body: JSON.stringify(body) }));
-const valid = { name: "민철", email: "a@b.co", message: "문의합니다" };
+process.env.ADMIN_SESSION_SECRET = "ops-secret";
+process.env.ENCRYPTION_KEY = Buffer.alloc(32, 7).toString("base64");
+
+// 세션 쿠키로 문의를 보낸다. session이 null이면 비로그인.
+const post = async (body: unknown, session: { role: "admin" | "customer"; file?: string; email?: string } | null) =>
+  contact.POST(new NextRequest("http://x/api/contact", {
+    method: "POST",
+    headers: session ? { cookie: `${ADMIN_SESSION_COOKIE}=${await createSessionToken("ops-secret", session)}` } : {},
+    body: JSON.stringify(body),
+  }));
+let userN = 0;
+// 고객 세션은 DB 멤버십을 확인하므로 실제 고객을 만들어 둔다.
+const newCustomer = async () => {
+  const email = `u${++userN}@x.com`;
+  (await import("@/lib/customers")).saveCustomer(email, WEDDING, email);
+  return { role: "customer" as const, file: email, email };
+};
+const withFetch = async (fn: () => Promise<void>) => {
+  setEnv(true); calls.length = 0;
+  const realFetch = globalThis.fetch; globalThis.fetch = fakeFetch;
+  try { await fn(); } finally { globalThis.fetch = realFetch; }
+};
+
+test("contact: 세션 없으면 401", async () => {
+  setEnv(true);
+  assert.equal((await post({ message: "hi" }, null)).status, 401);
+});
 
 test("contact: 텔레그램 미설정이면 503(성공한 척 안 함)", async () => {
   setEnv(false);
-  assert.equal((await post(valid)).status, 503);
+  assert.equal((await post({ message: "hi" }, await newCustomer())).status, 503);
 });
 
-test("contact: 검증·허니팟·전달", async () => {
-  setEnv(true);
-  const realFetch = globalThis.fetch; globalThis.fetch = fakeFetch; calls.length = 0;
-  try {
-    assert.equal((await post({ ...valid, email: "nope" })).status, 400);
-    assert.equal((await post({ ...valid, message: "" })).status, 400);
-    assert.equal((await post({ ...valid, message: "a".repeat(1001) })).status, 400);
-    assert.equal(calls.length, 0);
-    assert.equal((await post({ ...valid, website: "http://spam" })).status, 200); // 허니팟: 전달 안 함
-    assert.equal(calls.length, 0);
-    assert.equal((await post(valid)).status, 200);
+test("contact: 고객 세션의 이메일·파일이 알림에 들어가고 본문 이메일은 무시", async () => {
+  const me = await newCustomer();
+  await withFetch(async () => {
+    assert.equal((await post({ message: "문의합니다", email: "evil@x.com", file: "other" }, me)).status, 200);
     assert.equal(calls.length, 1);
-    assert.ok(calls[0].body.text.startsWith("[문의]") && calls[0].body.text.includes("a@b.co") && calls[0].body.text.includes("문의합니다"));
-  } finally { globalThis.fetch = realFetch; }
+    const t = calls[0].body.text;
+    assert.ok(t.startsWith("[문의]") && t.includes(me.email) && t.includes(`청첩장: ${me.file}`) && t.includes("문의합니다"));
+    assert.ok(!t.includes("evil@x.com") && !t.includes("other"));
+  });
 });
 
-test("contact: IP당 분당 3회 제한", async () => {
-  setEnv(true);
-  const realFetch = globalThis.fetch; globalThis.fetch = fakeFetch;
-  try {
+test("contact: 관리자 세션은 관리자로 표시", async () => {
+  await withFetch(async () => {
+    assert.equal((await post({ message: "x" }, { role: "admin", file: "ad@x.com" })).status, 200);
+    assert.ok(calls[0].body.text.includes("[관리자] ad@x.com"));
+  });
+});
+
+test("contact: 길이 제한·허니팟", async () => {
+  const me = await newCustomer();
+  await withFetch(async () => {
+    assert.equal((await post({ message: "  " }, me)).status, 400);
+    assert.equal((await post({ message: "a".repeat(1001) }, me)).status, 400);
+    assert.equal(calls.length, 0);
+    assert.equal((await post({ message: "x", website: "http://spam" }, me)).status, 200); // 전달 안 함
+    assert.equal(calls.length, 0);
+  });
+});
+
+test("contact: 로그인 사용자당 분당 3회 제한", async () => {
+  const me = await newCustomer();
+  await withFetch(async () => {
     const codes = [];
-    for (let i = 0; i < 4; i++) codes.push((await post(valid, "9.9.9.9")).status);
+    for (let i = 0; i < 4; i++) codes.push((await post({ message: "x" }, me)).status);
     assert.deepEqual(codes, [200, 200, 200, 429]);
-  } finally { globalThis.fetch = realFetch; }
+  });
+});
+
+test("contact: 문의 내용은 DB·데이터 폴더에 저장되지 않음", async () => {
+  const me = await newCustomer();
+  const secret = "SECRET-INQUIRY-내용-12345";
+  await withFetch(async () => { assert.equal((await post({ message: secret }, me)).status, 200); });
+  (await import("@/lib/db")).getDb().pragma("wal_checkpoint(TRUNCATE)");
+  const walk = (d: string): string[] => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+  for (const f of walk(process.env.DATA_DIR!)) assert.ok(!fs.readFileSync(f).includes(secret), f);
+});
+
+test("카카오 채널 환경변수·SupportLink 참조가 src에 남지 않음, /faq는 로그인 안내", () => {
+  const walk = (d: string): string[] => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+  for (const f of walk("src")) {
+    const t = fs.readFileSync(f, "utf8");
+    assert.ok(!/KAKAO_CHANNEL|SupportLink|lib\/support/.test(t), f);
+  }
+  const faq = fs.readFileSync("src/app/faq/page.tsx", "utf8");
+  assert.match(faq, /href="\/admin\/login"/);
+  assert.match(faq, /<details/);
+  assert.match(faq, /19,900원/);
+  assert.match(fs.readFileSync("src/app/page.tsx", "utf8"), /href="\/faq"/);
 });
 
 test("health: ok:true, 민감정보 없음", async () => {

@@ -153,16 +153,14 @@ if (state("ENCRYPTION_KEY") === "있음") {
 }
 check("SITE_URL", "warn", "메일 속 링크와 공유 주소가 비게 됨");
 check("NEXT_PUBLIC_KAKAO_MAP_KEY", "warn", "지도가 나오지 않음(빌드 시점에 고정)");
-check("NEXT_PUBLIC_KAKAO_CHANNEL_URL", "none", "선택 항목, 카카오톡 문의 링크가 숨겨짐(빌드 시점에 고정)");
-check("TELEGRAM_BOT_TOKEN", "none");
-check("TELEGRAM_CHAT_ID", "none");
-if (!(env("TELEGRAM_BOT_TOKEN") && env("TELEGRAM_CHAT_ID"))) out("  텔레그램 설정이 없으면 문의 폼이 숨겨지고 운영 알림(문의·서버 오류·메일 실패)이 꺼집니다.");
+check("TELEGRAM_BOT_TOKEN", "warn", "문의 접수 불가(문의하기·서버 오류·메일 실패 알림이 꺼짐)");
+check("TELEGRAM_CHAT_ID", "warn", "문의 접수 불가(문의하기·서버 오류·메일 실패 알림이 꺼짐)");
 out(`DATA_DIR: ${env("DATA_DIR") ? "지정됨" : "미지정(기본 ./data 사용)"}`);
 
 // ---- 확정 필요 문구 ----
 head("공개 문서의 [확정 필요] 항목");
 let tbd = 0;
-for (const f of ["app/privacy/page.tsx", "app/terms/page.tsx", "app/faq/page.tsx", "components/SupportLink.tsx"]) {
+for (const f of ["app/privacy/page.tsx", "app/terms/page.tsx", "app/faq/page.tsx"]) {
   let t;
   try { t = src(f); } catch { continue; }
   const items = [...t.matchAll(/<Tbd>([\s\S]*?)<\/Tbd>/g)].map((m) => m[1].replace(/\s+/g, " ").trim());

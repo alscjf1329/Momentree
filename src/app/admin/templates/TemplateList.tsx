@@ -7,7 +7,6 @@ import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 import { tplPickedKey } from "@/lib/onboarding";
 import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
-import SupportLink from "@/components/SupportLink";
 import { canUseTemplate, type Plan } from "@/lib/plan";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
@@ -438,7 +437,7 @@ export default function TemplateList() {
             <p className="text-xs text-[#b42318] mb-3">{error}</p>
           )}
           {upgrade && (
-            <p className="text-xs text-ink mb-3 leading-relaxed">이 템플릿은 유료(1회 결제)에서 쓸 수 있어요. 업그레이드가 필요하면 <SupportLink />해 주세요.</p>
+            <p className="text-xs text-ink mb-3 leading-relaxed">이 템플릿은 유료(1회 결제)에서 쓸 수 있어요. 업그레이드가 필요하면 <Link href="/admin/contact" className="underline underline-offset-4">문의</Link>해 주세요.</p>
           )}
 
           {/* 템플릿 그리드 */}
