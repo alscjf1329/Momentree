@@ -51,7 +51,7 @@ function PreviewFrame({ template, data, watermark }: { template: string; data: W
   );
 }
 
-export default function PreviewPane({ template, data, watermark = false }: { template: string; data: WeddingData; watermark?: boolean }) {
+export default function PreviewPane({ template, data, watermark = false, raise = false }: { template: string; data: WeddingData; watermark?: boolean; raise?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -66,7 +66,7 @@ export default function PreviewPane({ template, data, watermark = false }: { tem
 
       {/* 모바일·태블릿: 떠 있는 버튼 → 전체화면 미리보기 (입력한 내용이 그대로 반영됨) */}
       <button onClick={() => setOpen(true)}
-        className="xl:hidden fixed bottom-24 sm:bottom-6 right-4 z-40 px-5 py-3 rounded-full text-sm font-medium text-white shadow-lg"
+        className={`xl:hidden fixed ${raise ? "bottom-36 sm:bottom-24" : "bottom-24 sm:bottom-6"} right-4 z-40 px-5 py-3 rounded-full text-sm font-medium text-white shadow-lg`}
         style={{ background: "var(--color-ink)" }}>
         미리보기
       </button>

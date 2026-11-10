@@ -75,7 +75,7 @@ docker compose up --build
 | 탭 | 경로 | 내용 |
 |---|---|---|
 | 하객 현황 | `/admin` | RSVP 응답 조회, 인라인 수정/삭제 |
-| 고객 설정 (고객: 내 정보 설정) | `/admin/setup` | 스키마 기반 폼으로 청첩장 데이터 입력, 실시간 미리보기 |
+| 고객 설정 (고객: 내 정보 설정) | `/admin/setup` | 스키마 기반 6단계 위저드로 청첩장 데이터 입력, 실시간 미리보기 |
 | 템플릿 | `/admin/templates` | 템플릿 갤러리에서 선택 → 자동 저장 |
 
 ### 인증 방식
@@ -195,7 +195,7 @@ SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마
 
 ## 청첩장 데이터 스키마
 
-고객 데이터 필드는 템플릿별 스키마(`src/templates/<id>.schema.ts`)로 정의되고, 어드민 폼(`src/components/admin/AdminForm.tsx`)이 이 스키마를 읽어 자동으로 입력 폼과 실시간 미리보기를 생성합니다. 새 필드를 추가하려면 스키마 파일에 필드를 선언하기만 하면 됩니다 — 폼 코드를 직접 수정할 필요가 없습니다.
+고객 데이터 필드는 템플릿별 스키마(`src/templates/<id>.schema.ts`)로 정의되고, 설정 화면의 6단계 위저드(`src/app/admin/setup/SetupWizard.tsx`, 단계 구성은 `src/lib/setupSteps.ts`)가 이 스키마를 읽어 자동으로 입력 폼과 실시간 미리보기를 생성합니다. 새 필드를 추가하려면 스키마 파일에 필드를 선언하기만 하면 됩니다 — 폼 코드를 직접 수정할 필요가 없습니다.
 
 전용 스키마 파일이 없는 8종(classic·editorial·minimal·romantic·twilight·blossom·modern·luxury)은 `garden.schema.ts`를 폴백으로 쓰되, 각 템플릿이 실제로 렌더링하지 않는 필드(`excludeTemplates`)는 폼에서 숨깁니다.
 
