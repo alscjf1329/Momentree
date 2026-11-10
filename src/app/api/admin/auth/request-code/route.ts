@@ -47,14 +47,20 @@ export async function POST(req: NextRequest) {
   }
 
   const code = generateOtpCode();
-  await issueOtp(email, code, secret, role, file);
+  try {
+    await issueOtp(email, code, secret, role, file);
 
-  // 지연에 민감 — 접수 직후 즉시 1회 시도하고 결과를 기다린다(옛 코드가 뒤늦게 재발송되지 않게 재시도 없음).
-  const sent = await enqueueMail(
-    { to: email, subject: "[Momentree] 인증 코드", html: `<p>인증 코드: <strong style="font-size:20px">${code}</strong></p><p>${OTP_TTL_MS / 60000}분간 유효합니다.</p>` },
-    { immediate: true, maxAttempts: 1 }
-  );
-  if (!sent) return NextResponse.json({ error: "이메일 발송에 실패했습니다" }, { status: 502 });
+    // 지연에 민감 — 접수 직후 즉시 1회 시도하고 결과를 기다린다(옛 코드가 뒤늦게 재발송되지 않게 재시도 없음).
+    const sent = await enqueueMail(
+      { to: email, subject: "[Momentree] 인증 코드", html: `<p>인증 코드: <strong style="font-size:20px">${code}</strong></p><p>${OTP_TTL_MS / 60000}분간 유효합니다.</p>` },
+      { immediate: true, maxAttempts: 1 }
+    );
+    if (!sent) return NextResponse.json({ error: "이메일 발송에 실패했습니다" }, { status: 502 });
+  } catch (e) {
+    // 키 누락·저장 폴더 쓰기 실패 등 — 빈 응답 대신 JSON으로 알리고 원인은 서버 로그에 남긴다
+    console.error("[request-code] 실패", e instanceof Error ? `${e.name}: ${e.message}` : e);
+    return NextResponse.json({ error: "서버에 문제가 생겨 코드를 보내지 못했어요. 잠시 후 다시 시도해 주세요" }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

@@ -35,8 +35,9 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "요청에 실패했습니다");
+      // 서버가 비정상 종료하면 본문이 비어 있어 json()이 실패한다 — 안내 문구로 대체
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "서버에 문제가 생겼어요. 잠시 후 다시 시도해 주세요");
       setStep("verify");
     } catch (e) {
       setError(e instanceof Error ? e.message : "요청에 실패했습니다");
@@ -54,8 +55,8 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "인증에 실패했습니다");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "서버에 문제가 생겼어요. 잠시 후 다시 시도해 주세요");
       // 고객은 바로 청첩장 편집 화면으로, 관리자는 대시보드로
       router.push(data.role === "customer" ? "/admin/setup" : "/admin");
       router.refresh();
