@@ -1,4 +1,3 @@
-import { SERVICE_NAME } from "@/lib/brand";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { addMember, can, INVITABLE, listMembers, removeMember } from "@/lib/access";
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
   const preview = `${base}/invite/${getTemplate(t.file!)}?id=${getShareId(t.file!)}`;
   await enqueueMail({
     to: email,
-    subject: `[${SERVICE_NAME}] ${inviter} 님이 '${label}' 청첩장 공동 편집에 초대했어요`,
+    subject: `[Momentree] ${inviter} 님이 '${label}' 청첩장 공동 편집에 초대했어요`,
     html: `<p><b>${inviter}</b> 님이 <b>${label}</b> 청첩장을 함께 편집하도록 초대했어요.</p>
      <p><a href="${login}" style="display:inline-block;padding:10px 18px;background:#1f2937;color:#fff;border-radius:8px;text-decoration:none">초대 수락하고 편집하기</a></p>
      <p style="color:#666;font-size:13px">버튼을 누르고 이 이메일(${email})로 인증 코드를 받아 로그인하면 바로 편집 화면이 열립니다.<br>청첩장 미리보기: <a href="${preview}">${preview}</a></p>`,

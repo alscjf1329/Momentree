@@ -1,15 +1,14 @@
-import { SERVICE_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import "./globals.css";
 import RegisterSW from "@/components/RegisterSW";
 import PreventPinchZoom from "@/components/PreventPinchZoom";
 
 export const metadata: Metadata = {
-  title: `${SERVICE_NAME} — 모바일 청첩장`,
+  title: "Momentree — 모바일 청첩장",
   description: "두 분의 하루를 링크 하나로. 모바일 청첩장을 만들고 하객 응답까지 한곳에서 관리하세요.",
   appleWebApp: {
     capable: true,
-    title: SERVICE_NAME,
+    title: "Momentree",
     statusBarStyle: "black-translucent",
   },
 };

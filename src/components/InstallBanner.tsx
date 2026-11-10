@@ -1,5 +1,4 @@
 "use client";
-import { SERVICE_NAME } from "@/lib/brand";
 
 import { useEffect, useState } from "react";
 
@@ -35,7 +34,7 @@ export default function InstallBanner() {
       <div className="flex items-center gap-3 min-w-0">
         <span style={{ fontSize: 22 }}>📲</span>
         <div className="min-w-0">
-          <p className="text-xs font-medium truncate">{SERVICE_NAME} 앱으로 설치</p>
+          <p className="text-xs font-medium truncate">Momentree 앱으로 설치</p>
           <p className="text-[10px] opacity-60">홈 화면에 추가해서 빠르게 열기</p>
         </div>
       </div>

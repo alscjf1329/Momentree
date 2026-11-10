@@ -1,4 +1,3 @@
-import { SERVICE_NAME } from "@/lib/brand";
 import { NextRequest, NextResponse } from "next/server";
 import { generateOtpCode, type SessionRole } from "@/lib/adminAuth";
 import { isOnCooldown, issueOtp, OTP_TTL_MS } from "@/lib/adminOtp";
@@ -52,7 +51,7 @@ export async function POST(req: NextRequest) {
 
   // 지연에 민감 — 접수 직후 즉시 1회 시도하고 결과를 기다린다(옛 코드가 뒤늦게 재발송되지 않게 재시도 없음).
   const sent = await enqueueMail(
-    { to: email, subject: `[${SERVICE_NAME}] 인증 코드`, html: `<p>인증 코드: <strong style="font-size:20px">${code}</strong></p><p>${OTP_TTL_MS / 60000}분간 유효합니다.</p>` },
+    { to: email, subject: "[Momentree] 인증 코드", html: `<p>인증 코드: <strong style="font-size:20px">${code}</strong></p><p>${OTP_TTL_MS / 60000}분간 유효합니다.</p>` },
     { immediate: true, maxAttempts: 1 }
   );
   if (!sent) return NextResponse.json({ error: "이메일 발송에 실패했습니다" }, { status: 502 });
