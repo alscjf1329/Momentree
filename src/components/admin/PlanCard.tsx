@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import SupportLink from "@/components/SupportLink";
+import Link from "next/link";
 import { PLAN_LABEL, type Plan } from "@/lib/plan";
 
 interface Usage { plan: Plan; expired: boolean; until: number | null; photos: number; photoLimit: number | null; rsvp: number; rsvpLimit: number | null }
@@ -36,7 +36,7 @@ export default function PlanCard({ file, admin, onPlan }: { file: string; admin:
       {u.plan === "paid" && u.until !== null && <p className="text-sub">유료 이용 기간: {new Date(u.until).toISOString().slice(0, 10)}까지</p>}
       <p className="text-sub">사진 {of(u.photos, u.photoLimit)}장 · 하객 응답 {of(u.rsvp, u.rsvpLimit)}건</p>
       {u.plan === "free" && !admin && (
-        <p className="text-sub leading-relaxed">모든 템플릿·사진/응답 무제한·함께 편집·워터마크 없음은 유료(1회 결제)에서 쓸 수 있어요. 업그레이드가 필요하면 <SupportLink />해 주세요.</p>
+        <p className="text-sub leading-relaxed">모든 템플릿·사진/응답 무제한·함께 편집·워터마크 없음은 유료(1회 결제)에서 쓸 수 있어요. 업그레이드가 필요하면 <Link href="/admin/contact" className="underline underline-offset-4">문의</Link>해 주세요.</p>
       )}
     </div>
   );

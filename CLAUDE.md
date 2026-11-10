@@ -34,4 +34,4 @@
 - 사용자 결정이 필요한 티켓은 임의로 구현하지 않고 안건으로 제안한 뒤 승인받는다.
 
 ## 운영 환경변수 (서버 .env, .env.example 참고)
-`ENCRYPTION_KEY`, `SITE_URL`, `NEXT_PUBLIC_KAKAO_CHANNEL_URL`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. `NEXT_PUBLIC_*`는 빌드 시점에 고정된다.
+`ENCRYPTION_KEY`, `SITE_URL`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`(문의하기가 의존, 없으면 문의 접수 불가). `NEXT_PUBLIC_*`는 빌드 시점에 고정된다.

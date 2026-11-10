@@ -2,7 +2,6 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
-import SupportLink from "@/components/SupportLink";
 import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
@@ -93,7 +92,6 @@ export default async function Home() {
         <p className="mt-1">© momentree</p>
         <p className="mt-2 flex flex-wrap justify-center gap-x-4">
           <Link href="/faq" className="underline underline-offset-4">자주 묻는 질문</Link>
-          <SupportLink />
           <Link href="/terms" className="underline underline-offset-4">이용약관</Link>
           <Link href="/privacy" className="underline underline-offset-4">개인정보처리방침</Link>
         </p>
