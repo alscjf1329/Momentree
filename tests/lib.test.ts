@@ -88,8 +88,9 @@ test("템플릿별 스키마: 쓰지 않는 필드는 숨기고 쓰는 필드는
   for (const k of ["mainTitle", "subInfo", "rsvpMessage", "rsvpPopupDelaySec"]) assert.ok(!classic.has(k), `classic: ${k}`);
 
   assert.ok(keys("blossom").has("gallery") && !keys("blossom").has("envelopeClosed"));
-  assert.ok(!keys("minimal").has("gallery") && keys("minimal").has("groom.nameFull"));
+  assert.ok(keys("minimal").has("gallery") && keys("minimal").has("groom.nameFull")); // 갤러리는 화면이 쓰는 모든 템플릿에 입력칸이 있다(MOM-57)
   assert.ok(!keys("editorial").has("groom.nameFull"));
+  assert.ok(!keys("garden").has("groom.nameFull") && !keys("mono").has("groom.nameFull")); // 화면에서 안 쓰는 전체이름은 숨김
   // 모든 템플릿에 필수 공통 필드는 남는다
   for (const t of ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury", "garden", "mono"]) {
     assert.ok(keys(t).has("groom.name") && keys(t).has("date") && keys(t).has("venue.name"), t);
