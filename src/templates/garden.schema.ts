@@ -127,8 +127,7 @@ export const gardenSchema: TemplateSchema = {
           type: "array-object",
           label: "안내사항",
           common: true,
-          excludeTemplates: BASIC,
-          helpText: "Location-Contact 사이, 한 장씩 스와이프로 표시",
+          helpText: "오시는 길 아래에 한 장씩 넘겨 볼 수 있게 표시돼요",
           itemFields: [
             { key: "title", type: "text", label: "제목", placeholder: "예: 주차 안내" },
             { key: "content", type: "textarea", label: "내용" },
@@ -139,8 +138,8 @@ export const gardenSchema: TemplateSchema = {
     {
       title: "배경음악",
       fields: [
-        { key: "bgm.title", type: "text", label: "제목", common: true, excludeTemplates: BASIC },
-        { key: "bgm.src", type: "file", label: "파일 (mp3)", common: true, excludeTemplates: BASIC, placeholder: "/audio/bgm.mp3" },
+        { key: "bgm.title", type: "text", label: "제목", common: true },
+        { key: "bgm.src", type: "file", label: "파일 (mp3)", common: true, placeholder: "/audio/bgm.mp3" },
       ],
     },
     {

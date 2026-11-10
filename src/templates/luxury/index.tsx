@@ -7,6 +7,8 @@ import GreetingSection from "@/components/sections/GreetingSection";
 import CalendarSection from "@/components/sections/CalendarSection";
 import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
+import InfoSection from "@/components/sections/InfoSection";
+import BgmPlayer from "@/components/sections/BgmPlayer";
 import RSVPSection from "@/components/sections/RSVPSection";
 import GuestbookSection from "@/components/sections/GuestbookSection";
 
@@ -159,11 +161,13 @@ function LuxuryGallery() {
 export default function LuxuryTemplate() {
   return (
     <div style={VARS}>
+      <BgmPlayer />
       <Hero />
       <GreetingSection />
       <CalendarSection />
       <LuxuryGallery />
       <LocationSection />
+      <InfoSection />
       <ContactSection />
       <RSVPSection />
       <GuestbookSection />

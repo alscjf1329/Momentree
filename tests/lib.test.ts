@@ -84,8 +84,8 @@ test("템플릿별 스키마: 쓰지 않는 필드는 숨기고 쓰는 필드는
   assert.ok(!garden.has("envelopeClosed")); // garden엔 봉투 UI 없음
 
   const classic = keys("classic");
-  for (const k of ["envelopeClosed", "envelopeOpen", "gallery", "introBg", "groom.nameFull"]) assert.ok(classic.has(k), `classic: ${k}`);
-  for (const k of ["mainTitle", "subInfo", "rsvpMessage", "rsvpPopupDelaySec", "info", "bgm.src"]) assert.ok(!classic.has(k), `classic: ${k}`);
+  for (const k of ["envelopeClosed", "envelopeOpen", "gallery", "introBg", "groom.nameFull", "info", "bgm.src"]) assert.ok(classic.has(k), `classic: ${k}`);
+  for (const k of ["mainTitle", "subInfo", "rsvpMessage", "rsvpPopupDelaySec"]) assert.ok(!classic.has(k), `classic: ${k}`);
 
   assert.ok(keys("blossom").has("gallery") && !keys("blossom").has("envelopeClosed"));
   assert.ok(!keys("minimal").has("gallery") && keys("minimal").has("groom.nameFull"));
