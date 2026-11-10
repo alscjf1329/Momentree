@@ -44,7 +44,7 @@ if (envPath) {
   try { fileEnv = readEnvFile(envPath); } catch { warn.push(`.env 파일을 읽지 못했습니다: ${envPath}`); }
 }
 const env = (k) => process.env[k] || fileEnv[k] || "";
-const placeholder = (v) => /^(change-me|your-|xxxx|123456)/i.test(v) || /@example\.com$/.test(v);
+const placeholder = (v) => /^(change-me|xxxx|123456)/i.test(v) || /your-/i.test(v) || /@example\.com$/.test(v);
 
 const dataDir = path.resolve(env("DATA_DIR") || "./data");
 const dbFile = path.join(dataDir, "momentree.db");
