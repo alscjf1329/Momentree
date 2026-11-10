@@ -39,7 +39,10 @@ export default function AdminForm({
       .filter((s) => s.fields.length > 0);
   const commonSections = pick((f) => !!f.common);
   const specificSections = pick((f) => !f.common);
-  const sections = view !== "main" ? pick(() => true) : tab === "common" ? commonSections : specificSections;
+  // 템플릿 전용 항목이 없으면 탭 자체를 숨기고 기본 정보만 보여 준다
+  const hasSpecific = specificSections.length > 0;
+  const active = hasSpecific ? tab : "common";
+  const sections = view !== "main" ? pick(() => true) : active === "common" ? commonSections : specificSections;
 
   const isEmpty = (v: unknown) => v == null || (typeof v === "string" && !v.trim()) || (Array.isArray(v) && v.every((x) => !String(x ?? "").trim()));
   const status = (fields: FieldSchema[]) => {
@@ -51,7 +54,7 @@ export default function AdminForm({
 
   return (
     <div className="space-y-4">
-      {view === "main" && (
+      {view === "main" && hasSpecific && (
       <div className="flex gap-1 bg-[#f2f2f2] p-1 rounded-full w-fit">
         {(["common", "specific"] as const).map((t) => (
           <button
@@ -59,7 +62,7 @@ export default function AdminForm({
             type="button"
             onClick={() => setTab(t)}
             className={`px-4 h-9 text-sm rounded-full transition-colors ${
-              tab === t ? "bg-white text-ink font-bold shadow-sm" : "text-sub"
+              active === t ? "bg-white text-ink font-bold shadow-sm" : "text-sub"
             }`}
           >
             {t === "common" ? "기본 정보" : `${schema.name} 전용 옵션`}
@@ -72,7 +75,7 @@ export default function AdminForm({
         {sections.map((section, i) => {
           const { errorCount, missing } = status(section.fields);
           const hasRequired = section.fields.some((f) => f.required);
-          const key = `${tab}:${section.title}`;
+          const key = `${active}:${section.title}`;
           const open = toggled[key] ?? (view !== "main" || !narrow || i === 0 || errorCount > 0);
           const badge = errorCount > 0 ? { text: `확인 필요 ${errorCount}`, tone: "warn" as const }
             : missing > 0 ? { text: `필수 ${missing}개 남음`, tone: "warn" as const }
@@ -91,7 +94,7 @@ export default function AdminForm({
         )}
       </div>
 
-      {view === "main" && tab === "common" && links && (
+      {view === "main" && active === "common" && links && (
         <div className="border-t border-line">
           <LinkRow href={links.photos} label="사진 · 갤러리" hint={`${(getByPath(data, "gallery") as unknown[] | undefined)?.length ?? 0}장`} />
           <LinkRow href={links.accounts} label="축의금 계좌"
