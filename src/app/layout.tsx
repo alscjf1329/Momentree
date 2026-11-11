@@ -6,6 +6,8 @@ import PreventPinchZoom from "@/components/PreventPinchZoom";
 export const metadata: Metadata = {
   title: "Momentree — 모바일 청첩장",
   description: "두 분의 하루를 링크 하나로. 모바일 청첩장을 만들고 하객 응답까지 한곳에서 관리하세요.",
+  // 링크가 없으면 브라우저가 /favicon.ico 를 따로 요청해 404 가 난다
+  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }] },
   appleWebApp: {
     capable: true,
     title: "Momentree",

@@ -1,4 +1,4 @@
-const CACHE = "momentree-v2";
+const CACHE = "momentree-v3"; // 올리면 activate에서 이전 캐시가 지워진다
 
 // 앱 셸 — 오프라인에서도 뜨게 할 URL 목록
 const PRECACHE = ["/", "/admin", "/offline"];
@@ -29,6 +29,20 @@ self.addEventListener("fetch", (e) => {
 
   const url = new URL(request.url);
 
+  // 우리 도메인의 http(s) 요청만 다룬다 — 확장 프로그램(chrome-extension:)·외부 도메인은 cache.put 이 예외를 던지고,
+  // Next 의 화면 조각(RSC) 요청은 같은 주소라도 헤더에 따라 응답이 달라 캐시에 두면 안 된다.
+  if (url.origin !== self.location.origin) return;
+  if (request.headers.has("RSC") || url.searchParams.has("_rsc")) return;
+
+  // 캐시 저장 실패(용량·응답 종류)가 요청 처리에 영향을 주지 않게 삼킨다. 정상(200) 응답만 저장.
+  const save = (res) => {
+    if (res.ok && res.status === 200) {
+      const clone = res.clone();
+      caches.open(CACHE).then((c) => c.put(request, clone)).catch(() => {});
+    }
+    return res;
+  };
+
   // API 요청 — 항상 네트워크, 실패 시 캐시
   if (url.pathname.startsWith("/api/")) {
     e.respondWith(
@@ -43,11 +57,7 @@ self.addEventListener("fetch", (e) => {
   if (url.pathname.startsWith("/_next/static/")) {
     e.respondWith(
       fetch(request)
-        .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE).then((c) => c.put(request, clone));
-          return res;
-        })
+        .then(save)
         .catch(() => caches.match(request))
     );
     return;
@@ -59,11 +69,7 @@ self.addEventListener("fetch", (e) => {
       caches.match(request).then(
         (cached) =>
           cached ||
-          fetch(request).then((res) => {
-            const clone = res.clone();
-            caches.open(CACHE).then((c) => c.put(request, clone));
-            return res;
-          })
+          fetch(request).then(save)
       )
     );
     return;
@@ -79,11 +85,7 @@ self.addEventListener("fetch", (e) => {
   // HTML 페이지 — network-first, 오프라인 시 캐시 → /offline 폴백
   e.respondWith(
     fetch(request)
-      .then((res) => {
-        const clone = res.clone();
-        caches.open(CACHE).then((c) => c.put(request, clone));
-        return res;
-      })
+      .then(save)
       .catch(() =>
         caches.match(request).then(
           (cached) => cached || caches.match("/offline")
