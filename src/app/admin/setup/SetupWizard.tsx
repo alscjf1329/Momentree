@@ -124,10 +124,14 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
         </>
       )}
 
-      {saveError && <p role="alert" className="max-w-xl text-sm text-[#b42318] leading-relaxed">{saveError}</p>}
-
       {/* 모바일은 아래 탭 위에, 넓은 화면은 맨 아래에 붙는다 */}
       <div className="fixed inset-x-0 bottom-16 sm:bottom-0 z-40 bg-white border-t border-line" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+        {/* 저장 실패 안내는 입력칸 맨 아래가 아니라 눌렀던 버튼 바로 위에 — 길게 스크롤된 화면에서도 보이게 */}
+        {saveError && (
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-2">
+            <p role="alert" className="max-w-xl text-sm text-[#b42318] leading-relaxed bg-[#fff4f2] rounded-lg px-3 py-2 break-words">{saveError}</p>
+          </div>
+        )}
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center">
           <div className="max-w-3xl mx-auto xl:mx-0 w-full">
             <div className="max-w-xl flex gap-3">
