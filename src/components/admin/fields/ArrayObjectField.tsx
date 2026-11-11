@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Label } from "./fieldStyles";
+import { uploadFile } from "@/lib/uploadClient";
 import type { RenderFieldArgs } from "./types";
 
 interface ArrayObjectFieldProps extends RenderFieldArgs {
@@ -40,12 +41,7 @@ export default function ArrayObjectField({
     setBulkProgress({ done: 0, total: list.length });
     const uploaded: Record<string, unknown>[] = [];
     for (const file of list) {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("kind", "image");
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const json = await res.json();
-      if (res.ok) uploaded.push({ src: json.path, alt: "" });
+      try { uploaded.push({ src: await uploadFile(file, "image"), alt: "" }); } catch { /* 실패한 파일은 건너뜀 */ }
       setBulkProgress((p) => (p ? { ...p, done: p.done + 1 } : p));
     }
     onChange(path, [...items, ...uploaded]);

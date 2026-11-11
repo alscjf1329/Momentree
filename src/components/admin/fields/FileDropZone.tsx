@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { uploadFile } from "@/lib/uploadClient";
 
 export default function FileDropZone({
   value,
@@ -22,13 +23,7 @@ export default function FileDropZone({
     setUploading(true);
     setError("");
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("kind", kind);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "업로드에 실패했습니다");
-      onChange(json.path);
+      onChange(await uploadFile(file, kind));
     } catch (e) {
       setError(e instanceof Error ? e.message : "업로드에 실패했습니다");
     } finally {

@@ -10,6 +10,16 @@ const LIMITS: Record<string, { dir: string; mime: string; maxBytes: number }> = 
   audio: { dir: "audio", mime: "audio/", maxBytes: 20 * 1024 * 1024 },
 };
 
+// 폰 브라우저는 mp3 등의 종류(MIME)를 비우거나 octet-stream 으로 보내는 일이 있어, 그때만 확장자로 판정한다
+const EXTS: Record<string, string[]> = {
+  image: [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"],
+  audio: [".mp3", ".m4a", ".aac", ".wav", ".ogg"],
+};
+const typeOk = (file: File, kind: string, mime: string) =>
+  file.type !== "image/svg+xml" &&
+  (file.type.startsWith(mime) ||
+    ((file.type === "" || file.type === "application/octet-stream") && EXTS[kind].includes(path.extname(file.name).toLowerCase())));
+
 function safeExt(filename: string, fallback: string): string {
   const ext = path.extname(filename).toLowerCase().replace(/[^a-z0-9.]/g, "");
   return ext || fallback;
@@ -31,7 +41,7 @@ export async function POST(req: NextRequest) {
   if (!limit) {
     return NextResponse.json({ error: "지원하지 않는 업로드 종류입니다" }, { status: 400 });
   }
-  if (!file.type.startsWith(limit.mime) || file.type === "image/svg+xml") {
+  if (!typeOk(file, kind as string, limit.mime)) {
     return NextResponse.json(
       { error: kind === "image" ? "이미지 파일만 업로드할 수 있습니다 (SVG 제외)" : "오디오 파일만 업로드할 수 있습니다" },
       { status: 400 }

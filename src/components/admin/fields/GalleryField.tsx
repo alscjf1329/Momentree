@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Label } from "./fieldStyles";
+import { uploadFile } from "@/lib/uploadClient";
 import type { FieldComponentProps } from "./types";
 
 interface GalleryItem {
@@ -25,14 +26,8 @@ export default function GalleryField({ field, path, value, onChange }: FieldComp
     const uploaded: GalleryItem[] = [];
     let bad = 0;
     for (const file of list) {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("kind", "image");
       try {
-        const res = await fetch("/api/upload", { method: "POST", body: form });
-        const json = await res.json();
-        if (res.ok) uploaded.push({ src: json.path, alt: "" });
-        else bad++;
+        uploaded.push({ src: await uploadFile(file, "image"), alt: "" });
       } catch {
         bad++;
       }

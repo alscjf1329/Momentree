@@ -9,7 +9,7 @@ export default function FileField({ field, path, value, onChange, error }: Field
   return (
     <div>
       <Label>{field.label}</Label>
-      <FileDropZone value={current} onChange={(p) => onChange(path, p)} kind="audio" accept="audio/*" />
+      <FileDropZone value={current} onChange={(p) => onChange(path, p)} kind="audio" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" />
       <input
         className={INPUT + " mt-2 text-xs"}
         value={current}
