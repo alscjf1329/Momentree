@@ -5,7 +5,7 @@ import { WEDDING } from "@/content";
 export const EXAMPLE: WeddingData = {
   ...WEDDING,
   slug: "example",
-  template: "classic",
+  template: "mono",
   theme: "classic-cream",
   groom: {
     name: "한도윤", nameFull: "한 도 윤", fatherName: "한상우", motherName: "정미숙", relation: "장남",

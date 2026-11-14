@@ -4,7 +4,7 @@ export const LAST_FILE_KEY = "momentree_last_file";
 
 export const DEFAULT_WEDDING_DATA: WeddingData = {
   slug: "",
-  template: "classic",
+  template: "mono",
   theme: "classic-cream",
   groom: { name: "", nameFull: "", fatherName: "", motherName: "", relation: "장남",
     accounts: [{ name: "", bank: "", number: "", holder: "" }] },

@@ -2,11 +2,11 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
-import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
+import { LEGACY_TEMPLATES, TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
 // 템플릿 격자 타일 (눌러서 해당 데모를 연다) — 실제 템플릿 목록·대표색에서 파생
-const TILES = Object.entries(TEMPLATE_NAMES).map(([id, label]) => ({ id, label, ...TEMPLATE_TINT[id] }));
+const TILES = Object.entries(TEMPLATE_NAMES).filter(([id]) => !LEGACY_TEMPLATES.includes(id)).map(([id, label]) => ({ id, label, ...TEMPLATE_TINT[id] }));
 
 const STEPS = [
   { n: "01", title: "정보 입력", desc: "이름, 날짜, 장소와 사진을 채워요." },

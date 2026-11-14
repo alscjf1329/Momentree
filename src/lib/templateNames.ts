@@ -1,10 +1,12 @@
 // 템플릿 id → 화면에 보이는 이름 (고객 목록·템플릿 선택 화면 공용)
 export const TEMPLATE_NAMES: Record<string, string> = {
-  classic: "클래식", editorial: "에디토리얼", minimal: "미니멀", romantic: "로맨틱", twilight: "트와이라잇",
-  blossom: "블로섬", modern: "모던", luxury: "럭셔리", garden: "가든", mono: "모노",
+  mono: "모노", minimal: "미니멀", romantic: "로맨틱", editorial: "에디토리얼", twilight: "트와이라잇",
+  blossom: "블로섬", modern: "모던", luxury: "럭셔리", garden: "가든", classic: "클래식",
 };
+// 폐기된 템플릿: 새로 고를 수 없고 랜딩에도 안 나온다. 이미 쓰는 고객의 청첩장·공유 링크는 그대로 동작한다.
+export const LEGACY_TEMPLATES = ["classic"];
 // 처음 보여줄 추천 템플릿 (나머지는 "더 보기")
-export const RECOMMENDED_TEMPLATES = ["classic", "minimal", "romantic"];
+export const RECOMMENDED_TEMPLATES = ["mono", "minimal", "romantic"];
 
 // 요약 카드 썸네일 색 (템플릿 대표색)
 export const TEMPLATE_TINT: Record<string, { bg: string; fg: string }> = {

@@ -6,12 +6,18 @@ import Link from "next/link";
 import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 import { tplPickedKey } from "@/lib/onboarding";
-import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
+import { LEGACY_TEMPLATES, RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
 import { canUseTemplate, type Plan } from "@/lib/plan";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
 
 const TEMPLATE_DEFS = [
+  {
+    id: "mono",
+    mood: "블랙 + 화이트",
+    desc: "흑백 그레이스케일 풀블리드 히어로 + 미니멀 타이포그래피",
+    bg: "linear-gradient(160deg,#ffffff 0%,#d9d9d9 100%)",
+  },
   {
     id: "classic",
     mood: "다크 로맨틱",
@@ -65,12 +71,6 @@ const TEMPLATE_DEFS = [
     mood: "풀 + 화이트",
     desc: "풀숲 풀블리드 히어로 + 캘리그래피 + 화이트 그리드 갤러리",
     bg: "linear-gradient(160deg,#eaf0e4 0%,#d6e2cc 100%)",
-  },
-  {
-    id: "mono",
-    mood: "블랙 + 화이트",
-    desc: "흑백 그레이스케일 풀블리드 히어로 + 미니멀 타이포그래피",
-    bg: "linear-gradient(160deg,#ffffff 0%,#d9d9d9 100%)",
   },
 ];
 
@@ -263,11 +263,13 @@ export default function TemplateList() {
     if (!selectedFile) { setPlan("free"); return; }
     fetch(`/api/plan?file=${encodeURIComponent(selectedFile)}`).then(r => r.ok ? r.json() : null).then(d => setPlan(d?.plan === "paid" ? "paid" : "free")).catch(() => {});
   }, [selectedFile]);
-  const isLocked = (id: string) => role === "customer" && !canUseTemplate(plan, id);
+  // 폐기된 템플릿은 지금 쓰는 고객에게만 보인다
+  const list = TEMPLATES.filter(t => !LEGACY_TEMPLATES.includes(t.id) || t.id === current);
+  const isLocked = (id: string) => role === "customer" && !canUseTemplate(plan, id, current);
 
   // 쓰는 것 + 추천 3종을 먼저, 나머지는 "더 보기" 뒤로
-  const featured = [...TEMPLATES.filter(t => t.id === current), ...TEMPLATES.filter(t => t.id !== current && RECOMMENDED_TEMPLATES.includes(t.id))]; // 쓰는 것이 맨 앞
-  const visible = showAll ? [...featured, ...TEMPLATES.filter(t => !featured.includes(t))] : featured;
+  const featured = [...list.filter(t => t.id === current), ...list.filter(t => t.id !== current && RECOMMENDED_TEMPLATES.includes(t.id))]; // 쓰는 것이 맨 앞
+  const visible = showAll ? [...featured, ...list.filter(t => !featured.includes(t))] : featured;
 
   // 템플릿 카드를 고르면: 기존 고객이면 template 필드만 바꿔 저장, 신규면 고객을 새로 만들고
   // 저장한 뒤 변수 입력(/admin/setup)으로 이동. 나머지 값은 그대로 유지되므로
@@ -373,7 +375,7 @@ export default function TemplateList() {
                 <p className="text-[10px] font-semibold text-sub tracking-widest uppercase">공유 링크</p>
               </div>
               <div className="p-3 space-y-1">
-                {TEMPLATES.map(t => (
+                {list.map(t => (
                   <a key={t.id} href={`/invite/${t.id}?${inviteQuery}`} target="_blank"
                     className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-soft group">
                     <span className="text-[11px] text-sub">{t.name}</span>
@@ -479,10 +481,10 @@ export default function TemplateList() {
             ))}
           </div>
 
-          {!showAll && TEMPLATES.length > visible.length && (
+          {!showAll && list.length > visible.length && (
             <button onClick={() => setShowAll(true)}
               className="mt-4 w-full h-12 text-sm font-medium text-ink bg-white border border-[#d4d4d4] rounded-full">
-              다른 템플릿 {TEMPLATES.length - visible.length}종 더 보기
+              다른 템플릿 {list.length - visible.length}종 더 보기
             </button>
           )}
 
@@ -493,7 +495,7 @@ export default function TemplateList() {
                 <p className="text-xs font-semibold text-sub tracking-widest uppercase">공유 링크</p>
               </div>
               <div className="p-4 space-y-2">
-                {TEMPLATES.map(t => (
+                {list.map(t => (
                   <div key={t.id} className="flex items-center justify-between text-xs">
                     <span className="text-sub">{t.name}</span>
                     <a href={`/invite/${t.id}?${inviteQuery}`} target="_blank"

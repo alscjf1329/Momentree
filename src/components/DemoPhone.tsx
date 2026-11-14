@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
+import { LEGACY_TEMPLATES, TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 
 // 랜딩의 예시 청첩장: 실제 데모 페이지(/invite/demo-*)를 폰 틀 안에서 보여준다.
 // 칩을 누르면 템플릿이 바뀌고, iframe은 화면에 가까워질 때만 불러온다(loading="lazy").
 const ITEMS = Object.entries(TEMPLATE_NAMES)
+  .filter(([id]) => !LEGACY_TEMPLATES.includes(id))
   .map(([id, name]) => ({ id, name, ...TEMPLATE_TINT[id] }));
 
 const W = 252; // 폰 화면 폭 — 청첩장은 390px 기준으로 그린 뒤 축소해서 보여준다
