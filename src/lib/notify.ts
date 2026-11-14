@@ -15,10 +15,16 @@ export async function notifyOperator(text: string, f: typeof fetch = fetch): Pro
       body: JSON.stringify({ chat_id: chatId, text: text.slice(0, 4096) }),
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) console.error(`[notify] 텔레그램 응답 ${res.status}`);
+    if (!res.ok) {
+      // 텔레그램의 description 은 원인 문구("bot was blocked by the user" 등)라 토큰이 들어 있지 않다
+      const why = ((await res.json().catch(() => null)) as { description?: string } | null)?.description;
+      console.error(`[notify] 텔레그램 응답 ${res.status}${why ? ` — ${why}` : ""}`);
+    }
     return res.ok;
   } catch (e) {
-    console.error(`[notify] 전송 실패: ${e instanceof Error ? e.name : "Error"}`);
+    // 네트워크 실패의 원인 코드(ENOTFOUND·ETIMEDOUT 등)는 e.cause 에 있다. 메시지·URL 은 토큰이 들어 있어 남기지 않는다.
+    const code = e instanceof Error ? (e.cause as { code?: string } | undefined)?.code : undefined;
+    console.error(`[notify] 전송 실패: ${e instanceof Error ? e.name : "Error"}${code ? ` (${code})` : ""}`);
     return false;
   }
 }
