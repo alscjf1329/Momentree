@@ -6,6 +6,12 @@ export function Tbd({ children }: { children: ReactNode }) {
   return <mark className="bg-[#fff3bf] text-ink px-1 font-bold break-words">[확정 필요: {children}]</mark>;
 }
 
+// 문의 이메일: 서버 환경변수(GMAIL_USER)에서 읽는다. 없으면 [확정 필요]로 보인다.
+export function ContactEmail() {
+  const mail = process.env.GMAIL_USER;
+  return mail ? <>{mail}</> : <Tbd>문의 이메일</Tbd>;
+}
+
 export function Sec({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-8">

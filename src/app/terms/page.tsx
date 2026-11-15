@@ -1,8 +1,9 @@
 // 주의: 법률 검토 전 초안입니다. [확정 필요] 표기 항목은 정책 확정 후 채우세요.
 import type { Metadata } from "next";
 import Link from "next/link";
-import LegalPage, { Sec, Tbd } from "@/components/LegalPage";
+import LegalPage, { ContactEmail, Sec, Tbd } from "@/components/LegalPage";
 
+export const dynamic = "force-dynamic"; // 문의 이메일을 실행 때 환경변수에서 읽는다
 export const metadata: Metadata = { title: "이용약관 — Momentree" };
 
 export default function TermsPage() {
@@ -10,14 +11,14 @@ export default function TermsPage() {
     <LegalPage title="이용약관">
       <Sec title="1. 목적과 운영자">
         <p>이 약관은 Momentree(이하 &quot;서비스&quot;)가 제공하는 모바일 청첩장 제작·공유 서비스의 이용 조건을 정합니다.</p>
-        <p>운영자: <Tbd>운영자 상호·대표자·사업자 정보</Tbd> / 문의: <Tbd>문의 이메일</Tbd> 또는 서비스 내 문의하기</p>
+        <p>운영자: 개인이 운영하는 서비스입니다. / 문의: <ContactEmail /> 또는 서비스 내 문의하기</p>
       </Sec>
 
       <Sec title="2. 서비스 내용">
         <ul>
           <li>청첩장 정보(일시·장소·사진·인사말·계좌 등)를 입력하고 색상을 골라 모바일 청첩장을 만들고, 공유 링크로 게시합니다. <Tbd>서비스 내용 문구 (디자인 선택 방식 변경 반영)</Tbd></li>
           <li>하객의 참석 여부와 방명록 메시지를 받아 확인·관리합니다.</li>
-          <li>요금: 무료와 유료(1회 결제 19,900원, 구독 없음) 두 가지입니다. 무료는 사진 5장, 하객 응답 30건까지이고 청첩장 하단에 작은 문구가 들어가며 함께 편집은 쓸 수 없습니다. 유료는 사진·응답 제한과 하단 문구가 없고 함께 편집을 쓸 수 있습니다. 유료는 예식일 후 3개월까지 유지되며, 그 뒤에는 청첩장을 삭제하지 않고 무료로 전환됩니다. 결제는 운영자가 안내하는 계좌로의 계좌이체로 합니다. <Tbd>환불 정책</Tbd></li>
+          <li>요금: 무료와 유료(1회 결제 19,900원, 구독 없음) 두 가지입니다. 무료는 사진 5장, 하객 응답 30건까지이고 청첩장 하단에 작은 문구가 들어가며 함께 편집은 쓸 수 없습니다. 유료는 사진·응답 제한과 하단 문구가 없고 함께 편집을 쓸 수 있습니다. 유료는 예식일 후 3개월까지 유지되며, 그 뒤에는 청첩장을 삭제하지 않고 무료로 전환됩니다. 결제는 운영자가 안내하는 계좌로의 계좌이체로 합니다. 유료 전환 후 7일 이내이고 청첩장을 아직 공유하지 않았다면 전액 환불해 드립니다. 청첩장을 공유한 뒤에는 서비스가 제공된 것으로 보아 환불이 제한되며, 운영자의 사정으로 서비스를 이용하지 못한 경우에는 전액 환불합니다. 환불은 서비스 안의 &quot;문의하기&quot;로 요청해 주세요.</li>
         </ul>
       </Sec>
 

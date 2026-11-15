@@ -1,8 +1,9 @@
 // 주의: 법률 검토 전 초안입니다. [확정 필요] 표기 항목(운영자 정보·문의처·보관 기간·시행일)은 MOM-11 등 정책 확정 후 채우세요.
 // 내용은 작성 시점 코드의 실제 처리 방식(src/lib/*, src/app/api/*, bin/backup.sh)에 근거합니다. 코드가 바뀌면 함께 갱신하세요.
 import type { Metadata } from "next";
-import LegalPage, { Sec, Tbd } from "@/components/LegalPage";
+import LegalPage, { ContactEmail, Sec, Tbd } from "@/components/LegalPage";
 
+export const dynamic = "force-dynamic"; // 문의 이메일을 실행 때 환경변수에서 읽는다
 export const metadata: Metadata = { title: "개인정보처리방침 — Momentree" };
 
 export default function PrivacyPage() {
@@ -11,9 +12,8 @@ export default function PrivacyPage() {
       <Sec title="1. 운영자">
         <p>Momentree(이하 &quot;서비스&quot;)의 운영자는 다음과 같습니다.</p>
         <ul>
-          <li>상호·대표자: <Tbd>운영자 상호 및 대표자명</Tbd></li>
-          <li>사업자 정보: <Tbd>사업자등록번호·주소</Tbd></li>
-          <li>개인정보 보호책임자·문의처: <Tbd>문의 이메일</Tbd> 또는 서비스 내 문의하기</li>
+          <li>상호·운영자: Momentree — 개인이 운영하는 서비스입니다(별도 상호·대표자는 없습니다)</li>
+          <li>개인정보 보호책임자·문의처: <ContactEmail /> 또는 서비스 내 문의하기</li>
         </ul>
       </Sec>
 
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
       <Sec title="8. 이용자의 권리">
         <p>이용자는 언제든지 자신의 개인정보에 대한 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다. 고객은 편집 화면에서 청첩장 정보와 하객 응답을 직접 수정·삭제할 수 있고, 하객은 본인이 제출한 정보의 삭제를 해당 청첩장의 고객 또는 아래 문의처에 요청할 수 있습니다.</p>
         <ul>
-          <li>문의처: <Tbd>문의 이메일</Tbd> 또는 서비스 내 문의하기</li>
+          <li>문의처: <ContactEmail /> 또는 서비스 내 문의하기</li>
           <li>처리 기한: 요청일로부터 10일 이내</li>
         </ul>
       </Sec>
