@@ -9,7 +9,7 @@ import { buildSteps, missingRequired, moveIndex, resolveIndex, stepForView } fro
 
 // 고객 전용 단계별 입력. 상태·저장은 SetupForm 것을 그대로 받아 쓴다.
 // 단계는 URL(?step=1..6, 완료는 done)이 정한다 — 체크리스트·옛 링크도 같은 방식으로 연결된다.
-export default function SetupWizard({ schema, data, errors, onChange, onSave, saving, saveError, summary, plan, stepHref, shareHref, templatesHref, fileKey }: {
+export default function SetupWizard({ schema, data, errors, onChange, onSave, saving, saveError, summary, plan, stepHref, shareHref, templatesHref, fileKey, saved }: {
   schema: TemplateSchema;
   data: unknown;
   errors: Record<string, string>;
@@ -22,6 +22,7 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
   stepHref: (step: string | number, file?: string) => string; // 운영자는 ?file= 이 붙는다
   shareHref: string;
   templatesHref: string;
+  saved: boolean; // 이미 저장된 청첩장이면 새로고침해도 모든 단계로 바로 이동
   fileKey: string; // 운영자가 다른 고객을 고르면(?file= 변경) 방문 기록을 비운다
 }) {
   const router = useRouter();
@@ -95,10 +96,10 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
             </div>
             <ol className="flex justify-between">
               {steps.map((s, i) => {
-                const warn = i <= reached && lefts[i] > 0 && i !== idx;
+                const warn = (saved || i <= reached) && lefts[i] > 0 && i !== idx;
                 return (
                   <li key={s.n} className="min-w-0">
-                    <button type="button" disabled={i > reached} onClick={() => go(s.n)}
+                    <button type="button" disabled={!saved && i > reached} onClick={() => go(s.n)}
                       aria-current={i === idx ? "step" : undefined}
                       aria-label={`${i + 1}단계 ${s.title}${lefts[i] > 0 ? `, 필수 ${lefts[i]}개 남음` : ""}`}
                       className="w-10 h-11 flex items-center justify-center disabled:opacity-40">

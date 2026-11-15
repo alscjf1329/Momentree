@@ -227,7 +227,7 @@ export default function SetupForm() {
 
           <SetupWizard schema={schema} data={data} errors={errors} onChange={handleChange} onSave={handleSave}
             saving={saving} saveError={saveError} stepHref={stepHref}
-            shareHref={`/admin/share${q()}`} templatesHref={`/admin/templates${q()}`} fileKey={fileParam}
+            shareHref={`/admin/share${q()}`} templatesHref={`/admin/templates${q()}`} fileKey={fileParam} saved={!!filename}
             summary={summaryCard}
             plan={filename ? <PlanCard file={filename} admin={role === "admin"} onPlan={setPlan} /> : null} />
         </div>
