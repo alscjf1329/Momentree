@@ -19,7 +19,8 @@ export interface WeddingData {
   slug: string;
   template: string;
   theme: string;
-  palette?: string; // 고객이 고른 색상 (themes.ts PALETTES 키, 비어 있으면 템플릿 기본색)
+  palette?: string; // 고객이 고른 색상 (themes.ts PALETTES 키 또는 "custom", 비어 있으면 템플릿 기본색)
+  customColors?: { bg: string; text: string; point: string }; // palette 가 "custom" 일 때 쓰는 직접 고른 색
   groom: PersonInfo;
   bride: PersonInfo;
   date: {

@@ -69,11 +69,28 @@ test("옛 view=photos·accounts 링크는 ④·⑤ 단계로 간다", () => {
   assert.match(readFileSync("src/app/admin/setup/SetupWizard.tsx", "utf8"), /stepForView\(sp\.get\("view"\)\)/);
 });
 
-test("색상: 팔레트는 변수 10개를 모두 채우고, 모노 위저드 4단계(사진)에 색상 항목이 있다", async () => {
+test("색상: 팔레트는 변수 10개를 모두 채우고, 모노 위저드 1단계에 색상 항목이 있다", async () => {
   const { PALETTES } = await import("@/themes");
   for (const [id, p] of Object.entries(PALETTES)) {
     if (id) assert.equal(Object.keys(p.vars).length, 10, id); // 변수 9개 + 구분 배경(--section-alt)
   }
-  const step4 = buildSteps(getSchemaForTemplate("mono")).find((s) => s.n === 4)!;
-  assert.ok(step4.sections.some((s) => s.fields.some((f) => f.key === "palette")));
+  const step1 = buildSteps(getSchemaForTemplate("mono")).find((s) => s.n === 1)!;
+  const keys = step1.sections.flatMap((s) => s.fields.map((f) => f.key));
+  assert.ok(keys.includes("palette") && keys.includes("customColors"));
+});
+
+test("직접 고른 색: 어떤 조합도 글자·포인트가 배경과 대비 4.5 이상, 배경은 밝게, 잘못된 값은 무시", async () => {
+  const { customPaletteVars, paletteVars, contrast } = await import("@/themes");
+  const pick = ["#000000", "#ffffff", "#ffff00", "#0000ff", "#ff69b4", "#222222", "#f5e6d3"];
+  for (const bg of pick) for (const text of pick) for (const point of pick) {
+    const v = customPaletteVars({ bg, text, point })!;
+    assert.equal(Object.keys(v).length, 10);
+    assert.ok(contrast(v["--color-text"], v["--color-cream"]) >= 4.5, `text ${bg}/${text}`);
+    assert.ok(contrast(v["--color-primary"], v["--color-cream"]) >= 4.5, `point ${bg}/${point}`);
+    assert.ok(contrast("#ffffff", v["--color-cream"]) < 3, `밝은 배경 ${bg}`);
+  }
+  assert.equal(customPaletteVars({ bg: "red", text: "#000000", point: "#000000" }), null);
+  assert.deepEqual(paletteVars("custom", undefined), {});
+  assert.deepEqual(paletteVars("", undefined), {});
+  assert.ok(paletteVars("rose", undefined)["--color-primary"]);
 });

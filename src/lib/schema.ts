@@ -8,6 +8,7 @@ export type FieldType =
   | "file" // 이미지 외 파일 업로드 (예: 배경음악 mp3, public/audio/)
   | "encrypted-text" // 저장 시 암호화 대상 (입력 UI는 text와 동일)
   | "palette" // 색상 견본 중 하나 고르기 (themes.ts PALETTES)
+  | "palette-custom" // 배경·글자·포인트 색을 직접 고르기 (palette = "custom")
   | "datetime"; // 연/월/일/요일/시간 복합 위젯
 
 export interface FieldSchema {

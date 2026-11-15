@@ -13,7 +13,7 @@ import LocationSection from "@/components/sections/LocationSection";
 import ContactSection from "@/components/sections/ContactSection";
 import RSVPSection from "@/components/sections/RSVPSection";
 import GuestbookSection from "@/components/sections/GuestbookSection";
-import { PALETTES } from "@/themes";
+import { paletteVars } from "@/themes";
 
 const VARS = {
   "--color-primary": "#1c1c1a",
@@ -589,7 +589,7 @@ function BgmPlayer() {
 export default function MonoTemplate() {
   const w = useWedding();
   return (
-    <div style={{ ...VARS, ...PALETTES[w.palette ?? ""]?.vars } as React.CSSProperties}>
+    <div style={{ ...VARS, ...paletteVars(w.palette, w.customColors) } as React.CSSProperties}>
       <BgmPlayer />
       <RSVPIntroModal />
       <Hero />

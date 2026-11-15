@@ -5,7 +5,7 @@ import type { FieldComponentProps } from "./types";
 
 // 색상 견본 고르기: 큰 원 두 개(진한 색 + 배경색)와 이름
 export default function PaletteField({ field, path, value, onChange }: FieldComponentProps) {
-  const cur = typeof value === "string" && value in PALETTES ? value : "";
+  const cur = value === "custom" ? "custom" : typeof value === "string" && value in PALETTES ? value : ""; // custom 이면 견본은 선택 안 됨
   return (
     <div>
       <p className="text-sm font-medium text-ink mb-2">{field.label}</p>

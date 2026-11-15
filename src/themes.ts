@@ -158,3 +158,32 @@ export const PALETTES: Record<string, { name: string; swatch: [string, string]; 
     vars: { "--color-primary": "#4a6275", "--color-primary-light": "#93a8b8", "--color-primary-dark": "#2b3d4d", "--color-accent": "#d3e0ea", "--color-gold": "#b09f75", "--color-cream": "#edf2f6", "--color-warm-gray": "#8a99a5", "--color-text": "#1d2a35", "--section-alt": "#d8e3ec", "--color-text-light": "#5f7080" },
   },
 };
+
+// ── 고객이 직접 고르는 색: 배경·글자·포인트 3가지에서 나머지 변수를 계산한다 ──
+export interface CustomColors { bg: string; text: string; point: string }
+const HEX = /^#[0-9a-f]{6}$/i;
+const rgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const hex = (c: number[]) => "#" + c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("");
+const mix = (a: string, b: string, t: number) => { const y = rgb(b); return hex(rgb(a).map((v, i) => v + (y[i] - v) * t)); }; // a 에서 b 쪽으로 t
+const lum = (h: string) => { const [r, g, b] = rgb(h).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+export const contrast = (a: string, b: string) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+
+// 읽기 어려운 조합은 자동으로 고친다: 배경은 밝게(공용 부품이 밝은 배경 기준), 글자·포인트는 배경과 대비 4.5 이상
+export function customPaletteVars(c: Partial<CustomColors> | undefined): Record<string, string> | null {
+  if (!c || !HEX.test(c.bg ?? "") || !HEX.test(c.text ?? "") || !HEX.test(c.point ?? "")) return null;
+  let bg = c.bg!.toLowerCase();
+  for (let i = 0; i < 30 && lum(bg) < 0.55; i++) bg = mix(bg, "#ffffff", 0.1);
+  const text = contrast(c.text!, bg) >= 4.5 ? c.text!.toLowerCase() : "#1c1c1a";
+  let point = c.point!.toLowerCase();
+  for (let i = 0; i < 30 && contrast(point, bg) < 4.5; i++) point = mix(point, "#000000", 0.1);
+  return {
+    "--color-primary": point, "--color-primary-dark": mix(point, "#000000", 0.35), "--color-primary-light": mix(point, bg, 0.55),
+    "--color-accent": mix(bg, point, 0.18), "--section-alt": mix(bg, point, 0.12), "--color-gold": mix(point, bg, 0.2),
+    "--color-cream": bg, "--color-text": text, "--color-text-light": mix(text, bg, 0.35), "--color-warm-gray": mix(text, bg, 0.5),
+  };
+}
+
+/** 고른 팔레트("custom" 이면 직접 고른 색) → CSS 변수. 없으면 템플릿 기본색 */
+export function paletteVars(palette: string | undefined, custom: Partial<CustomColors> | undefined): Record<string, string> {
+  return (palette === "custom" ? customPaletteVars(custom) : PALETTES[palette ?? ""]?.vars) ?? {};
+}

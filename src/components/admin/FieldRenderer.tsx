@@ -13,6 +13,7 @@ import ImageField from "./fields/ImageField";
 import FileField from "./fields/FileField";
 import DateTimeField from "./fields/DateTimeField";
 import PaletteField from "./fields/PaletteField";
+import PaletteCustomField from "./fields/PaletteCustomField";
 
 // 필드 타입 → 컴포넌트 디스패처. array-object 항목 내부에서도 재귀적으로 이 함수를 그대로 재사용한다
 // (ArrayObjectField가 이 함수를 renderItemField prop으로 받아서 호출 — 순환 import 방지).
@@ -49,6 +50,8 @@ export function renderField({ field, data, basePath, onChange, errors }: RenderF
       return <ImageField key={path} {...common} />;
     case "file":
       return <FileField key={path} {...common} />;
+    case "palette-custom":
+      return <PaletteCustomField key={path} {...common} palette={(data as { palette?: string } | null)?.palette} />;
     case "palette":
       return <PaletteField key={path} {...common} />;
     case "datetime":

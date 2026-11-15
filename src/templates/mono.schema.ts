@@ -131,7 +131,8 @@ export const monoSchema: TemplateSchema = {
     {
       title: "색상",
       fields: [
-        { key: "palette", type: "palette", label: "색상", common: true, helpText: "글자와 포인트 색이 함께 바뀌어요." },
+        { key: "palette", type: "palette", label: "추천 색상", common: true, helpText: "배경, 글자, 포인트 색이 함께 바뀌어요." },
+        { key: "customColors", type: "palette-custom", label: "직접 고르기", common: true, helpText: "너무 어둡거나 읽기 어려운 색은 자동으로 보정돼요." },
       ],
     },
     {
