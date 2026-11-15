@@ -59,11 +59,11 @@ export default function PreviewPane({ template, data, watermark = false, raise =
       {/* 넓은 화면: 오른쪽 고정 패널 */}
       <div className="sticky top-[104px] hidden xl:block">
         <p className="text-[10px] font-semibold text-sub tracking-widest uppercase mb-2">실시간 미리보기</p>
-        <div className="rounded-[32px] border-8 border-gray-800 overflow-hidden shadow-xl bg-white" style={{ width: 380, height: 720 }}>
+        <div className="rounded-[32px] border-8 border-gray-800 overflow-hidden shadow-xl bg-white" style={{ width: 380, height: "clamp(420px, calc(100dvh - 160px), 720px)" }}>
           <PreviewFrame template={template} data={data} watermark={watermark} />
         </div>
         {/* 색상 패널: 폰 왼쪽에 떠서 미리보기를 가리지 않는다 */}
-        {colorOpen && <div className="absolute right-full mr-4 top-6 w-[320px] max-h-[640px] overflow-y-auto bg-white rounded-2xl border border-line shadow-xl p-4">{colorPanel}</div>}
+        {colorOpen && <div className="absolute right-full mr-4 top-6 w-[320px] max-h-[clamp(320px,calc(100dvh-180px),640px)] overflow-y-auto bg-white rounded-2xl border border-line shadow-xl p-4">{colorPanel}</div>}
       </div>
 
       {/* 모바일·태블릿: 떠 있는 버튼 → 전체화면 미리보기 (입력한 내용이 그대로 반영됨) */}
