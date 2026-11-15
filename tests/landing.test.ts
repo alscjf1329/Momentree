@@ -37,7 +37,7 @@ test("랜딩: 모노가 첫 예시, 클래식은 랜딩에서 빠지고 신규 �
 });
 
 test("PC 대응: 모바일 기본 + 확장 접두사가 랜딩·약관에 있다", () => {
-  assert.match(page, /grid-cols-3 sm:grid-cols-5/);
+  assert.match(page, /grid-cols-3 lg:grid-cols-9/);
   assert.match(page, /lg:flex-row/);
   assert.match(fs.readFileSync("src/components/LegalPage.tsx", "utf8"), /max-w-xl sm:max-w-2xl/);
 });

@@ -63,7 +63,8 @@ export default async function Home() {
       {/* 템플릿 격자 */}
       <section className="max-w-3xl lg:max-w-5xl mx-auto">
         <p className="px-6 pt-8 pb-3 text-[13px] lg:pt-14 font-bold">모든 템플릿 둘러보기</p>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-0.5 lg:px-6">
+        {/* 타일 9개 = 3열×3줄(모바일·태블릿) / 한 줄(PC). 개수가 바뀌면 빈칸이 안 생기게 열 수를 약수로 다시 맞출 것 */}
+        <div className="grid grid-cols-3 lg:grid-cols-9 gap-0.5 lg:px-6">
           {TILES.map((t) => (
             <Link key={t.id} href={exampleHref(t.id, live)} target="_blank" aria-label={`${t.label} 예시 보기`}
               className="aspect-square flex items-center justify-center font-serif text-[13px] tracking-[0.08em]"
