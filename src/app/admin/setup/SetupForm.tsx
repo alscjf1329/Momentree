@@ -134,7 +134,7 @@ export default function SetupForm() {
   };
 
   // 다른 고객을 고르면 ① 단계부터 다시 시작한다
-  const selectClient = (f: string) => router.replace(`/admin/setup?file=${encodeURIComponent(f)}`);
+  const selectClient = (f: string) => window.history.replaceState(null, "", `/admin/setup?file=${encodeURIComponent(f)}`);
 
   const handleNewClient = () => {
     // 새 고객은 템플릿부터 먼저 고르고 오도록 유도 — 변수 입력은 그 다음 단계

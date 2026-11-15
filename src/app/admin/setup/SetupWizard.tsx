@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { renderField } from "@/components/admin/FieldRenderer";
 import type { TemplateSchema } from "@/lib/schema";
 import { buildSteps, missingRequired, moveIndex, resolveIndex, stepForView } from "@/lib/setupSteps";
@@ -25,7 +25,6 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
   saved: boolean; // 이미 저장된 청첩장이면 새로고침해도 모든 단계로 바로 이동
   fileKey: string; // 운영자가 다른 고객을 고르면(?file= 변경) 방문 기록을 비운다
 }) {
-  const router = useRouter();
   const sp = useSearchParams();
   const steps = useMemo(() => buildSteps(schema), [schema]);
   const stepParam = sp.get("step");
@@ -39,7 +38,8 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
   useEffect(() => { setReached((r) => Math.max(r, done ? steps.length - 1 : idx)); }, [idx, done, steps.length]);
 
   const go = (to: string | number, file?: string) => {
-    router.replace(stepHref(to, file), { scroll: false });
+    // 서버 요청 없이 주소만 바꾼다 (useSearchParams 가 따라간다) — router.replace 는 연결이 끊기면 단계가 안 넘어갔다
+    window.history.replaceState(null, "", stepHref(to, file));
     window.scrollTo({ top: 0 });
   };
   // 다음/완료: 먼저 저장하고, 실패하면 그 자리에 남는다
