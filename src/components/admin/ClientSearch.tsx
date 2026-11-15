@@ -18,6 +18,7 @@ export default function ClientSearch({ dir, current, onSelect }: {
         aria-label="고객 검색" autoComplete="off"
         onChange={(e) => { dir.setQ(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
+        onClick={() => setOpen(true)} // 고른 뒤에도 입력창이 포커스를 유지해 onFocus 가 다시 안 뜨므로
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         className="w-full h-11 border border-[#d4d4d4] focus:border-ink outline-none rounded-xl px-3 text-base bg-white" />
       {current && !open && <p className="mt-2 text-xs text-sub truncate">선택됨 · <span className="font-mono text-ink">{current}</span></p>}
