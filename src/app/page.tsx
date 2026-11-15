@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
 import { LEGACY_TEMPLATES, TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
+import { exampleHref } from "@/lib/exampleInfo";
+import { exampleLive } from "@/lib/exampleCustomer";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
 // 템플릿 격자 타일 (눌러서 해당 데모를 연다) — 실제 템플릿 목록·대표색에서 파생
@@ -18,6 +20,7 @@ export default async function Home() {
   const secret = process.env.ADMIN_SESSION_SECRET;
   const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
   const session = secret ? await verifySessionToken(token, secret) : null;
+  const live = exampleLive();
   const startHref = session ? (session.role === "admin" ? "/admin" : "/admin/setup") : "/admin/login";
 
   return (
@@ -54,7 +57,7 @@ export default async function Home() {
           <h2 className="font-serif font-semibold text-2xl lg:text-3xl leading-snug tracking-tight">이런 청첩장을<br />하객이 받게 돼요</h2>
           <p className="text-sm text-sub">실제 템플릿을 폰으로 직접 열어보세요</p>
         </div>
-        <DemoPhone />
+        <DemoPhone live={live} />
       </section>
 
       {/* 템플릿 격자 */}
@@ -62,7 +65,7 @@ export default async function Home() {
         <p className="px-6 pt-8 pb-3 text-[13px] lg:pt-14 font-bold">모든 템플릿 둘러보기</p>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-0.5 lg:px-6">
           {TILES.map((t) => (
-            <Link key={t.id} href={`/invite/demo-${t.id}`} target="_blank" aria-label={`${t.label} 예시 보기`}
+            <Link key={t.id} href={exampleHref(t.id, live)} target="_blank" aria-label={`${t.label} 예시 보기`}
               className="aspect-square flex items-center justify-center font-serif text-[13px] tracking-[0.08em]"
               style={{ background: t.bg, color: t.fg }}>
               {t.label}

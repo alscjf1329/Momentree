@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { exampleHref } from "@/lib/exampleInfo";
 import { LEGACY_TEMPLATES, TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 
-// 랜딩의 예시 청첩장: 실제 데모 페이지(/invite/demo-*)를 폰 틀 안에서 보여준다.
+// 랜딩의 예시 청첩장: 실제 데모 페이지(example 고객 데이터, 없으면 demo-*)를 폰 틀 안에서 보여준다.
 // 칩을 누르면 템플릿이 바뀌고, iframe은 화면에 가까워질 때만 불러온다(loading="lazy").
 const ITEMS = Object.entries(TEMPLATE_NAMES)
   .filter(([id]) => !LEGACY_TEMPLATES.includes(id))
@@ -13,7 +14,7 @@ const ITEMS = Object.entries(TEMPLATE_NAMES)
 const W = 252; // 폰 화면 폭 — 청첩장은 390px 기준으로 그린 뒤 축소해서 보여준다
 const SCALE = W / 390;
 
-export default function DemoPhone() {
+export default function DemoPhone({ live = false }: { live?: boolean }) {
   const [id, setId] = useState(ITEMS[0].id);
 
   return (
@@ -38,13 +39,13 @@ export default function DemoPhone() {
       <div className="relative rounded-[38px] border-[8px] border-ink bg-white overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,0.16)]"
         style={{ width: W + 16, height: 516 + 16 }}>
         <div style={{ width: W, height: 516, overflow: "hidden", position: "relative" }}>
-          <iframe key={id} src={`/invite/demo-${id}`} title={`${id} 예시 청첩장`} loading="lazy" tabIndex={-1}
+          <iframe key={id} src={exampleHref(id, live)} title={`${id} 예시 청첩장`} loading="lazy" tabIndex={-1}
             style={{ width: 390, height: 516 / SCALE, border: 0, transform: `scale(${SCALE})`, transformOrigin: "top left" }} />
         </div>
       </div>
 
       <div className="w-full max-w-sm px-6 flex flex-col items-center gap-2">
-        <Link href={`/invite/demo-${id}`} target="_blank"
+        <Link href={exampleHref(id, live)} target="_blank"
           className="w-full h-[52px] rounded-full bg-ink text-white text-base font-bold flex items-center justify-center">
           이 청첩장 열어보기
         </Link>

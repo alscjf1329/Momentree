@@ -79,8 +79,9 @@ if (db) {
   if (!hasTable("customers")) out("고객 테이블이 아직 없습니다.");
   else {
     const hasPlan = db.pragma("table_info(customers)").some((c) => c.name === "plan");
-    const rows = db.prepare(`select file, wedding_date${hasPlan ? ", plan" : ""} from customers`).all();
-    out(`고객 ${rows.length}명` + (hasPlan ? `: 유료 ${rows.filter((r) => r.plan === "paid").length}, 무료 ${rows.filter((r) => r.plan !== "paid").length}` : ""));
+    const all = db.prepare(`select file, wedding_date${hasPlan ? ", plan" : ""} from customers`).all();
+    const rows = all.filter((r) => r.file !== "example"); // 랜딩 예시 고객은 집계에서 뺀다(유료 취급·만료·보관 영향 없음)
+    out(`고객 ${rows.length}명` + (all.length !== rows.length ? " (랜딩 예시 example 제외)" : "") + (hasPlan ? `: 유료 ${rows.filter((r) => r.plan === "paid").length}, 무료 ${rows.filter((r) => r.plan !== "paid").length}` : ""));
     const now = Date.now();
     const bad = rows.filter((r) => parse(r.wedding_date) === null).length;
     const expired = (r) => { const t = parse(r.wedding_date); return t !== null && now >= addMonths(t, PAID_KEEP_MONTHS); };

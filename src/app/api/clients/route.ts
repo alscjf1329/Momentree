@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
 import { deleteCustomer, getCustomer, getPlan, getTemplate, listCustomers, newCustomerFile, saveCustomer } from "@/lib/customers";
+import { EXAMPLE_FILE } from "@/lib/exampleInfo";
 import { canUseTemplate, photoLimit, PLAN_MSG } from "@/lib/plan";
 
 // GET /api/clients               → 파일 목록 (customer는 자기 파일만)
@@ -69,5 +70,6 @@ export async function DELETE(req: NextRequest) {
 
   const file = req.nextUrl.searchParams.get("file");
   if (!file || !isValidClientFilename(file)) return NextResponse.json({ error: "file required" }, { status: 400 });
+  if (file === EXAMPLE_FILE) return NextResponse.json({ error: "랜딩 예시 청첩장은 삭제할 수 없어요." }, { status: 400 });
   return deleteCustomer(file) ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "not found" }, { status: 404 });
 }
