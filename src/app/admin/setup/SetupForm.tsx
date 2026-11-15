@@ -35,6 +35,7 @@ export default function SetupForm() {
   const [memberRole, setMemberRole] = useState<string | null>(null);
   const [memberCount, setMemberCount] = useState<number | null>(null);
   const [saveError, setSaveError] = useState(""); // 위저드의 저장 실패 안내
+  const [loadError, setLoadError] = useState(""); // 고객 불러오기 실패 안내
   const [plan, setPlan] = useState<Plan | null>(null); // 무료면 미리보기에 워터마크
 
   const schema = getSchemaForTemplate(data.template);
@@ -51,11 +52,18 @@ export default function SetupForm() {
 
   const loadFile = useCallback(async (f: string) => {
     if (!f) return;
-    const res = await fetch(`/api/clients?file=${encodeURIComponent(f)}`);
-    if (res.ok) {
-      setData(await res.json());
-      setFilename(f);
-      localStorage.setItem(LS_KEY, f);
+    setLoadError("");
+    try {
+      const res = await fetch(`/api/clients?file=${encodeURIComponent(f)}`);
+      if (res.ok) {
+        setData(await res.json());
+        setFilename(f);
+        localStorage.setItem(LS_KEY, f);
+      } else {
+        setLoadError(`고객 정보를 불러오지 못했어요. (${res.status}) ${f}`);
+      }
+    } catch {
+      setLoadError(`고객 정보를 불러오지 못했어요. 네트워크를 확인해 주세요. ${f}`);
     }
   }, []);
 
@@ -214,6 +222,8 @@ export default function SetupForm() {
               {dir.total > 0 && <ClientSearch dir={dir} current={filename} onSelect={selectClient} />}
             </div>
           )}
+
+          {loadError && <p role="alert" className="rounded-xl border border-rose bg-white px-4 py-3 text-sm text-rose break-all">{loadError}</p>}
 
           <SetupWizard schema={schema} data={data} errors={errors} onChange={handleChange} onSave={handleSave}
             saving={saving} saveError={saveError} stepHref={stepHref}
