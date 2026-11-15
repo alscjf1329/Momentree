@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { headers } from "next/headers";
+import { originFrom } from "@/lib/ogImage";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
@@ -10,6 +13,14 @@ const STEPS = [
   { n: "02", title: "색상 선택", desc: "원하는 색으로 청첩장 분위기를 맞춰요." },
   { n: "03", title: "링크 공유", desc: "카카오톡·문자로 링크 하나만 보내요." },
 ];
+
+// 링크 공유 미리보기 (카카오톡 등)
+export async function generateMetadata(): Promise<Metadata> {
+  const origin = originFrom(await headers());
+  const title = "Momentree — 모바일 청첩장";
+  const description = "두 분의 하루를 링크 하나로. 모바일 청첩장을 만들고 하객 응답까지 한곳에서 관리하세요.";
+  return { openGraph: { title, description, type: "website", siteName: "Momentree", locale: "ko_KR", url: origin, images: [{ url: `${origin}/icon-512.png` }] } };
+}
 
 export default async function Home() {
   const secret = process.env.ADMIN_SESSION_SECRET;

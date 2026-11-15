@@ -54,3 +54,18 @@ test("랜딩 예시: 모든 템플릿 데모가 EXAMPLE 기반이고 사진·필
   for (const a of [...EXAMPLE.groom.accounts, ...EXAMPLE.bride.accounts]) assert.match(a.number, /^000-00-00000\d$/);
   assert.ok(new Date(EXAMPLE.date.iso) > new Date("2027-01-01")); // 먼 미래 날짜
 });
+
+test("링크 미리보기: OG 이미지 주소 규칙, 고객 청첩장은 noindex, robots.txt 는 관리자·API 를 막는다", async () => {
+  const { ogImageUrl, originFrom } = await import("@/lib/ogImage");
+  assert.equal(ogImageUrl("https://x.kr", "/uploads/images/a.jpg"), "https://x.kr/_next/image?url=%2Fuploads%2Fimages%2Fa.jpg&w=1200&q=75");
+  assert.equal(ogImageUrl("https://x.kr", "/uploads/images/a.gif"), "https://x.kr/uploads/images/a.gif"); // gif 는 원본
+  assert.equal(ogImageUrl("https://x.kr", "https://cdn.test/a.png"), "https://cdn.test/a.png");
+  const h = (m: Record<string, string>) => ({ get: (k: string) => m[k] ?? null });
+  assert.equal(originFrom(h({}), "https://site.kr/"), "https://site.kr");
+  assert.equal(originFrom(h({ "x-forwarded-host": "a.kr", "x-forwarded-proto": "https" }), ""), "https://a.kr");
+  const invite = fs.readFileSync("src/app/invite/[slug]/page.tsx", "utf8");
+  assert.match(invite, /isCustomer \? \{ robots: \{ index: false, follow: false \} \}/);
+  const { default: robots } = await import("@/app/robots");
+  const disallow = (robots().rules as { disallow: string[] }[])[0].disallow;
+  for (const p of ["/admin", "/api", "/preview"]) assert.ok(disallow.includes(p), p);
+});

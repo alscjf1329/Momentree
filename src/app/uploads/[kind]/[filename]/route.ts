@@ -56,6 +56,7 @@ export async function GET(
     "Content-Type": mime,
     "Accept-Ranges": "bytes",
     "Cache-Control": "public, max-age=31536000, immutable",
+    "X-Robots-Tag": "noindex",
   };
 
   if (range) {

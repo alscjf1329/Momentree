@@ -1,5 +1,7 @@
 ﻿import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { ogImageUrl, originFrom } from "@/lib/ogImage";
 import { getInvite } from "@/invites";
 import type { WeddingData } from "@/types";
 import { isValidClientFilename } from "@/lib/newClient";
@@ -39,15 +41,14 @@ export async function generateMetadata({
   searchParams: Promise<{ file?: string; id?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const file = resolveFileParam(await searchParams);
+  const query = await searchParams;
+  const file = resolveFileParam(query);
 
-  let data: WeddingData | null = null;
-  if (file && slug in TEMPLATE_MAP) {
-    data = readClientFile(file);
-  } else {
-    data = getInvite(slug);
-  }
+  // 고객 청첩장(?id=·?file=)이면 파일에서, 아니면 정적 예시 슬러그에서 (본문 렌더와 같은 규칙)
+  const byFile = !!(query.file || query.id);
+  const data = byFile ? (file ? readClientFile(file) : null) : getInvite(slug);
   if (!data) return {};
+  const isCustomer = byFile && file !== EXAMPLE_FILE; // 랜딩 예시·데모만 검색에 나와도 된다
   const title = `${data.groom.name} ♥ ${data.bride.name} 결혼합니다`;
   const description = `${data.date.year}년 ${data.date.month}월 ${data.date.day}일 ${data.date.dayOfWeek} ${data.date.time}`;
   return {
@@ -55,7 +56,17 @@ export async function generateMetadata({
     description,
     // 카카오톡 등 링크 공유 미리보기는 og:description을 읽으므로
     // 위 description과 별개로 openGraph에도 명시해야 반영됨
-    openGraph: { title, description },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "Momentree",
+      locale: "ko_KR",
+      // 대표 사진 → 첫 갤러리 사진 → 앱 아이콘 순으로 미리보기 이미지
+      images: [{ url: ogImageUrl(originFrom(await headers()), data.introBg || data.gallery?.[0]?.src || "/icon-512.png") }],
+    },
+    // 고객의 청첩장은 검색 결과에 나오지 않게 한다 (링크를 받은 사람만 본다)
+    ...(isCustomer ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
