@@ -8,7 +8,7 @@ import { setByPath, validateBySchema } from "@/lib/schema";
 import { renderField } from "@/components/admin/FieldRenderer";
 import { COLOR_KEYS } from "@/lib/setupSteps";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
-import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
+import { DEFAULT_WEDDING_DATA, upcomingWeddingDate } from "@/lib/newClient";
 import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 import PlanCard from "@/components/admin/PlanCard";
 import type { Plan } from "@/lib/plan";
@@ -139,10 +139,22 @@ export default function SetupForm() {
   // 다른 고객을 고르면 ① 단계부터 다시 시작한다
   const selectClient = (f: string) => window.history.replaceState(null, "", `/admin/setup?file=${encodeURIComponent(f)}`);
 
-  const handleNewClient = () => {
-    // 새 고객은 템플릿부터 먼저 고르고 오도록 유도 — 변수 입력은 그 다음 단계
-    localStorage.removeItem(LS_KEY);
-    router.push("/admin/templates");
+  // 새 고객: 빈 청첩장을 바로 만들고(ID는 서버가 발급) 그 고객의 설정 화면으로 간다
+  const handleNewClient = async () => {
+    setSaveError("");
+    try {
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: "", data: { ...DEFAULT_WEDDING_DATA, date: upcomingWeddingDate(), template: "mono", slug: "" } }),
+      });
+      if (!res.ok) throw new Error();
+      const { file } = (await res.json()) as { file: string };
+      localStorage.setItem(LS_KEY, file);
+      router.push(`/admin/setup?file=${encodeURIComponent(file)}`);
+    } catch {
+      setSaveError("새 고객을 만들지 못했어요. 다시 시도해 주세요.");
+    }
   };
 
   const saveButton = (
@@ -199,7 +211,6 @@ export default function SetupForm() {
             {role === "admin" && (
               <button onClick={handleNewClient} className="h-10 px-4 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink hidden sm:block">+ 새 고객</button>
             )}
-            <Link href={`/admin/templates${q()}`} className="h-10 px-4 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink hidden sm:inline-flex items-center">템플릿</Link>
             {colorFields.length > 0 && (
               <button type="button" onClick={() => setColorOpen((o) => !o)} aria-expanded={colorOpen}
                 className={`h-10 px-4 rounded-full border text-sm font-medium text-ink ${colorOpen ? "border-ink" : "border-[#d4d4d4]"}`}>색상</button>
@@ -245,7 +256,7 @@ export default function SetupForm() {
 
           <SetupWizard schema={schema} data={data} errors={errors} onChange={handleChange} onSave={handleSave}
             saving={saving} saveError={saveError} stepHref={stepHref}
-            shareHref={`/admin/share${q()}`} templatesHref={`/admin/templates${q()}`} fileKey={fileParam} saved={!!filename}
+            shareHref={`/admin/share${q()}`} fileKey={fileParam} saved={!!filename}
             summary={summaryCard}
             plan={filename ? <PlanCard file={filename} admin={role === "admin"} onPlan={setPlan} /> : null} />
         </div>

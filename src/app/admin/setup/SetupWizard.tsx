@@ -9,7 +9,7 @@ import { buildSteps, missingRequired, moveIndex, resolveIndex, stepForView } fro
 
 // 고객 전용 단계별 입력. 상태·저장은 SetupForm 것을 그대로 받아 쓴다.
 // 단계는 URL(?step=1..6, 완료는 done)이 정한다 — 체크리스트·옛 링크도 같은 방식으로 연결된다.
-export default function SetupWizard({ schema, data, errors, onChange, onSave, saving, saveError, summary, plan, stepHref, shareHref, templatesHref, fileKey, saved }: {
+export default function SetupWizard({ schema, data, errors, onChange, onSave, saving, saveError, summary, plan, stepHref, shareHref, fileKey, saved }: {
   schema: TemplateSchema;
   data: unknown;
   errors: Record<string, string>;
@@ -21,7 +21,6 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
   plan: React.ReactNode; // 플랜 현황 (항상 켜 둬야 미리보기 워터마크가 맞는다)
   stepHref: (step: string | number, file?: string) => string; // 운영자는 ?file= 이 붙는다
   shareHref: string;
-  templatesHref: string;
   saved: boolean; // 이미 저장된 청첩장이면 새로고침해도 모든 단계로 바로 이동
   fileKey: string; // 운영자가 다른 고객을 고르면(?file= 변경) 방문 기록을 비운다
 }) {
@@ -82,7 +81,6 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
               </ul>
             </>
           )}
-          <Link href={templatesHref} className="h-11 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink flex items-center justify-center">템플릿 바꾸기</Link>
         </div>
       ) : (
         <>

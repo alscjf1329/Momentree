@@ -7,7 +7,6 @@ import { Suspense, useEffect, useState } from "react";
 const ICONS: Record<string, React.ReactNode> = {
   "/admin": <><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8" /></>,
   "/admin/setup": <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></>,
-  "/admin/templates": <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
   "/admin/admins": <><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z" /></>,
 };
 
@@ -44,7 +43,6 @@ function NavInner() {
   const nav = [
     { href: "/admin", label: "하객" },
     { href: "/admin/setup", label: isCustomer ? "편집" : "고객 설정" },
-    { href: "/admin/templates", label: "템플릿" },
     ...(me?.superAdmin ? [{ href: "/admin/admins", label: "관리자" }] : []),
   ];
 
