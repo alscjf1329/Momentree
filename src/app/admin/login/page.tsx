@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
     if (e) { setEmail(e.trim()); setInvited(true); }
     // 이미 로그인한 상태에서 초대 링크를 눌렀다면 (같은 이메일이면) 바로 편집 화면으로
     fetch("/api/admin/auth/me").then(r => r.ok ? r.json() : null).then(me => {
-      if (me && (!e || me.email?.toLowerCase() === e.trim().toLowerCase())) router.replace(me.role === "customer" ? "/admin/setup" : "/admin");
+      if (me && (!e || me.email?.toLowerCase() === e.trim().toLowerCase())) router.replace("/admin/setup");
     }).catch(() => {});
   }, [router]);
 
@@ -58,7 +58,7 @@ export default function AdminLoginPage() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "서버에 문제가 생겼어요. 잠시 후 다시 시도해 주세요");
       // 고객은 바로 청첩장 편집 화면으로, 관리자는 대시보드로
-      router.push(data.role === "customer" ? "/admin/setup" : "/admin");
+      router.push("/admin/setup");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "인증에 실패했습니다");

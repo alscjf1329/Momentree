@@ -16,7 +16,7 @@ export default async function Home() {
   const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
   const session = secret ? await verifySessionToken(token, secret) : null;
   const live = exampleLive();
-  const startHref = session ? (session.role === "admin" ? "/admin" : "/admin/setup") : "/admin/login";
+  const startHref = session ? "/admin/setup" : "/admin/login"; // 편집하러 가면 운영자도 항상 고객 설정으로
 
   return (
     <div className="bg-white min-h-dvh text-ink" style={{ fontFamily: "var(--font-sans)" }}>
