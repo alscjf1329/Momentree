@@ -36,4 +36,4 @@
 - 청첩장 템플릿 내부의 캘리그래피 폰트는 템플릿 개별 디자인이며 브랜드 폰트가 아니다.
 
 ## 로고
-B 둘러앉은 원(흰 배경) 채택. 서비스명은 마당(잠정, 상표 확인 전)이라 코드의 서비스명은 아직 바꾸지 않았다. 시안: `docs/logo-proposals/`. 적용 파일: `public/icon.svg`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`.
+C안 "M 나무" 채택(2026-11-15, MOM-18). M 글자 안에 로즈 점 하나가 있고, 점이 순간(moment)이다. 검정 `#111`과 로즈 `#C2255C`만 쓴다. 시안: `docs/logo-proposals/momentree/`. 적용 파일: `public/icon.svg`(원본), `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`(꽉 찬 흰 배경, 글자는 안전 영역 안), `apple-touch-icon.png`. 이름은 Momentree로 확정이라 예전 마당 시절 시안(`docs/logo-proposals/` 바로 아래)은 참고용이다.

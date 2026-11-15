@@ -4,11 +4,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const dir = join(process.cwd(), "docs/logo-proposals");
+const applied = join(process.cwd(), "docs/logo-proposals/momentree/icon-c.svg"); // 2026-11-15 채택한 C안(M 나무)
 const files = ["a", "b", "c"].flatMap((n) => [`icon-${n}.svg`, `wordmark-${n}.svg`]);
 
-test("적용된 앱 아이콘: public/icon.svg는 B, manifest·layout이 실제 파일을 가리킨다", () => {
+test("적용된 앱 아이콘: public/icon.svg는 C(M 나무), manifest·layout이 실제 파일을 가리킨다", () => {
   const svg = readFileSync("public/icon.svg", "utf8");
-  assert.equal(svg, readFileSync(join(dir, "icon-b.svg"), "utf8"));
+  assert.equal(svg, readFileSync(applied, "utf8"));
   assert.match(svg, /<rect [^>]*fill="#FFFFFF"/);
   const manifest = readFileSync("src/app/manifest.ts", "utf8");
   const srcs = [...manifest.matchAll(/src: "(\/[^"]+)"/g)].map((m) => m[1]);
