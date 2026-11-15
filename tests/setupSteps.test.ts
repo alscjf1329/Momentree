@@ -3,16 +3,16 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { TEMPLATE_NAMES } from "@/lib/templateNames";
-import { buildSteps, missingRequired, resolveIndex, stepForView, moveIndex, stepOf } from "@/lib/setupSteps";
+import { buildSteps, missingRequired, resolveIndex, stepForView, moveIndex, stepOf, COLOR_KEYS } from "@/lib/setupSteps";
 
 const ids = Object.keys(TEMPLATE_NAMES);
 const keysOf = (id: string) => getSchemaForTemplate(id).sections.flatMap((s) => s.fields.map((f) => f.key));
 
-test("9개 템플릿 모두 스키마의 모든 항목이 정확히 한 단계에 속한다", () => {
+test("9개 템플릿 모두 스키마의 모든 항목이 정확히 한 단계에 속한다 (색상 항목은 상단 패널이라 제외)", () => {
   assert.equal(ids.length, 9);
   for (const id of ids) {
     const got = buildSteps(getSchemaForTemplate(id)).flatMap((st) => st.sections.flatMap((s) => s.fields.map((f) => f.key)));
-    assert.deepEqual([...got].sort(), [...keysOf(id)].sort(), `${id}: 누락 또는 중복`);
+    assert.deepEqual([...got].sort(), keysOf(id).filter((k) => !COLOR_KEYS.includes(k)).sort(), `${id}: 누락 또는 중복`);
   }
 });
 
@@ -69,14 +69,15 @@ test("옛 view=photos·accounts 링크는 ④·⑤ 단계로 간다", () => {
   assert.match(readFileSync("src/app/admin/setup/SetupWizard.tsx", "utf8"), /stepForView\(sp\.get\("view"\)\)/);
 });
 
-test("색상: 팔레트는 변수 10개를 모두 채우고, 모노 위저드 1단계에 색상 항목이 있다", async () => {
+test("색상: 팔레트는 변수 10개를 모두 채우고, 색상 항목은 위저드 단계가 아니라 상단 패널에서 다룬다", async () => {
   const { PALETTES } = await import("@/themes");
   for (const [id, p] of Object.entries(PALETTES)) {
     if (id) assert.equal(Object.keys(p.vars).length, 10, id); // 변수 9개 + 구분 배경(--section-alt)
   }
-  const step1 = buildSteps(getSchemaForTemplate("mono")).find((s) => s.n === 1)!;
-  const keys = step1.sections.flatMap((s) => s.fields.map((f) => f.key));
-  assert.ok(keys.includes("palette") && keys.includes("customColors"));
+  const schemaKeys = keysOf("mono");
+  assert.ok(schemaKeys.includes("palette") && schemaKeys.includes("customColors")); // 폼 상단 '색상' 패널이 쓴다
+  const inSteps = buildSteps(getSchemaForTemplate("mono")).flatMap((st) => st.sections.flatMap((s) => s.fields.map((f) => f.key)));
+  assert.ok(!inSteps.includes("palette") && !inSteps.includes("customColors")); // 위저드 단계에는 없다
 });
 
 test("직접 고른 색: 어떤 조합도 글자·포인트가 배경과 대비 4.5 이상, 배경은 밝게, 잘못된 값은 무시", async () => {

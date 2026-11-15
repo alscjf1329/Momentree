@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import type { WeddingData } from "@/types";
 import { setByPath, validateBySchema } from "@/lib/schema";
+import { renderField } from "@/components/admin/FieldRenderer";
+import { COLOR_KEYS } from "@/lib/setupSteps";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { DEFAULT_WEDDING_DATA } from "@/lib/newClient";
 import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
@@ -37,6 +39,7 @@ export default function SetupForm() {
   const [saveError, setSaveError] = useState(""); // 위저드의 저장 실패 안내
   const [loadError, setLoadError] = useState(""); // 고객 불러오기 실패 안내
   const [plan, setPlan] = useState<Plan | null>(null); // 무료면 미리보기에 워터마크
+  const [colorOpen, setColorOpen] = useState(false); // 폼 상단 '색상' 패널
 
   const schema = getSchemaForTemplate(data.template);
   const errors = validateBySchema(schema, data);
@@ -154,6 +157,17 @@ export default function SetupForm() {
     </button>
   );
 
+  const colorFields = schema.sections.flatMap((sec) => sec.fields).filter((f) => COLOR_KEYS.includes(f.key));
+  const colorPanel = (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-[15px] font-bold">색상</h2>
+        <button type="button" onClick={() => setColorOpen(false)} className="min-h-[44px] px-3 text-sm text-ink">닫기 ✕</button>
+      </div>
+      {colorFields.map((f) => renderField({ field: f, data, basePath: "", onChange: handleChange, errors }))}
+    </div>
+  );
+
   const label = [data.groom.name, data.bride.name].map((n) => n?.trim()).filter(Boolean).join(" ♥ ");
   const tint = TEMPLATE_TINT[data.template] ?? TEMPLATE_TINT.mono;
   const dateText = data.date?.iso ? `${data.date.iso.slice(0, 10).replaceAll("-", ".")}` : "";
@@ -186,6 +200,10 @@ export default function SetupForm() {
               <button onClick={handleNewClient} className="h-10 px-4 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink hidden sm:block">+ 새 고객</button>
             )}
             <Link href={`/admin/templates${q()}`} className="h-10 px-4 rounded-full border border-[#d4d4d4] text-sm font-medium text-ink hidden sm:inline-flex items-center">템플릿</Link>
+            {colorFields.length > 0 && (
+              <button type="button" onClick={() => setColorOpen((o) => !o)} aria-expanded={colorOpen}
+                className={`h-10 px-4 rounded-full border text-sm font-medium text-ink ${colorOpen ? "border-ink" : "border-[#d4d4d4]"}`}>색상</button>
+            )}
             {saveButton}
           </div>
         </div>
@@ -232,7 +250,7 @@ export default function SetupForm() {
             plan={filename ? <PlanCard file={filename} admin={role === "admin"} onPlan={setPlan} /> : null} />
         </div>
 
-        <PreviewPane template={data.template} data={data} watermark={plan === "free"} raise />
+        <PreviewPane template={data.template} data={data} watermark={plan === "free"} raise colorPanel={colorPanel} colorOpen={colorOpen} onColorClose={() => setColorOpen(false)} />
       </div>
     </div>
   );

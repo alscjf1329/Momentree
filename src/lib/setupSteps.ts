@@ -4,10 +4,12 @@ import { getByPath, type SectionSchema, type TemplateSchema } from "@/lib/schema
 export const STEP_TITLES = ["신랑 · 신부", "예식 일시 · 장소", "인사말", "사진", "축의금 계좌", "추가 안내"] as const;
 export const LAST_STEP = STEP_TITLES.length;
 
+// 위저드 단계가 아니라 폼 상단 '색상' 버튼 패널에서 고르는 항목
+export const COLOR_KEYS = ["palette", "customColors"];
 const PHOTO = ["introBg", "gallery"];
 const ACCOUNT = ["groom.accounts", "bride.accounts"];
 const BY_TITLE: Record<string, number> = {
-  "신랑 정보": 1, "신부 정보": 1, "날짜 / 시간": 2, "장소": 2, "인사말": 3, "색상": 1, "마음 전하실 곳 (계좌번호) 문구": 5,
+  "신랑 정보": 1, "신부 정보": 1, "날짜 / 시간": 2, "장소": 2, "인사말": 3, "마음 전하실 곳 (계좌번호) 문구": 5,
 };
 // 항목이 다른 단계로 옮겨질 때 보여 줄 소제목
 const RENAME: Record<string, string> = { "신랑 정보": "신랑측 계좌", "신부 정보": "신부측 계좌", "이미지 경로": "사진" };
@@ -27,7 +29,7 @@ export function buildSteps(schema: TemplateSchema): WizardStep[] {
     const n = i + 1;
     const sections: SectionSchema[] = [];
     for (const s of schema.sections) {
-      const fields = s.fields.filter((f) => stepOf(s.title, f.key) === n);
+      const fields = s.fields.filter((f) => !COLOR_KEYS.includes(f.key) && stepOf(s.title, f.key) === n);
       if (fields.length === 0) continue;
       const moved = n !== BY_TITLE[s.title] && (n === 4 || n === 5) && RENAME[s.title];
       sections.push({ title: moved || s.title, fields });

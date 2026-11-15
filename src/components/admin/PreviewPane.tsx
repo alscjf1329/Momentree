@@ -51,7 +51,7 @@ function PreviewFrame({ template, data, watermark }: { template: string; data: W
   );
 }
 
-export default function PreviewPane({ template, data, watermark = false, raise = false }: { template: string; data: WeddingData; watermark?: boolean; raise?: boolean }) {
+export default function PreviewPane({ template, data, watermark = false, raise = false, colorPanel, colorOpen = false, onColorClose }: { template: string; data: WeddingData; watermark?: boolean; raise?: boolean; colorPanel?: React.ReactNode; colorOpen?: boolean; onColorClose?: () => void }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -62,6 +62,8 @@ export default function PreviewPane({ template, data, watermark = false, raise =
         <div className="rounded-[32px] border-8 border-gray-800 overflow-hidden shadow-xl bg-white" style={{ width: 380, height: 720 }}>
           <PreviewFrame template={template} data={data} watermark={watermark} />
         </div>
+        {/* 색상 패널: 폰 왼쪽에 떠서 미리보기를 가리지 않는다 */}
+        {colorOpen && <div className="absolute right-full mr-4 top-6 w-[320px] max-h-[640px] overflow-y-auto bg-white rounded-2xl border border-line shadow-xl p-4">{colorPanel}</div>}
       </div>
 
       {/* 모바일·태블릿: 떠 있는 버튼 → 전체화면 미리보기 (입력한 내용이 그대로 반영됨) */}
@@ -70,15 +72,16 @@ export default function PreviewPane({ template, data, watermark = false, raise =
         style={{ background: "var(--color-ink)" }}>
         미리보기
       </button>
-      {open && (
+      {(open || colorOpen) && (
         <div className="xl:hidden fixed inset-0 z-50 bg-black/60 flex flex-col" role="dialog" aria-label="청첩장 미리보기">
           <div className="flex items-center justify-between px-4 h-12 bg-white shrink-0">
             <span className="text-sm font-semibold text-ink">미리보기</span>
-            <button onClick={() => setOpen(false)} className="text-sm px-3 py-1.5 text-ink">닫기 ✕</button>
+            <button onClick={() => { setOpen(false); onColorClose?.(); }} className="text-sm px-3 py-1.5 text-ink">닫기 ✕</button>
           </div>
           <div className="flex-1 bg-white min-h-0">
             <PreviewFrame template={template} data={data} watermark={watermark} />
           </div>
+          {colorOpen && <div className="shrink-0 max-h-[45%] overflow-y-auto bg-white border-t border-line p-4">{colorPanel}</div>}
         </div>
       )}
     </>
