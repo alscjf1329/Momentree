@@ -92,6 +92,8 @@ const MIGRATIONS: (string | ((db: Database.Database) => void))[] = [
     db.exec("ALTER TABLE customers ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'");
     db.exec("UPDATE customers SET plan = 'paid'");
   },
+  // v6: 클래식 템플릿 폐기 — 기존 고객은 모노로 (암호화된 데이터 안의 값은 읽을 때 같은 규칙으로 바뀜)
+  "UPDATE customers SET template = 'mono' WHERE template = 'classic'",
 ];
 
 export function migrate(db: Database.Database): void {

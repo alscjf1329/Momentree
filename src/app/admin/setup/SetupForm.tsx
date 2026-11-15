@@ -155,7 +155,7 @@ export default function SetupForm() {
   );
 
   const label = [data.groom.name, data.bride.name].map((n) => n?.trim()).filter(Boolean).join(" ♥ ");
-  const tint = TEMPLATE_TINT[data.template] ?? TEMPLATE_TINT.classic;
+  const tint = TEMPLATE_TINT[data.template] ?? TEMPLATE_TINT.mono;
   const dateText = data.date?.iso ? `${data.date.iso.slice(0, 10).replaceAll("-", ".")}` : "";
 
   const summaryCard = (

@@ -5,7 +5,7 @@ import type { TemplateSchema } from "@/lib/schema";
 // common 없음   → "garden 전용 옵션" 탭, garden에서만 편집 가능
 // garden 스키마를 폴백으로 쓰는 8개 템플릿. 이 템플릿들이 실제로 렌더링하지 않는 필드는 어드민 폼에서 숨긴다
 // (src/templates/*/index.tsx + 공용 sections/*가 참조하는 필드를 기준으로 정리).
-const BASIC = ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury"];
+const BASIC = ["editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury"];
 const NO_NAME_FULL = ["editorial", "modern", "garden", "mono"]; // 화면에서 전체이름을 쓰지 않는 템플릿
 
 export const gardenSchema: TemplateSchema = {
@@ -145,8 +145,6 @@ export const gardenSchema: TemplateSchema = {
       title: "이미지 경로",
       fields: [
         { key: "introBg", type: "image", label: "인트로 배경", common: true },
-        { key: "envelopeClosed", type: "image", label: "봉투 (닫힘)", excludeTemplates: ["garden", ...BASIC.filter((t) => t !== "classic")] },
-        { key: "envelopeOpen", type: "image", label: "봉투 (열림)", excludeTemplates: ["garden", ...BASIC.filter((t) => t !== "classic")] },
         {
           key: "gallery",
           type: "array-object",

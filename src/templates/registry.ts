@@ -1,4 +1,3 @@
-import ClassicTemplate from "@/templates/classic";
 import EditorialTemplate from "@/templates/editorial";
 import MinimalTemplate from "@/templates/minimal";
 import RomanticTemplate from "@/templates/romantic";
@@ -10,7 +9,6 @@ import GardenTemplate from "@/templates/garden";
 import MonoTemplate from "@/templates/mono";
 
 export const TEMPLATE_MAP: Record<string, React.ComponentType> = {
-  classic: ClassicTemplate,
   editorial: EditorialTemplate,
   minimal: MinimalTemplate,
   romantic: RomanticTemplate,

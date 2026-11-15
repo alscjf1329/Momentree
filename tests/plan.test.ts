@@ -21,7 +21,7 @@ const call = async (method: string, route: string, session: Sess | null, body?: 
     headers: { "content-type": "application/json", ...(session ? { cookie: `${ADMIN_SESSION_COOKIE}=${await createSessionToken("test-secret", session)}` } : {}) },
   });
 const photos = (n: number) => Array.from({ length: n }, (_, i) => ({ src: `/p${i}.jpg`, alt: "" }));
-const wedding = (over: Partial<WeddingData> = {}): WeddingData => ({ ...WEDDING, date: { ...WEDDING.date, iso: "2999-01-01" }, template: "classic", gallery: photos(5), ...over }); // 예식일은 먼 미래(만료 방지)
+const wedding = (over: Partial<WeddingData> = {}): WeddingData => ({ ...WEDDING, date: { ...WEDDING.date, iso: "2999-01-01" }, template: "mono", gallery: photos(5), ...over }); // 예식일은 먼 미래(만료 방지)
 
 test("마이그레이션 v5: 기존 고객은 paid, 이후 신규는 free, 다시 돌려도 그대로", async () => {
   const { migrate } = await import("@/lib/db"); // 정적 import는 DATA_DIR 설정보다 먼저 평가돼 실제 data/를 건드린다
@@ -50,9 +50,7 @@ test("plan 순수 함수", () => {
   for (const t of FREE_TEMPLATES) assert.ok(canUseTemplate("free", t));
   assert.deepEqual(FREE_TEMPLATES, ["mono", "minimal", "romantic"]);
   assert.ok(!canUseTemplate("free", "luxury"));
-  assert.ok(!canUseTemplate("free", "classic")); // 클래식은 신규 선택 불가
-  assert.ok(canUseTemplate("free", "classic", "classic")); // 이미 쓰는 고객은 유지 가능
-  assert.ok(!canUseTemplate("free", "luxury", "luxury")); // 유료 템플릿은 예외 없음
+  assert.ok(!canUseTemplate("free", "classic")); // 폐기된 클래식은 고를 수 없다
   assert.ok(canUseTemplate("paid", "luxury"));
   assert.deepEqual([photoLimit("free"), rsvpLimit("free"), hasWatermark("free"), canInviteMembers("free")], [5, 30, true, false]);
   assert.deepEqual([photoLimit("paid"), rsvpLimit("paid"), hasWatermark("paid"), canInviteMembers("paid")], [Infinity, Infinity, false, true]);
@@ -77,15 +75,8 @@ test("서버 강제: 템플릿·사진·멤버 초대·RSVP (무료 제한, 유�
   assert.equal(r.status, 403);
   assert.match((await r.json()).error, /유료/);
   assert.equal(store.getCustomer("free@x.com")!.template, "romantic");
-  // 클래식 레거시: 새로 고르면 거부, 이미 클래식인 무료 고객의 유지 저장은 허용
+  // 폐기된 클래식은 저장할 수 없다 (기존 고객은 마이그레이션으로 모노가 됨)
   assert.equal(await save(me, wedding({ template: "classic" })), 403);
-  store.saveCustomer("old-classic@x.com", wedding({ template: "classic" }), "old-classic@x.com");
-  const oc: Sess = { role: "customer", file: "old-classic@x.com", email: "old-classic@x.com" };
-  const saveOc = async (data: WeddingData) => (await clients.POST(await call("POST", "clients", oc, { filename: "old-classic@x.com", data }))).status;
-  assert.equal(await saveOc(wedding({ template: "classic", gallery: photos(3) })), 200);
-  assert.equal(await saveOc(wedding({ template: "luxury" })), 403);
-  assert.equal(await saveOc(wedding({ template: "mono" })), 200);
-  assert.equal(await saveOc(wedding({ template: "classic" })), 403); // 한번 바꾸면 돌아갈 수 없다
   // 사진: 5장 OK, 6장 거부
   assert.equal(await save(me, wedding({ template: "romantic", gallery: photos(6) })), 403);
   assert.equal(await save(me, wedding({ template: "romantic", gallery: photos(5) })), 200);

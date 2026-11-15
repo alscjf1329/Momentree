@@ -33,7 +33,7 @@ export default function PreviewPage() {
     );
   }
 
-  const Template = TEMPLATE_MAP[params.template] ?? TEMPLATE_MAP.classic;
+  const Template = TEMPLATE_MAP[params.template] ?? TEMPLATE_MAP.mono;
 
   return (
     <WeddingProvider data={data} watermark={watermark}>

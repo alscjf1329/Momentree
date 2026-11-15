@@ -64,8 +64,6 @@ export interface WeddingData {
   directionsFromSeoul: { route: string; steps: string[] }[];
   gallery: { src: string; alt: string }[];
   introBg: string;
-  envelopeClosed: string;
-  envelopeOpen: string;
   // 배경음악
   bgm: { title: string; src: string };
 }

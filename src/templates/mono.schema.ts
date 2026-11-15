@@ -139,8 +139,6 @@ export const monoSchema: TemplateSchema = {
       title: "이미지 경로",
       fields: [
         { key: "introBg", type: "image", label: "인트로 배경", common: true },
-        { key: "envelopeClosed", type: "image", label: "봉투 (닫힘)", excludeTemplates: ["mono"] },
-        { key: "envelopeOpen", type: "image", label: "봉투 (열림)", excludeTemplates: ["mono"] },
         {
           key: "gallery",
           type: "array-object",

@@ -4,12 +4,12 @@ import { readFileSync } from "node:fs";
 import { getSchemaForTemplate } from "@/lib/templateSchemas";
 import { TEMPLATE_NAMES } from "@/lib/templateNames";
 
-test("안내사항·배경음악은 모든 템플릿 스키마에 나오고, 8개 템플릿 화면이 공용 부품을 쓴다", () => {
+test("안내사항·배경음악은 모든 템플릿 스키마에 나오고, 7개 템플릿 화면이 공용 부품을 쓴다", () => {
   for (const id of Object.keys(TEMPLATE_NAMES)) {
     const keys = getSchemaForTemplate(id).sections.flatMap((s) => s.fields).map((f) => f.key);
     for (const k of ["info", "bgm.title", "bgm.src"]) assert.ok(keys.includes(k), `${id}에 ${k} 없음`);
   }
-  for (const id of ["classic", "editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury"]) {
+  for (const id of ["editorial", "minimal", "romantic", "twilight", "blossom", "modern", "luxury"]) {
     const src = readFileSync(`src/templates/${id}/index.tsx`, "utf8");
     assert.match(src, /sections\/InfoSection/, id);
     assert.match(src, /sections\/BgmPlayer/, id);

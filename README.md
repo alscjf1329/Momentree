@@ -41,11 +41,10 @@ docker compose up --build
 
 ## 청첩장 템플릿
 
-10종의 완성된 템플릿을 제공하며, 어드민에서 고객마다 템플릿을 고르고 데이터를 입력하면 바로 청첩장이 생성됩니다.
+9종의 완성된 템플릿을 제공하며, 어드민에서 고객마다 템플릿을 고르고 데이터를 입력하면 바로 청첩장이 생성됩니다.
 
 | id | 이름 | 무드 |
 |---|---|---|
-| `classic` | 클래식 | 다크 로맨틱, 봉투 오프닝 스크롤 (폐기: 새로 고를 수 없음, 기존 고객만 유지) |
 | `editorial` | 에디토리얼 | 모던 매거진, 다크 풀블리드 |
 | `minimal` | 미니멀 | 클린 화이트 |
 | `romantic` | 로맨틱 | 드리미 플로럴 |
@@ -201,7 +200,7 @@ SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마
 
 고객 데이터 필드는 템플릿별 스키마(`src/templates/<id>.schema.ts`)로 정의되고, 설정 화면의 6단계 위저드(`src/app/admin/setup/SetupWizard.tsx`, 단계 구성은 `src/lib/setupSteps.ts`)가 이 스키마를 읽어 자동으로 입력 폼과 실시간 미리보기를 생성합니다. 새 필드를 추가하려면 스키마 파일에 필드를 선언하기만 하면 됩니다 — 폼 코드를 직접 수정할 필요가 없습니다.
 
-전용 스키마 파일이 없는 8종(classic·editorial·minimal·romantic·twilight·blossom·modern·luxury)은 `garden.schema.ts`를 폴백으로 쓰되, 각 템플릿이 실제로 렌더링하지 않는 필드(`excludeTemplates`)는 폼에서 숨깁니다.
+전용 스키마 파일이 없는 7종(editorial·minimal·romantic·twilight·blossom·modern·luxury)은 `garden.schema.ts`를 폴백으로 쓰되, 각 템플릿이 실제로 렌더링하지 않는 필드(`excludeTemplates`)는 폼에서 숨깁니다.
 
 ---
 

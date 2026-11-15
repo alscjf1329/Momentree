@@ -9,7 +9,6 @@ import { getCustomer, getPlan, getShareId } from "@/lib/customers";
 import { hasWatermark } from "@/lib/plan";
 import { WeddingProvider } from "@/context/WeddingContext";
 import { TEMPLATE_MAP } from "@/templates/registry";
-import ClassicTemplate from "@/templates/classic";
 
 function readClientFile(filename: string): WeddingData | null {
   // ?file= 값은 사용자 입력이므로 형식을 먼저 검증
@@ -75,12 +74,14 @@ export default async function InvitePage({
   let aiNote = false; // 랜딩 예시(example·demo-*)만
   let watermark = false; // 무료 고객의 청첩장만 (데모는 표시 안 함)
 
-  if ((query.file || query.id) && slug in TEMPLATE_MAP) {
+  // 폐기된 클래식 공유 링크(/invite/classic?id=…)는 모노로 연다
+  const tpl = slug === "classic" ? "mono" : slug;
+  if ((query.file || query.id) && tpl in TEMPLATE_MAP) {
     // 파일 기반 동적 렌더링: /invite/editorial?id=<공유 ID> (레거시: ?file=kim-minjun)
     const clientData = file ? readClientFile(file) : null;
     if (!file || !clientData) notFound();
     // 클라이언트로 내려가는 slug(RSVP·방명록 API 키)는 파일명(이메일) 대신 공유 ID를 쓴다
-    data = { ...clientData, template: slug, slug: getShareId(file) ?? "" };
+    data = { ...clientData, template: tpl, slug: getShareId(file) ?? "" };
     watermark = hasWatermark(getPlan(file) ?? "free");
     aiNote = file === EXAMPLE_FILE;
   } else {
@@ -91,7 +92,7 @@ export default async function InvitePage({
     aiNote = slug.startsWith("demo-") || slug === EXAMPLE_FILE; // 정적 예시 슬러그만
   }
 
-  const Template = TEMPLATE_MAP[data.template] ?? ClassicTemplate;
+  const Template = TEMPLATE_MAP[data.template] ?? TEMPLATE_MAP.mono;
 
   return (
     <WeddingProvider data={data} watermark={watermark} aiNote={aiNote}>

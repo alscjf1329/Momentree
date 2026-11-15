@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useInviteQuery } from "@/lib/useShareId";
 import { useClientDirectory } from "@/lib/useClientDirectory";
 import { tplPickedKey } from "@/lib/onboarding";
-import { LEGACY_TEMPLATES, RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
+import { RECOMMENDED_TEMPLATES, TEMPLATE_NAMES } from "@/lib/templateNames";
 import { canUseTemplate, type Plan } from "@/lib/plan";
 import type { WeddingData } from "@/types";
 import { DEFAULT_WEDDING_DATA, LAST_FILE_KEY, upcomingWeddingDate } from "@/lib/newClient";
@@ -17,12 +17,6 @@ const TEMPLATE_DEFS = [
     mood: "블랙 + 화이트",
     desc: "흑백 그레이스케일 풀블리드 히어로 + 미니멀 타이포그래피",
     bg: "linear-gradient(160deg,#ffffff 0%,#d9d9d9 100%)",
-  },
-  {
-    id: "classic",
-    mood: "다크 로맨틱",
-    desc: "봉투 오프닝 스크롤 + 골드 포인트",
-    bg: "linear-gradient(160deg,#1a1208 0%,#2a1e10 100%)",
   },
   {
     id: "editorial",
@@ -77,16 +71,6 @@ const TEMPLATE_DEFS = [
 const TEMPLATES = TEMPLATE_DEFS.map(t => ({ ...t, name: TEMPLATE_NAMES[t.id] }));
 
 function TemplatePreview({ id }: { id: string }) {
-  if (id === "classic") return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-2"
-      style={{ background: "linear-gradient(160deg,#1a1208,#2a1e10)" }}>
-      <div style={{ width: 32, height: 1, background: "#c9a96e", opacity: 0.5 }} />
-      <p className="font-serif text-white tracking-widest font-light" style={{ fontSize: "clamp(11px,2vw,16px)", opacity: 0.85 }}>Kim · Lee</p>
-      <span style={{ color: "#c9a96e", fontSize: 10 }}>♥</span>
-      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 8, letterSpacing: "0.4em" }}>2025.10.18</p>
-      <div style={{ width: 32, height: 1, background: "#c9a96e", opacity: 0.5 }} />
-    </div>
-  );
   if (id === "editorial") return (
     <div className="w-full h-full flex flex-col justify-center px-5" style={{ background: "#0d0d0d" }}>
       <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.12)", marginBottom: 16 }} />
@@ -263,9 +247,8 @@ export default function TemplateList() {
     if (!selectedFile) { setPlan("free"); return; }
     fetch(`/api/plan?file=${encodeURIComponent(selectedFile)}`).then(r => r.ok ? r.json() : null).then(d => setPlan(d?.plan === "paid" ? "paid" : "free")).catch(() => {});
   }, [selectedFile]);
-  // 폐기된 템플릿은 지금 쓰는 고객에게만 보인다
-  const list = TEMPLATES.filter(t => !LEGACY_TEMPLATES.includes(t.id) || t.id === current);
-  const isLocked = (id: string) => role === "customer" && !canUseTemplate(plan, id, current);
+  const list = TEMPLATES;
+  const isLocked = (id: string) => role === "customer" && !canUseTemplate(plan, id);
 
   // 쓰는 것 + 추천 3종을 먼저, 나머지는 "더 보기" 뒤로
   const featured = [...list.filter(t => t.id === current), ...list.filter(t => t.id !== current && RECOMMENDED_TEMPLATES.includes(t.id))]; // 쓰는 것이 맨 앞

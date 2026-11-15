@@ -8,8 +8,8 @@ import { buildSteps, missingRequired, resolveIndex, stepForView, moveIndex, step
 const ids = Object.keys(TEMPLATE_NAMES);
 const keysOf = (id: string) => getSchemaForTemplate(id).sections.flatMap((s) => s.fields.map((f) => f.key));
 
-test("10개 템플릿 모두 스키마의 모든 항목이 정확히 한 단계에 속한다", () => {
-  assert.equal(ids.length, 10);
+test("9개 템플릿 모두 스키마의 모든 항목이 정확히 한 단계에 속한다", () => {
+  assert.equal(ids.length, 9);
   for (const id of ids) {
     const got = buildSteps(getSchemaForTemplate(id)).flatMap((st) => st.sections.flatMap((s) => s.fields.map((f) => f.key)));
     assert.deepEqual([...got].sort(), [...keysOf(id)].sort(), `${id}: 누락 또는 중복`);
@@ -29,7 +29,6 @@ test("단계 매핑: 계좌는 5, 사진은 4, 이름·일정·인사말은 1~3,
     for (const k of ["groom.accounts", "bride.accounts", "contactNotice"]) assert.equal(at(k), 5);
     for (const k of ["info", "bgm.src", "rsvpNotice"]) assert.equal(at(k), 6);
     assert.ok(!steps.find((s) => s.n === 1)!.sections.flatMap((s) => s.fields).some((f) => f.key.endsWith(".accounts")));
-    if (keysOf(id).includes("envelopeClosed")) assert.equal(at("envelopeClosed"), 4);
   }
   assert.equal(stepOf("처음 보는 섹션", "x"), 6); // 명시되지 않은 섹션은 6단계
 });
@@ -40,7 +39,7 @@ test("비어 있는 단계는 건너뛴다", () => {
 });
 
 test("필수 남음 계산·단계 이동", () => {
-  const steps = buildSteps(getSchemaForTemplate("classic"));
+  const steps = buildSteps(getSchemaForTemplate("minimal"));
   assert.equal(missingRequired(steps[0], { groom: { name: "" }, bride: { name: "김" } }), 1);
   assert.equal(missingRequired(steps[0], { groom: { name: "홍" }, bride: { name: "김" } }), 0);
   assert.equal(resolveIndex(steps, null), 0);

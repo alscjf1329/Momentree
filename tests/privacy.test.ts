@@ -51,9 +51,20 @@ test("마이그레이션 v3: 평문 행 암호화, 재실행·이미 암호화�
   const after = snap();
   for (const s of ["평문이름", "평문메시지", "평문방명", "평문글"]) assert.ok(!after.includes(s), s);
   assert.ok(after.includes(sealed)); // 이미 암호화된 값은 다시 암호화하지 않음
-  assert.equal(db.pragma("user_version", { simple: true }), 5);
+  assert.equal(db.pragma("user_version", { simple: true }), 6);
 
   db.pragma("user_version = 2");
   migrate(db); // 재실행해도 변화 없음
   assert.equal(snap(), after);
+});
+
+test("마이그레이션 v6: 폐기된 클래식 고객은 모노로, 다른 템플릿은 그대로(멱등)", async () => {
+  const { migrate } = await import("@/lib/db");
+  const db = new Database(":memory:");
+  migrate(db);
+  db.pragma("user_version = 5");
+  const ins = db.prepare("insert into customers (file,share_id,template,data_enc,created_at,updated_at) values (?,?,?,'x','t','t')");
+  ins.run("a", "sa", "classic"); ins.run("b", "sb", "luxury");
+  migrate(db); migrate(db);
+  assert.deepEqual(db.prepare("select file, template from customers order by file").all(), [{ file: "a", template: "mono" }, { file: "b", template: "luxury" }]);
 });

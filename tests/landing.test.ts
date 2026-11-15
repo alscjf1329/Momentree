@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { LEGACY_TEMPLATES, TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
+import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
 
 const page = fs.readFileSync("src/app/page.tsx", "utf8");
 const demo = fs.readFileSync("src/components/DemoPhone.tsx", "utf8");
@@ -16,24 +16,19 @@ test("랜딩의 템플릿 목록·개수는 TEMPLATE_NAMES 에서 파생되고 �
   assert.doesNotMatch(page, /크림|브라운|골드/);
 });
 
-test("랜딩: 모노가 첫 예시, 클래식은 랜딩에서 빠지고 신규 기본은 모노, classic 데이터 경로는 유지", async () => {
+test("랜딩: 모노가 첫 예시, 클래식은 완전히 폐기되고 신규 기본은 모노", async () => {
   assert.equal(Object.keys(TEMPLATE_NAMES)[0], "mono");
-  assert.match(page, /LEGACY_TEMPLATES\.includes/);
-  assert.match(demo, /LEGACY_TEMPLATES\.includes/);
-  assert.ok(LEGACY_TEMPLATES.includes("classic"));
-  const landing = Object.keys(TEMPLATE_NAMES).filter((id) => !LEGACY_TEMPLATES.includes(id));
-  assert.equal(landing[0], "mono");
-  assert.ok(!landing.includes("classic"));
-  assert.equal(landing.length, Object.keys(TEMPLATE_NAMES).length - 1);
+  assert.ok(!("classic" in TEMPLATE_NAMES));
   const { DEFAULT_WEDDING_DATA } = await import("@/lib/newClient");
   const { EXAMPLE } = await import("@/example");
   assert.equal(DEFAULT_WEDDING_DATA.template, "mono");
   assert.equal(EXAMPLE.template, "mono");
-  // 기존 클래식 고객·링크: 템플릿 파일·맵·데모 슬러그·공유 경로가 그대로
+  // 옛 클래식 링크는 모노로 열린다
   const { getInvite } = await import("@/invites");
-  assert.equal(getInvite("demo-classic")!.template, "classic");
-  assert.ok(fs.existsSync("src/templates/classic.tsx") || fs.existsSync("src/templates/classic"));
-  assert.match(fs.readFileSync("src/templates/registry.ts", "utf8"), /classic: ClassicTemplate/);
+  assert.equal(getInvite("demo-classic")!.template, "mono");
+  assert.ok(!fs.existsSync("src/templates/classic"));
+  assert.doesNotMatch(fs.readFileSync("src/templates/registry.ts", "utf8"), /classic/);
+  assert.match(fs.readFileSync("src/app/invite/[slug]/page.tsx", "utf8"), /slug === "classic" \? "mono"/);
 });
 
 test("PC 대응: 모바일 기본 + 확장 접두사가 랜딩·약관에 있다", () => {

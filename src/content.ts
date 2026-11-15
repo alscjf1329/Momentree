@@ -4,7 +4,7 @@ import type { WeddingData } from "@/types";
 
 export const WEDDING: WeddingData = {
   slug: "sample",
-  template: "classic",
+  template: "mono",
   theme: "classic-cream",
   groom: {
     name: "김민준",
@@ -93,9 +93,6 @@ export const WEDDING: WeddingData = {
   ],
   // 인트로 배경 이미지 (없으면 흰 배경)
   introBg: "",
-  // 봉투 이미지 (스크롤 오프닝용)
-  envelopeClosed: "/images/envelope-closed.jpg",
-  envelopeOpen: "/images/envelope-open.jpg",
   // 배경음악 (public/audio/ 에 mp3 넣고 src 지정)
   bgm: { title: "", src: "" },
 };

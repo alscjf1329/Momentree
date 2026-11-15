@@ -1,5 +1,4 @@
 import { SERVICE_NAME } from "@/lib/brand";
-import { LEGACY_TEMPLATES } from "@/lib/templateNames";
 
 // 플랜 구조 (MOM-10): 무료 / 유료(1회 결제, 구독 없음). 결제(PG)는 아직 없어 관리자가 수동으로 전환한다.
 export type Plan = "free" | "paid";
@@ -23,9 +22,7 @@ export const PLAN_LABEL: Record<Plan, string> = { free: "무료", paid: "유료"
 
 // 알 수 없는 값은 무료로 본다
 export const planOf = (customer: { plan?: string | null } | null | undefined): Plan => (customer?.plan === "paid" ? "paid" : "free");
-// current: 고객이 지금 쓰는 템플릿. 폐기된(legacy) 템플릿을 그대로 유지하는 저장은 무료여도 허용한다.
-export const canUseTemplate = (plan: Plan, id: string, current?: string): boolean =>
-  (PLAN_LIMITS[plan].templates?.includes(id) ?? true) || (id === current && LEGACY_TEMPLATES.includes(id));
+export const canUseTemplate = (plan: Plan, id: string): boolean => PLAN_LIMITS[plan].templates?.includes(id) ?? true;
 export const photoLimit = (plan: Plan): number => PLAN_LIMITS[plan].photos;
 export const rsvpLimit = (plan: Plan): number => PLAN_LIMITS[plan].rsvp;
 export const hasWatermark = (plan: Plan): boolean => PLAN_LIMITS[plan].watermark;
