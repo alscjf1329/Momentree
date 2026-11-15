@@ -68,3 +68,21 @@ test("마이그레이션 v6·v7: 폐기된 템플릿 고객은 모두 모노로(
   migrate(db); migrate(db);
   assert.deepEqual(db.prepare("select file, template from customers order by file").all(), [{ file: "a", template: "mono" }, { file: "b", template: "mono" }]);
 });
+
+test("고객 삭제: 업로드한 사진·음악 파일도 지우되, 다른 청첩장이 쓰는 파일은 남긴다", async () => {
+  const { saveCustomer, deleteCustomer } = await import("@/lib/customers");
+  const { WEDDING } = await import("@/content");
+  const dir = path.join(process.env.DATA_DIR!, "uploads");
+  fs.mkdirSync(path.join(dir, "images"), { recursive: true });
+  fs.mkdirSync(path.join(dir, "audio"), { recursive: true });
+  for (const f of ["images/own.jpg", "images/shared.jpg", "audio/own.mp3"]) fs.writeFileSync(path.join(dir, f), "x");
+  const withFiles = (imgs: string[], bgm: string) => ({ ...WEDDING, introBg: imgs[0], gallery: imgs.map((src) => ({ src, alt: "" })), bgm: { title: "", src: bgm } });
+  saveCustomer("up1", withFiles(["/uploads/images/own.jpg", "/uploads/images/shared.jpg"], "/uploads/audio/own.mp3"), null);
+  saveCustomer("up2", withFiles(["/uploads/images/shared.jpg"], ""), null);
+  assert.equal(deleteCustomer("up1"), true);
+  assert.ok(!fs.existsSync(path.join(dir, "images/own.jpg")));
+  assert.ok(!fs.existsSync(path.join(dir, "audio/own.mp3")));
+  assert.ok(fs.existsSync(path.join(dir, "images/shared.jpg"))); // 다른 고객이 쓰는 파일은 그대로
+  assert.equal(deleteCustomer("up2"), true);
+  assert.ok(!fs.existsSync(path.join(dir, "images/shared.jpg")));
+});

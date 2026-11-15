@@ -1,4 +1,7 @@
+import fs from "fs";
+import path from "path";
 import type { WeddingData } from "@/types";
+import { DATA_DIR } from "@/lib/paths";
 import { getDb } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/accountCrypto";
 import { addMember, filesOf } from "@/lib/access";
@@ -102,15 +105,30 @@ export function saveCustomer(file: string, data: WeddingData, email?: string | n
   if (!existed && email) addMember(file, email, "owner"); // 가입 이메일 = 소유자
 }
 
+// 청첩장 데이터가 가리키는 업로드 파일(/uploads/images|audio/…) 경로들
+const uploadRefs = (plain: string): Set<string> => new Set(plain.match(/\/uploads\/(?:images|audio)\/[A-Za-z0-9._-]+/g) ?? []);
+
 export function deleteCustomer(file: string): boolean {
   if (file === EXAMPLE_FILE) return false; // 랜딩 예시 고객은 삭제 불가
   // 하객 개인정보(RSVP·방명록)도 함께 지운다 — slug가 file이라 외래키가 없어 직접 지움. 고객 삭제 경로는 여기 하나뿐.
   const db = getDb();
-  return db.transaction(() => {
+  const blob = db.prepare("select data_enc from customers where file = ?").pluck().get(file) as string | undefined;
+  const mine = blob ? uploadRefs(decrypt(blob)) : new Set<string>();
+  const deleted = db.transaction(() => {
     db.prepare("delete from rsvp_entries where slug = ?").run(file);
     db.prepare("delete from guestbook_entries where slug = ?").run(file);
     return db.prepare("delete from customers where file = ?").run(file).changes > 0;
   })();
+  if (deleted && mine.size) {
+    // 업로드한 사진·음악도 지운다. 다른 청첩장이 같은 파일을 쓰고 있으면 남긴다.
+    for (const b of db.prepare("select data_enc from customers").pluck().all() as string[]) for (const r of uploadRefs(decrypt(b))) mine.delete(r);
+    const root = path.join(DATA_DIR, "uploads");
+    for (const ref of mine) {
+      const f = path.join(DATA_DIR, ref);
+      if (f.startsWith(root + path.sep)) fs.rmSync(f, { force: true });
+    }
+  }
+  return deleted;
 }
 
 // 최근 수정 순. 검색은 이메일·고객ID(공유 ID)·표시 이름·파일명·예식일 부분 일치.
