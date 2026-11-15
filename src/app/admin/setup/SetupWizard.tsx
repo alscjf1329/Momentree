@@ -55,7 +55,7 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
   const btn = "h-12 rounded-full text-base font-bold flex items-center justify-center disabled:opacity-50";
 
   return (
-    <div className="pb-20 space-y-5">
+    <div className="space-y-5">
       {(done || idx === 0) && summary}
       {(done || cur.n === 4) ? plan : <div className="hidden">{plan}</div>}
 
@@ -125,16 +125,16 @@ export default function SetupWizard({ schema, data, errors, onChange, onSave, sa
         </>
       )}
 
-      {/* 모바일은 아래 탭 위에, 넓은 화면은 맨 아래에 붙는다 */}
-      <div className="fixed inset-x-0 bottom-16 sm:bottom-0 z-40 bg-white border-t border-line" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      {/* 입력 칸 아래에 붙는 이전·다음 바 — 화면 전체를 덮지 않고 이 열 안에서만 따라다닌다(모바일은 아래 탭 위) */}
+      <div className="sticky bottom-16 sm:bottom-0 z-10 bg-white border-t border-line" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {/* 저장 실패 안내는 입력칸 맨 아래가 아니라 눌렀던 버튼 바로 위에 — 길게 스크롤된 화면에서도 보이게 */}
         {saveError && (
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-2">
+          <div className="pt-2">
             <p role="alert" className="max-w-xl text-sm text-[#b42318] leading-relaxed bg-[#fff4f2] rounded-lg px-3 py-2 break-words">{saveError}</p>
           </div>
         )}
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center">
-          <div className="max-w-3xl mx-auto xl:mx-0 w-full">
+        <div className="h-16 flex items-center">
+          <div className="w-full">
             <div className="max-w-xl flex gap-3">
               <button type="button" onClick={prev} disabled={saving || (!done && idx === 0)} className={`${btn} flex-1 min-w-0 border border-[#d4d4d4] text-ink`}>이전</button>
               {done ? (
