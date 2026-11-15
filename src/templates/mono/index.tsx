@@ -25,6 +25,7 @@ const VARS = {
   "--color-warm-gray": "#9c988f",
   "--color-text": "#1c1c1a",
   "--color-text-light": "#6e6b64",
+  "--section-alt": "#EBEBEB",
 } as React.CSSProperties;
 
 type Step = "intro" | "form" | "done";
@@ -84,7 +85,7 @@ function RSVPIntroModal() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div className="absolute inset-0" style={{ background: "#000000" }}
             onClick={close} />
-          <motion.div className="relative bg-white rounded-3xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-8 text-center"
+          <motion.div className="relative bg-[var(--color-cream)] rounded-3xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-8 text-center"
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.4, ease: "easeOut" }}>
 
@@ -223,7 +224,7 @@ function RSVPIntroModal() {
 }
 
 function LineDivider() {
-  return <div className="mx-auto" style={{ width: 40, height: 1, background: "#111", opacity: 0.5 }} />;
+  return <div className="mx-auto" style={{ width: 40, height: 1, background: "var(--color-primary)", opacity: 0.5 }} />;
 }
 
 // 히어로 타이핑/보조정보 애니메이션 타이밍 — RSVP 팝업이 이 애니메이션 종료 후 뜨도록 공유
@@ -255,7 +256,7 @@ function Hero() {
     setHeroHeight(window.visualViewport?.height ?? window.innerHeight);
   }, []);
   return (
-    <section className="relative overflow-hidden bg-white" style={{ height: heroHeight ? `${heroHeight}px` : "100svh" }}>
+    <section className="relative overflow-hidden bg-[var(--color-cream)]" style={{ height: heroHeight ? `${heroHeight}px` : "100svh" }}>
       {w.introBg && (
         <div className="absolute inset-0">
           <Image src={w.introBg} alt="bg" fill className="object-cover" priority sizes="480px" unoptimized={isGif(w.introBg)} />
@@ -266,7 +267,7 @@ function Hero() {
         {w.mainTitle.split("\n").map((line, i) => (
           <span
             key={i}
-            className={`block ${w.introBg ? "text-white" : "text-black"}`}
+            className={`block ${w.introBg ? "text-white" : "text-[var(--color-text)]"}`}
             style={{
               fontFamily: "'Noto Serif KR', serif",
               fontWeight: 500,
@@ -283,13 +284,13 @@ function Hero() {
 
         {w.subInfo.map((line, i) => (
           <p key={i}
-            className={`text-xs tracking-[0.3em] mt-3 ${w.introBg ? "text-white/80" : "text-black/60"}`}>
+            className={`text-xs tracking-[0.3em] mt-3 ${w.introBg ? "text-white/80" : "text-[var(--color-text-light)]"}`}>
             {line}
           </p>
         ))}
       </div>
 
-      <div className={`absolute bottom-8 left-0 right-0 flex justify-center ${w.introBg ? "text-white/70" : "text-black/50"}`}>
+      <div className={`absolute bottom-8 left-0 right-0 flex justify-center ${w.introBg ? "text-white/70" : "text-[var(--color-text-light)]"}`}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" strokeWidth="1.5"
             strokeLinecap="round" strokeLinejoin="round" />
@@ -340,7 +341,7 @@ function MonoGallery() {
   if (w.gallery.length === 0) return null;
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-[var(--color-cream)]">
       <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -358,7 +359,7 @@ function MonoGallery() {
               width: "100%",
               aspectRatio: "3/4",
               scrollSnapAlign: "center",
-              background: "#fff",
+              background: "var(--color-cream)",
             }}>
             {/* 세로 사진 기준 박스 — 가로 사진은 상하 여백 생김 */}
             <Image src={img.src} alt={img.alt} fill className="object-contain" sizes="480px" priority={i === 0} unoptimized={isGif(img.src)} />
@@ -383,7 +384,7 @@ function MonoGallery() {
               width: 56,
               height: 56,
               opacity: active === i ? 1 : 0.4,
-              outline: active === i ? "2px solid #111" : "none",
+              outline: active === i ? "2px solid var(--color-primary)" : "none",
               outlineOffset: 2,
             }}>
             <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="56px" unoptimized={isGif(img.src)} />
@@ -423,7 +424,7 @@ function InfoSection() {
   if (w.info.length === 0) return null;
 
   return (
-    <section className="py-16 bg-[#EBEBEB]">
+    <section className="py-16 bg-[var(--section-alt)]">
       <motion.div className="px-6 mb-6 text-center"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -440,12 +441,12 @@ function InfoSection() {
             style={{
               width: "88%",
               scrollSnapAlign: "center",
-              background: "#fff",
+              background: "var(--color-cream)",
               boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
             }}>
-            <p className="font-serif text-lg text-black tracking-wide">{item.title}</p>
-            <div className="w-6 h-px bg-black/20 my-4" />
-            <p className="text-sm text-black/55 leading-loose whitespace-pre-wrap">
+            <p className="font-serif text-lg text-[var(--color-text)] tracking-wide">{item.title}</p>
+            <div className="w-6 h-px bg-[var(--color-accent)] my-4" />
+            <p className="text-sm text-[var(--color-text-light)] leading-loose whitespace-pre-wrap">
               {item.content}
             </p>
           </div>
@@ -461,7 +462,7 @@ function InfoSection() {
               style={{
                 width: active === i ? 16 : 6,
                 height: 6,
-                background: active === i ? "#111" : "var(--color-accent)",
+                background: active === i ? "var(--color-primary)" : "var(--color-accent)",
               }} />
           ))}
         </div>
@@ -488,7 +489,7 @@ function MessageWall() {
   if (messages.length === 0) return null;
 
   return (
-    <section className="py-16 px-6 bg-white">
+    <section className="py-16 px-6 bg-[var(--color-cream)]">
       <motion.div className="text-center mb-8"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6 }}>
@@ -497,7 +498,7 @@ function MessageWall() {
       </motion.div>
       <div className="space-y-3 max-w-sm mx-auto">
         {messages.map((m, i) => (
-          <motion.div key={i} className="bg-white border border-[var(--color-accent)] p-4"
+          <motion.div key={i} className="bg-[var(--color-cream)] border border-[var(--color-accent)] p-4"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
@@ -566,7 +567,7 @@ function BgmPlayer() {
         onClick={toggle}
         aria-label={playing ? "배경음악 정지" : "배경음악 재생"}
         className="fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full flex items-center justify-center text-white"
-        style={{ background: "#111111" }}
+        style={{ background: "var(--color-primary)" }}
       >
         {playing ? (
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">

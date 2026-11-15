@@ -69,10 +69,10 @@ test("옛 view=photos·accounts 링크는 ④·⑤ 단계로 간다", () => {
   assert.match(readFileSync("src/app/admin/setup/SetupWizard.tsx", "utf8"), /stepForView\(sp\.get\("view"\)\)/);
 });
 
-test("색상: 팔레트는 변수 9개를 모두 채우고, 모노 위저드 4단계(사진)에 색상 항목이 있다", async () => {
+test("색상: 팔레트는 변수 10개를 모두 채우고, 모노 위저드 4단계(사진)에 색상 항목이 있다", async () => {
   const { PALETTES } = await import("@/themes");
   for (const [id, p] of Object.entries(PALETTES)) {
-    if (id) assert.equal(Object.keys(p.vars).length, 9, id);
+    if (id) assert.equal(Object.keys(p.vars).length, 10, id); // 변수 9개 + 구분 배경(--section-alt)
   }
   const step4 = buildSteps(getSchemaForTemplate("mono")).find((s) => s.n === 4)!;
   assert.ok(step4.sections.some((s) => s.fields.some((f) => f.key === "palette")));

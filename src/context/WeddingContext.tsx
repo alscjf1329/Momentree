@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import type { WeddingData } from "@/types";
 import { watermarkText } from "@/lib/plan";
 import { EXAMPLE_AI_NOTE } from "@/lib/exampleInfo";
-import { THEMES, DEFAULT_THEME } from "@/themes";
+import { THEMES, DEFAULT_THEME, PALETTES } from "@/themes";
 
 const WeddingContext = createContext<WeddingData | null>(null);
 
@@ -27,14 +27,14 @@ export function WeddingProvider({
 }) {
   const theme = THEMES[data.theme] ?? DEFAULT_THEME;
   // CSS 변수를 wrapper div에 설정 → 자식 컴포넌트에서 var(--color-*) 로 참조
-  const styleVars = theme.vars as React.CSSProperties;
+  const styleVars = { ...theme.vars, ...PALETTES[data.palette ?? ""]?.vars } as React.CSSProperties;
 
   return (
     <WeddingContext.Provider value={data}>
       <div style={styleVars}>
         {children}
-        {watermark && <p className="py-4 text-center text-[11px] text-neutral-400 bg-white" data-watermark>{watermarkText}</p>}
-        {aiNote && <p className="pb-3 text-center text-[10px] text-neutral-300 bg-white" data-ai-note>{EXAMPLE_AI_NOTE}</p>}
+        {watermark && <p className="py-4 text-center text-[11px] text-neutral-400 bg-[var(--color-cream)]" data-watermark>{watermarkText}</p>}
+        {aiNote && <p className="pb-3 text-center text-[10px] text-neutral-300 bg-[var(--color-cream)]" data-ai-note>{EXAMPLE_AI_NOTE}</p>}
       </div>
     </WeddingContext.Provider>
   );

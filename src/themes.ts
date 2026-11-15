@@ -138,23 +138,23 @@ export const THEMES: Record<string, Theme> = {
 
 export const DEFAULT_THEME = THEMES["classic-cream"];
 
-// 고객이 고르는 색상(팔레트). ""(고르지 않음)은 템플릿 기본색. 글자·배경 대비를 맞춰 둔 밝은 배경 5종.
+// 고객이 고르는 색상(팔레트). ""(고르지 않음)은 템플릿 기본색. 배경·글자 대비를 맞춰 둔 밝은 톤 5종(배경색까지 함께 바뀜).
 export const PALETTES: Record<string, { name: string; swatch: [string, string]; vars: Record<string, string> }> = {
   "": { name: "기본", swatch: ["#1c1c1a", "#ece9e3"], vars: {} },
   beige: {
-    name: "웜 베이지", swatch: ["#7a5c45", "#efe5da"],
-    vars: { "--color-primary": "#7a5c45", "--color-primary-light": "#b49a86", "--color-primary-dark": "#4d3727", "--color-accent": "#efe5da", "--color-gold": "#c2a06b", "--color-cream": "#fffdfa", "--color-warm-gray": "#a39385", "--color-text": "#3b2c22", "--color-text-light": "#7d6a5c" },
+    name: "웜 베이지", swatch: ["#7a5c45", "#f7f1e8"],
+    vars: { "--color-primary": "#7a5c45", "--color-primary-light": "#b49a86", "--color-primary-dark": "#4d3727", "--color-accent": "#e6d8c6", "--color-gold": "#c2a06b", "--color-cream": "#f7f1e8", "--color-warm-gray": "#a39385", "--color-text": "#3b2c22", "--section-alt": "#e9dccb", "--color-text-light": "#7d6a5c" },
   },
   rose: {
-    name: "더스티 로즈", swatch: ["#a24a62", "#f6e3e8"],
-    vars: { "--color-primary": "#a24a62", "--color-primary-light": "#d49aaa", "--color-primary-dark": "#6e2a3d", "--color-accent": "#f6e3e8", "--color-gold": "#c4a079", "--color-cream": "#fffdfd", "--color-warm-gray": "#ad9aa0", "--color-text": "#3a2229", "--color-text-light": "#85666e" },
+    name: "더스티 로즈", swatch: ["#a24a62", "#fbeff1"],
+    vars: { "--color-primary": "#a24a62", "--color-primary-light": "#d49aaa", "--color-primary-dark": "#6e2a3d", "--color-accent": "#efd3da", "--color-gold": "#c4a079", "--color-cream": "#fbeff1", "--color-warm-gray": "#ad9aa0", "--color-text": "#3a2229", "--section-alt": "#f0d6dc", "--color-text-light": "#85666e" },
   },
   sage: {
-    name: "세이지", swatch: ["#5d7352", "#e9eee4"],
-    vars: { "--color-primary": "#5d7352", "--color-primary-light": "#a3b596", "--color-primary-dark": "#3a4d31", "--color-accent": "#e9eee4", "--color-gold": "#b39a5f", "--color-cream": "#fcfdfa", "--color-warm-gray": "#98a08c", "--color-text": "#26301f", "--color-text-light": "#667060" },
+    name: "세이지", swatch: ["#5d7352", "#eff3ea"],
+    vars: { "--color-primary": "#5d7352", "--color-primary-light": "#a3b596", "--color-primary-dark": "#3a4d31", "--color-accent": "#d6e0cc", "--color-gold": "#b39a5f", "--color-cream": "#eff3ea", "--color-warm-gray": "#98a08c", "--color-text": "#26301f", "--section-alt": "#dce5d3", "--color-text-light": "#667060" },
   },
   blue: {
-    name: "스모키 블루", swatch: ["#4a6275", "#e4ebf0"],
-    vars: { "--color-primary": "#4a6275", "--color-primary-light": "#93a8b8", "--color-primary-dark": "#2b3d4d", "--color-accent": "#e4ebf0", "--color-gold": "#b09f75", "--color-cream": "#fcfdfe", "--color-warm-gray": "#8a99a5", "--color-text": "#1d2a35", "--color-text-light": "#5f7080" },
+    name: "스모키 블루", swatch: ["#4a6275", "#edf2f6"],
+    vars: { "--color-primary": "#4a6275", "--color-primary-light": "#93a8b8", "--color-primary-dark": "#2b3d4d", "--color-accent": "#d3e0ea", "--color-gold": "#b09f75", "--color-cream": "#edf2f6", "--color-warm-gray": "#8a99a5", "--color-text": "#1d2a35", "--section-alt": "#d8e3ec", "--color-text-light": "#5f7080" },
   },
 };
