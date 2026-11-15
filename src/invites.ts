@@ -10,14 +10,14 @@ export const INVITES: Record<string, WeddingData> = {
 
   // 템플릿 데모
   "demo-classic": demo("demo-classic", "mono"),
-  "demo-editorial": demo("demo-editorial", "editorial"),
-  "demo-minimal": demo("demo-minimal", "minimal"),
-  "demo-romantic": demo("demo-romantic", "romantic"),
-  "demo-twilight": demo("demo-twilight", "twilight"),
-  "demo-blossom": demo("demo-blossom", "blossom"),
-  "demo-modern": demo("demo-modern", "modern"),
-  "demo-luxury": demo("demo-luxury", "luxury"),
-  "demo-garden": demo("demo-garden", "garden"),
+  "demo-editorial": demo("demo-editorial", "mono"),
+  "demo-minimal": demo("demo-minimal", "mono"),
+  "demo-romantic": demo("demo-romantic", "mono"),
+  "demo-twilight": demo("demo-twilight", "mono"),
+  "demo-blossom": demo("demo-blossom", "mono"),
+  "demo-modern": demo("demo-modern", "mono"),
+  "demo-luxury": demo("demo-luxury", "mono"),
+  "demo-garden": demo("demo-garden", "mono"),
   "demo-mono": demo("demo-mono", "mono"),
 
   // 테마 데모 (같은 레이아웃, 다른 컬러)

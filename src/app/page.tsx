@@ -2,17 +2,12 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import InstallBanner from "@/components/InstallBanner";
 import DemoPhone from "@/components/DemoPhone";
-import { TEMPLATE_NAMES, TEMPLATE_TINT } from "@/lib/templateNames";
-import { exampleHref } from "@/lib/exampleInfo";
 import { exampleLive } from "@/lib/exampleCustomer";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/adminAuth";
 
-// 템플릿 격자 타일 (눌러서 해당 데모를 연다) — 실제 템플릿 목록·대표색에서 파생
-const TILES = Object.entries(TEMPLATE_NAMES).map(([id, label]) => ({ id, label, ...TEMPLATE_TINT[id] }));
-
 const STEPS = [
   { n: "01", title: "정보 입력", desc: "이름, 날짜, 장소와 사진을 채워요." },
-  { n: "02", title: "템플릿 선택", desc: `${TILES.length}가지 중 분위기에 맞게 골라요.` },
+  { n: "02", title: "색상 선택", desc: "원하는 색으로 청첩장 분위기를 맞춰요." },
   { n: "03", title: "링크 공유", desc: "카카오톡·문자로 링크 하나만 보내요." },
 ];
 
@@ -55,24 +50,9 @@ export default async function Home() {
       <section id="example" className="bg-soft border-y border-line py-9 lg:py-16 lg:px-[calc((100%-64rem)/2)] flex flex-col lg:flex-row lg:justify-center lg:gap-16 items-center gap-6 scroll-mt-14">
         <div className="px-6 text-center lg:text-left lg:w-80 lg:shrink-0 lg:px-0 flex flex-col gap-2">
           <h2 className="font-serif font-semibold text-2xl lg:text-3xl leading-snug tracking-tight">이런 청첩장을<br />하객이 받게 돼요</h2>
-          <p className="text-sm text-sub">실제 템플릿을 폰으로 직접 열어보세요</p>
+          <p className="text-sm text-sub">실제 청첩장을 폰으로 직접 열어보세요</p>
         </div>
         <DemoPhone live={live} />
-      </section>
-
-      {/* 템플릿 격자 */}
-      <section className="max-w-3xl lg:max-w-5xl mx-auto">
-        <p className="px-6 pt-8 pb-3 text-[13px] lg:pt-14 font-bold">모든 템플릿 둘러보기</p>
-        {/* 타일 9개 = 3열×3줄(모바일·태블릿) / 한 줄(PC). 개수가 바뀌면 빈칸이 안 생기게 열 수를 약수로 다시 맞출 것 */}
-        <div className="grid grid-cols-3 lg:grid-cols-9 gap-0.5 lg:px-6">
-          {TILES.map((t) => (
-            <Link key={t.id} href={exampleHref(t.id, live)} target="_blank" aria-label={`${t.label} 예시 보기`}
-              className="aspect-square flex items-center justify-center font-serif text-[13px] tracking-[0.08em]"
-              style={{ background: t.bg, color: t.fg }}>
-              {t.label}
-            </Link>
-          ))}
-        </div>
       </section>
 
       {/* 3단계 */}

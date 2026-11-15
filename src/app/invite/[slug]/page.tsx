@@ -74,9 +74,9 @@ export default async function InvitePage({
   let aiNote = false; // 랜딩 예시(example·demo-*)만
   let watermark = false; // 무료 고객의 청첩장만 (데모는 표시 안 함)
 
-  // 폐기된 클래식 공유 링크(/invite/classic?id=…)는 모노로 연다
-  const tpl = slug === "classic" ? "mono" : slug;
-  if ((query.file || query.id) && tpl in TEMPLATE_MAP) {
+  // 폐기된 템플릿의 옛 공유 링크(/invite/classic?id=… 등)는 모노로 연다
+  const tpl = slug in TEMPLATE_MAP ? slug : "mono";
+  if (query.file || query.id) {
     // 파일 기반 동적 렌더링: /invite/editorial?id=<공유 ID> (레거시: ?file=kim-minjun)
     const clientData = file ? readClientFile(file) : null;
     if (!file || !clientData) notFound();

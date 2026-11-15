@@ -44,7 +44,7 @@ function open(blob: string): WeddingData {
   // decrypt()는 실패 시 입력을 그대로 돌려주므로, 여전히 암호문이면 복호화 실패로 처리
   if (plain.startsWith("enc:")) throw new Error("고객 데이터를 복호화하지 못했습니다 (ENCRYPTION_KEY 확인)");
   const data = JSON.parse(plain) as WeddingData;
-  if ((data.template as string) === "classic") data.template = "mono"; // 폐기된 클래식 → 모노 (다시 저장될 때 반영)
+  data.template = "mono"; // 템플릿은 모노 하나 — 폐기된 옛 값은 읽을 때 모노로 (다시 저장될 때 반영)
   // 이후에 필드가 추가돼도 오래된 데이터가 깨지지 않게 빈 기본값과 병합 (groom/bride는 한 단계 더).
   // 데모용 샘플(김민준·이서연…)이 아니라 빈 값이어야, 없는 필드가 고객 청첩장에 남의 정보로 나오지 않는다.
   return { ...BLANK, ...data, groom: { ...BLANK.groom, ...data.groom }, bride: { ...BLANK.bride, ...data.bride }, date: { ...BLANK.date, ...data.date }, venue: { ...BLANK.venue, ...data.venue } };

@@ -18,7 +18,7 @@ export default function DemoPhone({ live = false }: { live?: boolean }) {
 
   return (
     <div className="flex flex-col items-center gap-6 w-full min-w-0">
-      <div className="flex gap-3 overflow-x-auto w-full px-6 pb-1 no-scrollbar" role="tablist" aria-label="예시 템플릿">
+      {ITEMS.length > 1 && <div className="flex gap-3 overflow-x-auto w-full px-6 pb-1 no-scrollbar" role="tablist" aria-label="예시 템플릿">
         {ITEMS.map((t) => {
           const on = t.id === id;
           return (
@@ -33,7 +33,7 @@ export default function DemoPhone({ live = false }: { live?: boolean }) {
             </button>
           );
         })}
-      </div>
+      </div>}
 
       <div className="relative rounded-[38px] border-[8px] border-ink bg-white overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,0.16)]"
         style={{ width: W + 16, height: 516 + 16 }}>

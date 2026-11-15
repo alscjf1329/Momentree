@@ -41,21 +41,8 @@ docker compose up --build
 
 ## 청첩장 템플릿
 
-9종의 완성된 템플릿을 제공하며, 어드민에서 고객마다 템플릿을 고르고 데이터를 입력하면 바로 청첩장이 생성됩니다.
-
-| id | 이름 | 무드 |
-|---|---|---|
-| `editorial` | 에디토리얼 | 모던 매거진, 다크 풀블리드 |
-| `minimal` | 미니멀 | 클린 화이트 |
-| `romantic` | 로맨틱 | 드리미 플로럴 |
-| `twilight` | 트와이라잇 | 시네마틱 다크 + 별빛 |
-| `blossom` | 블로섬 | 봄 벚꽃 |
-| `modern` | 모던 | 인스타 감성 |
-| `luxury` | 럭셔리 | 프리미엄 네이비 + 골드 |
-| `garden` | 가든 | 풀숲 히어로 + 캘리그래피, 갤러리·메시지월 포함 |
-| `mono` | 모노 | 흑백 모노크롬, 슬라이드 갤러리 |
-
-각 템플릿은 `src/templates/<id>/`에 구현되어 있고 `src/templates/registry.ts`에서 매핑됩니다.
+템플릿은 `mono`(모노) 하나입니다. 분위기는 고객이 편집 화면 상단의 "색상" 버튼에서 추천 색상 5종 또는 직접 고른 색(배경·글자·포인트)으로 정합니다(`src/themes.ts`).
+템플릿 컴포넌트는 `src/templates/mono/`, 매핑은 `src/templates/registry.ts`입니다. 예전에 있던 다른 템플릿(클래식 등)은 제거했고, 그 이름의 옛 공유 링크는 모노로 열립니다.
 청첩장 공유 URL 형식: `/invite/<template-id>?id=<공유 ID>` (기존 `?file=<고객파일명>` 링크도 계속 동작)
 
 ---
@@ -75,7 +62,7 @@ docker compose up --build
 |---|---|---|
 | 하객 현황 | `/admin` | RSVP 응답 조회, 인라인 수정/삭제 |
 | 고객 설정 (고객: 내 정보 설정) | `/admin/setup` | 스키마 기반 6단계 위저드로 청첩장 데이터 입력, 실시간 미리보기 |
-| 템플릿 | `/admin/templates` | 템플릿 갤러리에서 선택 → 자동 저장 |
+| 템플릿 | `/admin/templates` | 모노 선택 → 자동 저장 (새 고객은 여기서 시작) |
 
 ### 인증 방식
 
@@ -200,7 +187,7 @@ SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마
 
 고객 데이터 필드는 템플릿별 스키마(`src/templates/<id>.schema.ts`)로 정의되고, 설정 화면의 6단계 위저드(`src/app/admin/setup/SetupWizard.tsx`, 단계 구성은 `src/lib/setupSteps.ts`)가 이 스키마를 읽어 자동으로 입력 폼과 실시간 미리보기를 생성합니다. 새 필드를 추가하려면 스키마 파일에 필드를 선언하기만 하면 됩니다 — 폼 코드를 직접 수정할 필요가 없습니다.
 
-전용 스키마 파일이 없는 7종(editorial·minimal·romantic·twilight·blossom·modern·luxury)은 `garden.schema.ts`를 폴백으로 쓰되, 각 템플릿이 실제로 렌더링하지 않는 필드(`excludeTemplates`)는 폼에서 숨깁니다.
+알 수 없는 템플릿 이름은 모노 스키마로 봅니다. 화면이 렌더링하지 않는 필드는 `excludeTemplates` 로 폼에서 숨깁니다.
 
 ---
 
@@ -215,7 +202,7 @@ SQLite 단일 파일(`DATA_DIR/momentree.db`, WAL)에 저장됩니다. 스키마
 }
 ```
 
-템플릿 자체의 색상은 각 템플릿 컴포넌트 내부에서 관리됩니다.
+템플릿 기본색은 템플릿 컴포넌트 안에, 고객이 고르는 색은 `src/themes.ts` 의 `PALETTES`·`customPaletteVars` 가 정합니다.
 
 ---
 

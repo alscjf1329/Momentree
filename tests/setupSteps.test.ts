@@ -8,8 +8,7 @@ import { buildSteps, missingRequired, resolveIndex, stepForView, moveIndex, step
 const ids = Object.keys(TEMPLATE_NAMES);
 const keysOf = (id: string) => getSchemaForTemplate(id).sections.flatMap((s) => s.fields.map((f) => f.key));
 
-test("9개 템플릿 모두 스키마의 모든 항목이 정확히 한 단계에 속한다 (색상 항목은 상단 패널이라 제외)", () => {
-  assert.equal(ids.length, 9);
+test("모든 템플릿 스키마의 모든 항목이 정확히 한 단계에 속한다 (색상 항목은 상단 패널이라 제외)", () => {
   for (const id of ids) {
     const got = buildSteps(getSchemaForTemplate(id)).flatMap((st) => st.sections.flatMap((s) => s.fields.map((f) => f.key)));
     assert.deepEqual([...got].sort(), keysOf(id).filter((k) => !COLOR_KEYS.includes(k)).sort(), `${id}: 누락 또는 중복`);
@@ -39,7 +38,7 @@ test("비어 있는 단계는 건너뛴다", () => {
 });
 
 test("필수 남음 계산·단계 이동", () => {
-  const steps = buildSteps(getSchemaForTemplate("minimal"));
+  const steps = buildSteps(getSchemaForTemplate("mono"));
   assert.equal(missingRequired(steps[0], { groom: { name: "" }, bride: { name: "김" } }), 1);
   assert.equal(missingRequired(steps[0], { groom: { name: "홍" }, bride: { name: "김" } }), 0);
   assert.equal(resolveIndex(steps, null), 0);

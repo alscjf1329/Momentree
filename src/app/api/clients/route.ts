@@ -5,7 +5,7 @@ import { can } from "@/lib/access";
 import { isValidClientFilename } from "@/lib/newClient";
 import { deleteCustomer, getCustomer, getPlan, listCustomers, newCustomerFile, saveCustomer } from "@/lib/customers";
 import { EXAMPLE_FILE } from "@/lib/exampleInfo";
-import { canUseTemplate, photoLimit, PLAN_MSG } from "@/lib/plan";
+import { photoLimit, PLAN_MSG } from "@/lib/plan";
 
 // GET /api/clients               → 파일 목록 (customer는 자기 파일만)
 // GET /api/clients?detail=1      → 목록 + 표시 이름·소유자·예식일·수정일 (검색: &q=이메일/이름/예식일)
@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
   if (session.role !== "admin") {
     const plan = getPlan(filename) ?? "free";
     const d = body.data as WeddingData;
-    if (!canUseTemplate(plan, d?.template)) return NextResponse.json({ error: PLAN_MSG.template }, { status: 403 });
     if ((d?.gallery?.length ?? 0) > photoLimit(plan)) return NextResponse.json({ error: PLAN_MSG.photos(photoLimit(plan)) }, { status: 403 });
   }
 

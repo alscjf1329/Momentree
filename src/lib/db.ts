@@ -94,6 +94,8 @@ const MIGRATIONS: (string | ((db: Database.Database) => void))[] = [
   },
   // v6: 클래식 템플릿 폐기 — 기존 고객은 모노로 (암호화된 데이터 안의 값은 읽을 때 같은 규칙으로 바뀜)
   "UPDATE customers SET template = 'mono' WHERE template = 'classic'",
+  // v7: 템플릿은 모노 하나 — 다른 값이 남아 있으면 모노로 (같은 규칙을 읽을 때도 적용)
+  "UPDATE customers SET template = 'mono' WHERE template <> 'mono'",
 ];
 
 export function migrate(db: Database.Database): void {

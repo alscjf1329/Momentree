@@ -8,7 +8,7 @@ import { NextRequest } from "next/server";
 import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/adminAuth";
 import { WEDDING } from "@/content";
 import type { WeddingData } from "@/types";
-import { planOf, canUseTemplate, photoLimit, rsvpLimit, hasWatermark, canInviteMembers, FREE_TEMPLATES } from "@/lib/plan";
+import { planOf, photoLimit, rsvpLimit, hasWatermark, canInviteMembers } from "@/lib/plan";
 
 process.env.ADMIN_SESSION_SECRET = "test-secret";
 process.env.ENCRYPTION_KEY = Buffer.alloc(32, 7).toString("base64");
@@ -47,11 +47,6 @@ test("plan 순수 함수", () => {
   assert.equal(planOf({ plan: "paid" }), "paid");
   assert.equal(planOf({ plan: "x" }), "free");
   assert.equal(planOf(null), "free");
-  for (const t of FREE_TEMPLATES) assert.ok(canUseTemplate("free", t));
-  assert.deepEqual(FREE_TEMPLATES, ["mono", "minimal", "romantic"]);
-  assert.ok(!canUseTemplate("free", "luxury"));
-  assert.ok(!canUseTemplate("free", "classic")); // 폐기된 클래식은 고를 수 없다
-  assert.ok(canUseTemplate("paid", "luxury"));
   assert.deepEqual([photoLimit("free"), rsvpLimit("free"), hasWatermark("free"), canInviteMembers("free")], [5, 30, true, false]);
   assert.deepEqual([photoLimit("paid"), rsvpLimit("paid"), hasWatermark("paid"), canInviteMembers("paid")], [Infinity, Infinity, false, true]);
 });
@@ -70,16 +65,10 @@ test("서버 강제: 템플릿·사진·멤버 초대·RSVP (무료 제한, 유�
   const save = async (s: Sess, data: WeddingData) => (await clients.POST(await call("POST", "clients", s, { filename: "free@x.com", data }))).status;
 
   // 템플릿
-  assert.equal(await save(me, wedding({ template: "romantic" })), 200);
-  const r = await clients.POST(await call("POST", "clients", me, { data: wedding({ template: "luxury" }) }));
-  assert.equal(r.status, 403);
-  assert.match((await r.json()).error, /유료/);
-  assert.equal(store.getCustomer("free@x.com")!.template, "romantic");
-  // 폐기된 클래식은 저장할 수 없다 (기존 고객은 마이그레이션으로 모노가 됨)
-  assert.equal(await save(me, wedding({ template: "classic" })), 403);
+  assert.equal(await save(me, wedding({ template: "mono" })), 200);
   // 사진: 5장 OK, 6장 거부
-  assert.equal(await save(me, wedding({ template: "romantic", gallery: photos(6) })), 403);
-  assert.equal(await save(me, wedding({ template: "romantic", gallery: photos(5) })), 200);
+  assert.equal(await save(me, wedding({ template: "mono", gallery: photos(6) })), 403);
+  assert.equal(await save(me, wedding({ template: "mono", gallery: photos(5) })), 200);
   // 멤버 초대
   const inv = await members.POST(await call("POST", "members", me, { email: "b@x.com" }));
   assert.equal(inv.status, 403);
@@ -96,7 +85,7 @@ test("서버 강제: 템플릿·사진·멤버 초대·RSVP (무료 제한, 유�
   assert.equal((await guest(32, admin)).status, 200); // 관리자 대행은 제한 없음
 
   // 관리자 우회 (대행 편집)
-  assert.equal(await save(admin, wedding({ template: "luxury", gallery: photos(9) })), 200);
+  assert.equal(await save(admin, wedding({ template: "mono", gallery: photos(9) })), 200);
   assert.equal((await members.POST(await call("POST", "members", admin, { email: "b@x.com", file: "free@x.com" }))).status, 200);
 
   // 관리자만 플랜 전환 → 유료가 되면 제한 해제
@@ -105,7 +94,7 @@ test("서버 강제: 템플릿·사진·멤버 초대·RSVP (무료 제한, 유�
   assert.equal((await planRoute.POST(await plan(me, "paid"))).status, 401);
   assert.equal((await planRoute.POST(await plan(admin, "paid"))).status, 200);
   assert.equal(store.getPlan("free@x.com"), "paid");
-  assert.equal(await save(me, wedding({ template: "luxury", gallery: photos(9) })), 200);
+  assert.equal(await save(me, wedding({ template: "mono", gallery: photos(9) })), 200);
   assert.equal((await guest(33)).status, 200);
   assert.equal((await members.POST(await call("POST", "members", me, { email: "c@x.com" }))).status, 200);
   assert.ok(access.listMembers("free@x.com").length >= 3);
@@ -138,10 +127,10 @@ test("유료 만료: 예식일+3개월 직전/직후, 예식일 없음, 무료 �
   store.setPlan(none, "paid");
   assert.equal(store.getPlan(none, D("2099-01-01")), "paid"); // 예식일 없으면 만료 없음
   assert.equal(store.getPlan(mk("fr@x.com", "2020-01-01"), D("2099-01-01")), "free");
-  // 서버 강제: 만료 고객은 유료 템플릿 거부, 관리자는 우회
+  // 서버 강제: 만료 고객은 무료 한도(사진 5장) 적용, 관리자는 우회
   const old = mk("old2@x.com", "2020-01-01");
   store.setPlan(old, "paid");
-  const save = async (s: Sess) => (await clients.POST(await call("POST", "clients", s, { filename: old, data: wedding({ template: "luxury" }) }))).status;
+  const save = async (s: Sess) => (await clients.POST(await call("POST", "clients", s, { filename: old, data: wedding({ gallery: photos(9) }) }))).status;
   assert.equal(await save({ role: "customer", file: old, email: old }), 403);
   assert.equal(await save({ role: "admin", email: "a@x.com" }), 200);
 });

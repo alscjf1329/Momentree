@@ -76,7 +76,7 @@ test("AI 문구는 example·demo 경로에서만, 랜딩 링크는 id=example �
   const ctx = fs.readFileSync("src/context/WeddingContext.tsx", "utf8");
   assert.match(ctx, /aiNote && /);
   assert.ok(EXAMPLE_AI_NOTE);
-  for (const f of ["src/app/page.tsx", "src/components/DemoPhone.tsx"]) {
+  for (const f of ["src/components/DemoPhone.tsx"]) {
     const s = fs.readFileSync(f, "utf8");
     assert.match(s, /exampleHref\(/);
     assert.doesNotMatch(s, /\/invite\/demo-\$/);
