@@ -4,7 +4,7 @@ import { getByPath, type SectionSchema, type TemplateSchema } from "@/lib/schema
 export const STEP_TITLES = ["신랑 · 신부", "예식 일시 · 장소", "인사말", "사진", "축의금 계좌", "추가 안내"] as const;
 export const LAST_STEP = STEP_TITLES.length;
 
-const PHOTO = ["introBg", "gallery"];
+const PHOTO = ["introBg", "palette", "gallery"];
 const ACCOUNT = ["groom.accounts", "bride.accounts"];
 const BY_TITLE: Record<string, number> = {
   "신랑 정보": 1, "신부 정보": 1, "날짜 / 시간": 2, "장소": 2, "인사말": 3, "마음 전하실 곳 (계좌번호) 문구": 5,

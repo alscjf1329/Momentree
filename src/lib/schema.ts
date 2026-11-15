@@ -7,6 +7,7 @@ export type FieldType =
   | "image" // 드래그앤드롭/클릭 업로드 + 경로 직접 입력 (public/images/)
   | "file" // 이미지 외 파일 업로드 (예: 배경음악 mp3, public/audio/)
   | "encrypted-text" // 저장 시 암호화 대상 (입력 UI는 text와 동일)
+  | "palette" // 색상 견본 중 하나 고르기 (themes.ts PALETTES)
   | "datetime"; // 연/월/일/요일/시간 복합 위젯
 
 export interface FieldSchema {

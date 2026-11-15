@@ -19,6 +19,7 @@ export interface WeddingData {
   slug: string;
   template: string;
   theme: string;
+  palette?: string; // 고객이 고른 색상 (themes.ts PALETTES 키, 비어 있으면 템플릿 기본색)
   groom: PersonInfo;
   bride: PersonInfo;
   date: {

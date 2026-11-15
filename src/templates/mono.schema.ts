@@ -129,6 +129,12 @@ export const monoSchema: TemplateSchema = {
       ],
     },
     {
+      title: "색상",
+      fields: [
+        { key: "palette", type: "palette", label: "색상", common: true, helpText: "글자와 포인트 색이 함께 바뀌어요." },
+      ],
+    },
+    {
       title: "배경음악",
       fields: [
         { key: "bgm.title", type: "text", label: "제목", common: true },
