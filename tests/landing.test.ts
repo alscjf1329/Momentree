@@ -63,6 +63,8 @@ test("링크 미리보기: OG 이미지 주소 규칙, 고객 청첩장은 noind
   const h = (m: Record<string, string>) => ({ get: (k: string) => m[k] ?? null });
   assert.equal(originFrom(h({}), "https://site.kr/"), "https://site.kr");
   assert.equal(originFrom(h({ "x-forwarded-host": "a.kr", "x-forwarded-proto": "https" }), ""), "https://a.kr");
+  assert.equal(originFrom(h({ host: "momentree.shop" }), ""), "https://momentree.shop"); // 프로토콜 헤더가 없어도 https
+  assert.equal(originFrom(h({ host: "localhost:3000" }), ""), "http://localhost:3000");
   const invite = fs.readFileSync("src/app/invite/[slug]/page.tsx", "utf8");
   assert.match(invite, /isCustomer \? \{ robots: \{ index: false, follow: false \} \}/);
   const { default: robots } = await import("@/app/robots");
