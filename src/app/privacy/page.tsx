@@ -67,7 +67,7 @@ export default function PrivacyPage() {
         <ul>
           <li>이메일 발송: Google LLC(Gmail SMTP) — 인증 코드·공동 편집 초대 메일을 보낼 때 수신자 이메일과 메일 내용이 전달됩니다.</li>
           <li>웹 폰트: Google Fonts — 페이지를 열 때 브라우저가 Google 서버에서 폰트를 내려받으며, 이때 접속 정보(IP 등)가 Google에 전달될 수 있습니다.</li>
-          <li>서버 호스팅·인프라 사업자: <Tbd>서버 호스팅 업체 및 위치(국내/해외)</Tbd></li>
+          <li>서버 호스팅: 위탁 업체 없이 운영자가 직접 운영하는 국내 서버에 보관합니다.</li>
         </ul>
         <p>국외 이전 해당 여부와 고지 항목은 <Tbd>법률 검토 후 확정</Tbd>합니다.</p>
       </Sec>
